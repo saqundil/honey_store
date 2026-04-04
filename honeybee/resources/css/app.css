@@ -1,0 +1,427 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.hero-button {
+		@apply inline-flex items-center justify-center bg-honey-orange font-condensed text-sm font-bold uppercase tracking-[0.18em] text-white transition-opacity hover:opacity-90;
+	}
+
+	.product-shell {
+		@apply relative overflow-hidden rounded-[2rem] bg-white/90 shadow-[0px_24px_60px_rgba(0,0,0,0.08)] ring-1 ring-black/5 backdrop-blur-sm;
+	}
+
+	.product-panel {
+		@apply rounded-[1.75rem] bg-white p-6 shadow-[0px_18px_40px_rgba(0,0,0,0.05)] ring-1 ring-black/5 lg:p-7;
+	}
+
+	.product-chip {
+		@apply inline-flex items-center rounded-full border border-honey-orange/20 bg-honey-orange/10 px-3 py-1 font-condensed text-[11px] font-bold uppercase tracking-[0.18em] text-honey-dark;
+	}
+
+	.product-thumb {
+		@apply relative overflow-hidden rounded-[1.1rem] border border-black/8 bg-white transition-all duration-200;
+	}
+
+	.product-thumb.is-active {
+		@apply border-honey-orange shadow-[0px_14px_30px_rgba(195,97,34,0.16)];
+	}
+
+	.product-stepper-button {
+		@apply inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-xl font-bold text-honey-dark transition hover:border-honey-orange hover:text-honey-orange;
+	}
+
+	.product-summary-row {
+		@apply flex items-center justify-between gap-4 text-sm leading-6 text-honey-muted;
+	}
+
+	.figma-product-title {
+		@apply relative isolate overflow-hidden;
+	}
+
+	.figma-product-title__inner {
+		@apply flex min-h-[clamp(18rem,34vw,25rem)] flex-col justify-end gap-8 py-12 text-white sm:py-16 lg:flex-row lg:items-center lg:justify-between;
+	}
+
+	.figma-product-title__eyebrow {
+		@apply font-condensed text-sm font-bold uppercase tracking-[0.28em] text-white/85;
+	}
+
+	.figma-product-title__heading {
+		@apply mt-3 max-w-[12ch] font-condensed text-[clamp(2.6rem,8vw,4.5rem)] font-bold uppercase leading-[0.94] drop-shadow-[0_14px_34px_rgba(0,0,0,0.18)];
+	}
+
+	.figma-product-page {
+		@apply relative bg-[linear-gradient(180deg,#ffffff_0%,#fffaf5_100%)];
+	}
+
+	.figma-product-grid {
+		@apply grid gap-10 xl:grid-cols-[minmax(0,1.05fr)_minmax(19rem,29rem)] xl:items-start;
+	}
+
+	.figma-gallery-shell {
+		@apply grid gap-4 rounded-[2rem] border border-black/5 bg-white p-4 shadow-[0_24px_60px_rgba(44,27,11,0.08)] sm:p-5 lg:grid-cols-[88px_minmax(0,1fr)] lg:gap-6 lg:items-start;
+	}
+
+	.figma-gallery-strip {
+		@apply order-2 flex gap-3 overflow-x-auto pb-1 snap-x snap-mandatory lg:order-1 lg:grid lg:grid-cols-1 lg:gap-4 lg:overflow-visible lg:pb-0;
+	}
+
+	.figma-gallery-thumb {
+		@apply relative h-20 w-20 shrink-0 snap-start overflow-hidden rounded-2xl border border-black/5 bg-[#f7f3f0] shadow-[0_10px_26px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-0.5 hover:border-honey-orange/35 hover:shadow-[0_16px_34px_rgba(199,72,23,0.12)] lg:h-[88px] lg:w-[88px];
+	}
+
+	.figma-gallery-thumb.is-active {
+		@apply border-honey-orange shadow-[0_18px_36px_rgba(199,72,23,0.16)];
+	}
+
+	.figma-gallery-frame {
+		@apply relative order-1 aspect-[1/1] overflow-hidden rounded-[1.75rem] bg-[#f7f3f0] ring-1 ring-black/5 sm:aspect-[1/0.94] lg:order-2 xl:aspect-[1/1.02];
+	}
+
+	.figma-status-chip {
+		@apply absolute right-4 top-4 rounded-full bg-honey-orange px-3 py-1.5 font-condensed text-[12px] font-bold uppercase tracking-[0.15em] text-white shadow-[0_12px_28px_rgba(199,72,23,0.3)] sm:right-6 sm:top-6;
+	}
+
+	.figma-status-chip--small {
+		@apply right-4 top-4 text-[11px];
+	}
+
+	.figma-tab-shell {
+		@apply rounded-[2rem] border border-black/5 bg-white px-5 py-6 shadow-[0_20px_50px_rgba(44,27,11,0.05)] sm:px-6 sm:py-7;
+	}
+
+	.figma-tab-list {
+		@apply flex flex-wrap gap-3 border-b border-black/10 pb-5;
+	}
+
+	.figma-tab-button {
+		@apply rounded-full border border-transparent px-4 py-2.5 font-condensed text-sm font-bold uppercase tracking-[0.18em] text-honey-dark transition duration-200 hover:border-black/10 hover:bg-[#fffaf5] hover:text-honey-orange;
+	}
+
+	.figma-tab-button.is-active {
+		@apply border-honey-orange/15 bg-honey-orange/10 text-honey-orange;
+	}
+
+	.figma-tab-panel {
+		@apply pt-6;
+	}
+
+	.figma-copy {
+		@apply text-base leading-8 text-honey-grey sm:text-lg;
+	}
+
+	.figma-fact-card {
+		@apply rounded-[1.35rem] border border-black/5 bg-[#f7f3f0] px-5 py-5;
+	}
+
+	.figma-fact-card__label {
+		@apply font-condensed text-xs font-bold uppercase tracking-[0.22em] text-honey-orange;
+	}
+
+	.figma-fact-card__value {
+		@apply mt-3 text-base leading-7 text-honey-dark;
+	}
+
+	.figma-note-card {
+		@apply rounded-[1.15rem] border border-black/5 bg-[#f7f3f0] px-5 py-4 text-base leading-7 text-honey-dark;
+	}
+
+	.figma-review-card {
+		@apply rounded-[1.5rem] border border-black/5 bg-[#f7f3f0] px-6 py-7;
+	}
+
+	.figma-review-card__quote {
+		@apply text-lg leading-8 text-honey-grey;
+	}
+
+	.figma-summary-shell {
+		@apply self-start xl:sticky xl:top-24;
+	}
+
+	.figma-summary-card {
+		@apply rounded-[2rem] border border-black/5 bg-white p-5 shadow-[0_24px_70px_rgba(44,27,11,0.08)] sm:p-7;
+	}
+
+	.figma-kicker {
+		@apply font-condensed text-sm font-bold uppercase tracking-[0.22em] text-honey-orange;
+	}
+
+	.figma-product-name {
+		@apply mt-2 font-condensed text-[clamp(2.3rem,5vw,3.2rem)] font-bold uppercase leading-[0.96] text-honey-dark;
+	}
+
+	.figma-product-price {
+		@apply mt-5 font-condensed text-[clamp(2.3rem,6vw,3.75rem)] font-bold text-honey-orange;
+	}
+
+	.figma-purchase-row {
+		@apply grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(12rem,14rem)];
+	}
+
+	.figma-quantity-box {
+		@apply rounded-[1.35rem] border border-black/10 bg-[#fcfaf7] px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)];
+	}
+
+	.figma-quantity-box__label {
+		@apply mb-3 block text-base text-honey-grey;
+	}
+
+	.figma-quantity-box__controls {
+		@apply flex items-center justify-between gap-3;
+	}
+
+	.figma-quantity-box__button {
+		@apply inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-2xl text-honey-dark shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition duration-200 hover:-translate-y-0.5 hover:text-honey-orange;
+	}
+
+	.figma-quantity-box__input {
+		@apply w-20 border-0 bg-transparent p-0 text-center text-lg text-honey-dark outline-none;
+	}
+
+	.figma-cart-button {
+		@apply inline-flex min-h-[62px] items-center justify-center rounded-[1.35rem] bg-honey-orange px-6 font-condensed text-sm font-bold uppercase tracking-[0.2em] text-white shadow-[0_18px_35px_rgba(199,72,23,0.22)] transition duration-200 hover:-translate-y-0.5 hover:opacity-95;
+	}
+
+	.figma-order-card {
+		@apply rounded-[1.5rem] border border-black/5 bg-[#f7f3f0] p-5;
+	}
+
+	.figma-order-card__header {
+		@apply flex flex-wrap items-center justify-between gap-3;
+	}
+
+	.figma-order-card__header h3 {
+		@apply font-condensed text-xl font-bold uppercase text-honey-dark;
+	}
+
+	.figma-order-card__header span {
+		@apply font-condensed text-xs font-bold uppercase tracking-[0.18em] text-honey-orange;
+	}
+
+	.figma-form-label {
+		@apply mb-2 block font-condensed text-xs font-bold uppercase tracking-[0.18em] text-honey-dark;
+	}
+
+	.figma-form-heading {
+		@apply font-condensed text-xl font-bold uppercase text-honey-dark;
+	}
+
+	.figma-form-input,
+	.figma-form-textarea {
+		@apply w-full rounded-[1rem] border border-black/10 bg-[#f7f3f0] px-4 py-3.5 text-honey-dark outline-none transition duration-200 placeholder:text-honey-muted focus:border-honey-orange focus:bg-white focus:ring-4 focus:ring-honey-orange/10;
+	}
+
+	.figma-meta-stack {
+		@apply space-y-2 border-t border-black/10 pt-6;
+	}
+
+	.figma-meta-row {
+		@apply flex items-start justify-between gap-4 text-sm leading-7 text-honey-grey;
+	}
+
+	.figma-meta-row span:first-child {
+		@apply text-honey-muted;
+	}
+
+	.figma-meta-row span:last-child {
+		@apply text-right text-honey-dark;
+	}
+
+	.figma-share-row {
+		@apply flex flex-wrap items-center justify-between gap-4 border-t border-black/10 pt-6 text-[15px] text-honey-muted;
+	}
+
+	.figma-share-icons {
+		@apply flex items-center gap-3;
+	}
+
+	.figma-share-icons a {
+		@apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-honey-orange font-condensed text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_12px_24px_rgba(199,72,23,0.2)] transition duration-200 hover:-translate-y-0.5 hover:opacity-95;
+	}
+
+	.figma-submit-button {
+		@apply inline-flex min-h-[56px] items-center justify-center rounded-[1rem] bg-honey-gold px-8 py-3 font-condensed text-sm font-bold uppercase tracking-[0.2em] text-white shadow-[0_16px_30px_rgba(212,161,58,0.2)] transition duration-200 hover:-translate-y-0.5 hover:opacity-95;
+	}
+
+	.figma-whatsapp-button {
+		@apply inline-flex min-h-[56px] items-center justify-center rounded-[1rem] border border-[#25D366]/30 bg-[#25D366]/10 px-8 py-3 font-condensed text-sm font-bold uppercase tracking-[0.2em] text-[#1b7f46] transition duration-200 hover:-translate-y-0.5 hover:bg-[#25D366]/15;
+	}
+
+	.figma-related-section {
+		@apply bg-[linear-gradient(180deg,#fffaf5_0%,#f7f3f0_100%)];
+	}
+
+	.figma-related-card {
+		@apply overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(44,27,11,0.12)];
+	}
+
+	.figma-related-card__media {
+		@apply relative aspect-square overflow-hidden bg-[#f3eeea];
+	}
+
+	.figma-related-card__content {
+		@apply px-5 pb-6 pt-5 text-center;
+	}
+
+	.figma-related-card__content h3 {
+		@apply font-condensed text-[1.65rem] font-bold uppercase text-honey-dark;
+	}
+
+	.figma-related-card__content p {
+		@apply mt-2 font-condensed text-[1.35rem] font-bold text-honey-orange;
+	}
+
+	.figma-related-card__content a {
+		@apply mt-5 inline-flex font-condensed text-xs font-bold uppercase tracking-[0.18em] text-honey-dark transition-colors hover:text-honey-orange;
+	}
+
+	.figma-gallery-frame img,
+	.figma-related-card__media img {
+		@apply transition duration-500;
+	}
+
+	.figma-related-card:hover .figma-related-card__media img {
+		transform: scale(1.04);
+	}
+
+	.figma-gallery-thumb:focus-visible,
+	.figma-tab-button:focus-visible,
+	.figma-cart-button:focus-visible,
+	.figma-submit-button:focus-visible,
+	.figma-whatsapp-button:focus-visible,
+	.figma-share-icons a:focus-visible,
+	.figma-quantity-box__button:focus-visible {
+		outline: 2px solid rgba(199, 72, 23, 0.7);
+		outline-offset: 3px;
+	}
+
+	html[dir="rtl"] .product-form-grid {
+		direction: rtl;
+	}
+
+	html[dir="rtl"] .figma-product-title__inner,
+	html[dir="rtl"] .figma-product-grid,
+	html[dir="rtl"] .figma-tab-list,
+	html[dir="rtl"] .figma-share-row,
+	html[dir="rtl"] .figma-purchase-row {
+		direction: rtl;
+	}
+
+	html[dir="rtl"] .figma-meta-row span:last-child {
+		text-align: left;
+	}
+
+	.hero-flight-path {
+		fill: none;
+		stroke: rgba(19, 19, 19, 0.13);
+		stroke-dasharray: 8 12;
+		stroke-linecap: round;
+		stroke-width: 2.5;
+	}
+
+	.hero-bee {
+		transform-origin: center;
+		user-select: none;
+		will-change: transform;
+	}
+
+	.hero-bee--float-fast {
+		animation: hero-bee-float-fast 4.8s ease-in-out infinite;
+	}
+
+	.hero-bee--float-medium {
+		animation: hero-bee-float-medium 6s ease-in-out infinite;
+	}
+
+	.hero-bee--float-large {
+		animation: hero-bee-float-large 7.2s ease-in-out infinite;
+	}
+}
+
+@keyframes hero-bee-float-fast {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0) rotate(0deg);
+	}
+
+	50% {
+		transform: translate3d(0, -10px, 0) rotate(-7deg);
+	}
+}
+
+@keyframes hero-bee-float-medium {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0) rotate(0deg);
+	}
+
+	50% {
+		transform: translate3d(0, 13px, 0) rotate(6deg);
+	}
+}
+
+@keyframes hero-bee-float-large {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0) rotate(0deg);
+	}
+
+	50% {
+		transform: translate3d(0, -15px, 0) rotate(8deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-bee--float-fast,
+	.hero-bee--float-medium,
+	.hero-bee--float-large {
+		animation: none;
+	}
+}
+
+@media (max-width: 1023px) {
+	.figma-product-title__inner {
+		min-height: 18rem;
+	}
+
+	.figma-summary-shell {
+		position: static;
+	}
+
+	.figma-gallery-strip {
+		scrollbar-width: none;
+	}
+
+	.figma-gallery-strip::-webkit-scrollbar {
+		display: none;
+	}
+
+	.figma-share-row {
+		justify-content: flex-start;
+	}
+
+	html[dir="rtl"] .figma-share-row {
+		justify-content: flex-start;
+	}
+}
+
+@media (max-width: 639px) {
+	.figma-product-grid {
+		gap: 2rem;
+	}
+
+	.figma-summary-card,
+	.figma-tab-shell,
+	.figma-gallery-shell {
+		border-radius: 1.5rem;
+	}
+
+	.figma-purchase-row {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.figma-share-icons {
+		width: 100%;
+	}
+}
