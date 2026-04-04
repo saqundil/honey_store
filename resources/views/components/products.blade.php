@@ -5,7 +5,7 @@
 
 @php($productsBackground = asset('images/Section.png'))
 
-<section id="products" class="relative overflow-hidden bg-honey-cream py-20 lg:py-28">
+<section id="products" class="relative scroll-mt-[116px] overflow-hidden bg-honey-cream py-20 xl:scroll-mt-[137px] lg:py-28">
 
     <img src="{{ $productsBackground }}"
          alt=""

@@ -21,7 +21,7 @@
                class="px-5 py-1 font-condensed text-[15px] font-bold uppercase tracking-[0.22em] text-honey-nav transition-colors hover:text-honey-orange xl:px-7">
                 {{ __('home.nav.pages') }}
             </a>
-            <a href="{{ url('/products') }}"
+            <a href="{{ route('home') }}#products"
                class="px-5 py-1 font-condensed text-[15px] font-bold uppercase tracking-[0.22em] text-honey-nav transition-colors hover:text-honey-orange xl:px-7">
                 {{ __('home.nav.products') }}
             </a>
@@ -87,7 +87,7 @@
         <nav class="flex flex-col gap-1 pt-4">
             <a href="{{ route('home') }}"       class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-orange">{{ __('home.nav.home') }}</a>
             <a href="{{ url('/pages') }}"  class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav hover:text-honey-orange">{{ __('home.nav.pages') }}</a>
-            <a href="{{ url('/products') }}" class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav hover:text-honey-orange">{{ __('home.nav.products') }}</a>
+            <a href="{{ route('home') }}#products" class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav hover:text-honey-orange">{{ __('home.nav.products') }}</a>
             <a href="{{ url('/blog') }}"   class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav hover:text-honey-orange">{{ __('home.nav.blog') }}</a>
             <a href="{{ url('/portfolio') }}" class="py-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav hover:text-honey-orange">{{ __('home.nav.portfolio') }}</a>
             <div class="flex items-center gap-3 pt-2 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav">

@@ -42,7 +42,7 @@
                          {{ __('home.hero.description') }}
                     </p>
 
-                    <a href="{{ url('/products') }}" class="hero-button mt-10 px-8 py-3.5 xl:mt-12 xl:px-[2.3125rem] xl:py-[0.9375rem]">
+                    <a href="{{ route('home') }}#products" class="hero-button mt-10 px-8 py-3.5 xl:mt-12 xl:px-[2.3125rem] xl:py-[0.9375rem]">
                          {{ __('home.hero.cta') }}
                     </a>
                </div>
@@ -146,7 +146,7 @@
                          {{ __('home.hero.title') }}
                     </h1>
 
-                      <a href="{{ url('/products') }}" class="hero-button mt-7 px-8 py-3.5">
+                      <a href="{{ route('home') }}#products" class="hero-button mt-7 px-8 py-3.5">
                          {{ __('home.hero.cta') }}
                     </a>
                     <div data-hero-bee-swoop

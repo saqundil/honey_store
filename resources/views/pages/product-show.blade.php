@@ -87,7 +87,7 @@
             <div class="mb-8 flex flex-wrap items-center gap-3 text-sm text-honey-muted md:mb-10">
                 <a href="{{ route('home') }}" class="transition-colors hover:text-honey-orange">{{ __('home.nav.home') }}</a>
                 <span>/</span>
-                <a href="{{ route('products.index') }}" class="transition-colors hover:text-honey-orange">{{ __('home.products.heading') }}</a>
+                <a href="{{ route('home') }}#products" class="transition-colors hover:text-honey-orange">{{ __('home.products.heading') }}</a>
                 <span>/</span>
                 <span class="text-honey-dark">{{ $product['name'] }}</span>
             </div>
