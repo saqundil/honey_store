@@ -17,7 +17,7 @@
     </section>
 
     {{-- 3. Products --}}
-    <x-products />
+    <x-products :products="$products" />
 
     {{-- 4. Testimonial + Gallery --}}
     <x-testimonial />

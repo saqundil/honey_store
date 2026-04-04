@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -11,20 +13,23 @@ class ProductController extends Controller
 {
     public function show(string $slug): View
     {
-        $product = $this->findProduct($slug);
-
-        abort_unless($product !== null, 404);
+        $product = Product::active()->where('slug', $slug)->firstOrFail();
+        $relatedProducts = Product::active()
+            ->where('id', '!=', $product->id)
+            ->limit(4)
+            ->get()
+            ->map(fn (Product $relatedProduct) => $relatedProduct->toLocalizedArray())
+            ->all();
 
         return view('pages.product-show', [
-            'product' => $product,
+            'product' => $product->toLocalizedArray(),
+            'relatedProducts' => $relatedProducts,
         ]);
     }
 
     public function order(Request $request, string $slug): RedirectResponse
     {
-        $product = $this->findProduct($slug);
-
-        abort_unless($product !== null, 404);
+        $product = Product::active()->where('slug', $slug)->firstOrFail();
 
         $validated = $request->validate([
             'customer_name' => ['required', 'string', 'max:120'],
@@ -34,27 +39,33 @@ class ProductController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $order = Order::create([
+            'product_id' => $product->id,
+            'customer_name' => $validated['customer_name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'quantity' => $validated['quantity'],
+            'notes' => $validated['notes'] ?? null,
+            'locale' => app()->getLocale(),
+            'unit_price' => $product->price_value,
+            'total_price' => (float) $product->price_value * (int) $validated['quantity'],
+            'currency' => $product->currency,
+            'currency_position' => $product->currency_position,
+            'price_decimals' => $product->price_decimals,
+            'status' => 'pending',
+        ]);
+
+        $productData = $product->toLocalizedArray();
+
         Log::info('Product order request received.', [
-            'product' => $product['slug'],
+            'order_id' => $order->id,
+            'product' => $product->slug,
             'locale' => app()->getLocale(),
             'order' => $validated,
         ]);
 
         return redirect()
             ->route('products.show', ['slug' => $slug])
-            ->with('order_success', __('home.product_page.order_success', ['product' => $product['name']]));
-    }
-
-    private function findProduct(string $slug): ?array
-    {
-        $products = trans('home.products.items');
-
-        foreach ($products as $product) {
-            if (($product['slug'] ?? null) === $slug) {
-                return $product;
-            }
-        }
-
-        return null;
+            ->with('order_success', __('home.product_page.order_success', ['product' => $productData['name']]));
     }
 }

@@ -1,6 +1,6 @@
 {{-- resources/views/components/products.blade.php --}}
 @props([
-    'products' => trans('home.products.items')
+    'products' => []
 ])
 
 @php($productsBackground = asset('images/Section.png'))

@@ -18,10 +18,7 @@
             ->take(5)
             ->values()
             ->all();
-        $relatedProducts = collect(trans('home.products.items'))
-            ->reject(fn (array $item) => ($item['slug'] ?? null) === ($product['slug'] ?? null))
-            ->take(4)
-            ->values();
+        $relatedProducts = collect($relatedProducts ?? [])->values();
         $relatedVisuals = [
             'images/product-figma/related-1.png',
             'images/product-figma/related-2.png',
