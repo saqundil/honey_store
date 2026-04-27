@@ -1,7 +1,7 @@
 {{-- resources/views/components/hero.blade.php --}}
 <section class="relative overflow-hidden bg-honey-cream" data-hero-scene>
      <div class="mx-auto hidden w-full max-w-[1920px] lg:block">
-          <div class="relative h-[calc(100vh_-_96px)] min-h-[540px] max-h-[760px] overflow-hidden xl:h-[calc(100vh_-_117px)] xl:min-h-[580px] xl:max-h-[820px]">
+          <div class="relative h-[calc(100vh_-_80px)] min-h-[540px] max-h-[760px] overflow-hidden lg:h-[calc(100vh_-_96px)] lg:min-h-[580px] xl:max-h-[820px]">
                <svg viewBox="0 0 1920 980"
                      aria-hidden="true"
                      class="pointer-events-none absolute inset-0 h-full w-full opacity-0">
@@ -92,7 +92,7 @@
      </div>
 
           <div class="w-full lg:hidden">
-              <div class="relative h-[calc(100dvh_-_96px)] min-h-[calc(100vh_-_96px)] overflow-hidden border-t border-black/5 bg-honey-cream">
+              <div class="relative h-[calc(100dvh_-_80px)] min-h-[calc(100vh_-_80px)] overflow-hidden border-t border-black/5 bg-honey-cream">
                <svg viewBox="0 0 390 760"
                     aria-hidden="true"
                     class="pointer-events-none absolute inset-0 h-full w-full opacity-0">

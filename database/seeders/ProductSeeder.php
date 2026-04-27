@@ -19,6 +19,8 @@ class ProductSeeder extends Seeder
         $slugs = $englishProducts->keys()->merge($arabicProducts->keys())->unique()->values();
 
         DB::transaction(function () use ($slugs, $englishProducts, $arabicProducts): void {
+            Product::query()->whereNotIn('slug', $slugs)->delete();
+
             foreach ($slugs as $index => $slug) {
                 $englishProduct = $englishProducts->get($slug, []);
                 $arabicProduct = $arabicProducts->get($slug, []);

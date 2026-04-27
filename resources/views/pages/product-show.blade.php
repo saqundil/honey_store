@@ -299,6 +299,20 @@
 
                             <p class="text-sm leading-7 text-honey-muted">{{ __('home.product_page.whatsapp_hint') }}</p>
                             <p class="text-sm leading-7 text-honey-muted">{{ __('home.product_page.form.disclaimer') }}</p>
+
+                            {{-- Trust Signals --}}
+                            <div class="mt-2 grid grid-cols-3 gap-3 border-t border-black/5 pt-6">
+                                @foreach (__('home.product_page.micro_benefits') as $benefit)
+                                    <div class="flex flex-col items-center gap-2 text-center">
+                                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-honey-gold/12">
+                                            <svg class="h-4 w-4 text-honey-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </span>
+                                        <span class="font-condensed text-[11px] font-bold uppercase tracking-[0.12em] text-honey-muted">{{ $benefit }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
                         </form>
                     </div>
                 </aside>
@@ -306,40 +320,42 @@
         </div>
     </section>
 
-    <section class="figma-related-section">
-        <div class="mx-auto max-w-[1130px] px-6 py-16 lg:py-20">
-            <div class="mx-auto max-w-3xl text-center">
-                <h2 class="font-condensed text-5xl font-bold uppercase text-honey-dark">{{ __('home.products.heading') }}</h2>
-                <p class="mt-4 text-lg leading-8 text-honey-grey">{{ __('home.product_page.related_description') }}</p>
-            </div>
+    @if ($relatedProducts->isNotEmpty())
+        <section class="figma-related-section">
+            <div class="mx-auto max-w-[1130px] px-6 py-16 lg:py-20">
+                <div class="mx-auto max-w-3xl text-center">
+                    <h2 class="font-condensed text-5xl font-bold uppercase text-honey-dark">{{ __('home.products.heading') }}</h2>
+                    <p class="mt-4 text-lg leading-8 text-honey-grey">{{ __('home.product_page.related_description') }}</p>
+                </div>
 
-            <div class="mt-12 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-                @foreach ($relatedProducts as $index => $relatedProduct)
-                    <article class="figma-related-card">
-                        <div class="figma-related-card__media">
-                            <img src="{{ asset($relatedVisuals[$index] ?? $relatedProduct['image']) }}"
-                                 alt="{{ $relatedProduct['name'] }}"
-                                   loading="lazy"
-                                   decoding="async"
-                                   width="420"
-                                   height="420"
-                                   sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
-                                 class="h-full w-full object-cover">
+                <div class="mt-12 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+                    @foreach ($relatedProducts as $index => $relatedProduct)
+                        <article class="figma-related-card">
+                            <div class="figma-related-card__media">
+                                <img src="{{ asset($relatedVisuals[$index] ?? $relatedProduct['image']) }}"
+                                     alt="{{ $relatedProduct['name'] }}"
+                                       loading="lazy"
+                                       decoding="async"
+                                       width="420"
+                                       height="420"
+                                       sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
+                                     class="h-full w-full object-cover">
 
-                            @if (!empty($relatedProduct['badge']))
-                                <span class="figma-status-chip figma-status-chip--small">{{ $relatedProduct['badge'] }}</span>
-                            @endif
-                        </div>
-                        <div class="figma-related-card__content">
-                            <h3>{{ $relatedProduct['name'] }}</h3>
-                            <p>{{ $relatedProduct['price'] }}</p>
-                            <a href="{{ route('products.show', ['slug' => $relatedProduct['slug']]) }}">{{ __('home.products.view_and_order') }}</a>
-                        </div>
-                    </article>
-                @endforeach
+                                @if (!empty($relatedProduct['badge']))
+                                    <span class="figma-status-chip figma-status-chip--small">{{ $relatedProduct['badge'] }}</span>
+                                @endif
+                            </div>
+                            <div class="figma-related-card__content">
+                                <h3>{{ $relatedProduct['name'] }}</h3>
+                                <p>{{ $relatedProduct['price'] }}</p>
+                                <a href="{{ route('products.show', ['slug' => $relatedProduct['slug']]) }}">{{ __('home.products.view_and_order') }}</a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

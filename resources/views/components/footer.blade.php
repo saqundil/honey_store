@@ -1,12 +1,18 @@
 @php
     $products = collect(trans('home.products.items'))->take(6);
     $articles = collect(trans('home.news.articles'))->take(3);
-    $hiveLinks = trans('home.footer.hive_links');
     $footerBackground = asset('images/Footer [qodef-page-footer].webp');
     $phoneValue = __('home.footer.phone_value');
     $emailValue = __('home.footer.email');
     $phoneHref = preg_replace('/[^\d+]/', '', $phoneValue);
     $followLabel = app()->isLocale('ar') ? 'تابعنا' : 'Follow us';
+    $hiveLinks = [
+        ['label' => __('home.footer.hive_links.0'), 'route' => route('about')],
+        ['label' => __('home.footer.hive_links.1'), 'route' => route('contact')],
+        ['label' => __('home.footer.hive_links.2'), 'route' => route('faq')],
+        ['label' => __('home.footer.hive_links.3'), 'route' => route('shipping')],
+        ['label' => __('home.footer.hive_links.4'), 'route' => route('privacy')],
+    ];
 @endphp
 
 <footer class="relative overflow-hidden border-t border-[#8b5e22]/20 bg-[#d3a863] text-[#2f2416]" aria-labelledby="site-footer-heading">
@@ -150,7 +156,12 @@
 
                 <ul class="space-y-2 text-[15px] leading-7 text-[#4a3a24]" role="list">
                     @foreach ($hiveLinks as $item)
-                        <li class="rounded-lg py-1">{{ $item }}</li>
+                        <li>
+                            <a href="{{ $item['route'] }}"
+                               class="inline-flex rounded-lg py-1 transition duration-200 hover:text-[#8b5e22] focus:outline-none focus:text-[#8b5e22]">
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
                     @endforeach
                 </ul>
             </nav>
@@ -166,7 +177,15 @@
                 </span>
             </div>
 
-            <p class="text-center text-[12px] leading-6 text-[#6f5226] md:text-right">
+            <div class="flex flex-wrap items-center gap-4 text-[12px] text-[#6f5226]">
+                <a href="{{ route('privacy') }}" class="transition-colors hover:text-[#8b5e22]">{{ __('pages.privacy.title') }}</a>
+                <span class="text-[#8b5e22]/30">·</span>
+                <a href="{{ route('terms') }}" class="transition-colors hover:text-[#8b5e22]">{{ __('pages.terms.title') }}</a>
+                <span class="text-[#8b5e22]/30">·</span>
+                <a href="{{ route('shipping') }}" class="transition-colors hover:text-[#8b5e22]">{{ __('pages.shipping.title') }}</a>
+            </div>
+
+            <p class="text-center text-[12px] leading-6 text-[#6f5226] {{ app()->isLocale('ar') ? 'md:text-left' : 'md:text-right' }}">
                 &copy; {{ date('Y') }} {{ __('home.footer.copyright_owner') }} {{ __('home.footer.all_rights_reserved') }}
             </p>
         </div>
