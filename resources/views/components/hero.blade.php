@@ -1,5 +1,9 @@
 {{-- resources/views/components/hero.blade.php --}}
-<section class="relative overflow-hidden bg-honey-cream" data-hero-scene>
+@php
+     $isArabic = app()->isLocale('ar');
+@endphp
+
+<section class="relative overflow-hidden bg-[#fbf7f1]" data-hero-scene>
      <div class="mx-auto hidden w-full max-w-[1920px] lg:block">
           <div class="relative h-[calc(100vh_-_80px)] min-h-[540px] max-h-[760px] overflow-hidden lg:h-[calc(100vh_-_96px)] lg:min-h-[580px] xl:max-h-[820px]">
                <svg viewBox="0 0 1920 980"
@@ -34,9 +38,15 @@
                          {{ __('home.hero.eyebrow') }}
                     </p>
 
-                    <h1 class="mt-6 font-condensed text-[clamp(4.25rem,6.2vw,7rem)] font-bold uppercase leading-[0.83] tracking-[0.01em] text-honey-dark">
-                         {{ __('home.hero.title') }}
-                    </h1>
+                         @if ($isArabic)
+                              <h1 class="mt-6 font-condensed font-bold uppercase text-honey-dark" style="font-size: clamp(3.55rem, 5.2vw, 5.85rem); line-height: 1; letter-spacing: 0;">
+                                   {{ __('home.hero.title') }}
+                              </h1>
+                         @else
+                              <h1 class="mt-6 font-condensed font-bold uppercase text-honey-dark" style="font-size: clamp(4.25rem, 6.2vw, 7rem); line-height: 0.83; letter-spacing: 0.01em;">
+                                   {{ __('home.hero.title') }}
+                              </h1>
+                         @endif
 
                     <p class="mt-8 max-w-[28rem] text-base leading-[1.8] text-honey-grey xl:max-w-[30rem] xl:text-[17px] xl:leading-[1.75]">
                          {{ __('home.hero.description') }}
@@ -92,7 +102,7 @@
      </div>
 
           <div class="w-full lg:hidden">
-              <div class="relative h-[calc(100dvh_-_80px)] min-h-[calc(100vh_-_80px)] overflow-hidden border-t border-black/5 bg-honey-cream">
+              <div class="relative h-[calc(100dvh_-_80px)] min-h-[calc(100vh_-_80px)] overflow-hidden border-t border-black/5 bg-[#fbf7f1]">
                <svg viewBox="0 0 390 760"
                     aria-hidden="true"
                     class="pointer-events-none absolute inset-0 h-full w-full opacity-0">
@@ -142,9 +152,15 @@
                                  alt="{{ __('home.hero.product_alt') }}"
                                  class="mb-6 w-full max-w-[13.5rem] select-none sm:max-w-[15rem]">
 
-                           <h1 class="max-w-[10ch] font-condensed text-[clamp(3.25rem,16vw,5.4rem)] font-bold uppercase leading-[0.82] tracking-[0.01em] text-honey-dark">
+                                                                  @if ($isArabic)
+                                                                      <h1 class="max-w-[10ch] font-condensed font-bold uppercase text-honey-dark" style="font-size: clamp(2.95rem, 11.5vw, 4.15rem); line-height: 1; letter-spacing: 0;">
                          {{ __('home.hero.title') }}
                     </h1>
+                                                                  @else
+                                                                      <h1 class="max-w-[10ch] font-condensed font-bold uppercase text-honey-dark" style="font-size: clamp(3.25rem, 16vw, 5.4rem); line-height: 0.82; letter-spacing: 0.01em;">
+                         {{ __('home.hero.title') }}
+                    </h1>
+                                                                  @endif
 
                       <a href="{{ route('home') }}#products" class="hero-button mt-7 px-8 py-3.5">
                          {{ __('home.hero.cta') }}

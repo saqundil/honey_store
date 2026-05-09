@@ -11,15 +11,29 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        // Refresh the MySQL connection after schema changes so prepared statements
+        // from the migration phase do not leak into the seeding phase.
+        DB::purge();
+        DB::reconnect();
+
         $english = require lang_path('en/home.php');
         $arabic = require lang_path('ar/home.php');
 
         $englishProducts = collect(data_get($english, 'products.items', []))->keyBy('slug');
         $arabicProducts = collect(data_get($arabic, 'products.items', []))->keyBy('slug');
         $slugs = $englishProducts->keys()->merge($arabicProducts->keys())->unique()->values();
+        $slugList = $slugs->all();
 
-        DB::transaction(function () use ($slugs, $englishProducts, $arabicProducts): void {
-            Product::query()->whereNotIn('slug', $slugs)->delete();
+        DB::transaction(function () use ($slugs, $slugList, $englishProducts, $arabicProducts): void {
+            Product::query()
+                ->select(['id', 'slug'])
+                ->get()
+                ->reject(fn (Product $product) => in_array($product->slug, $slugList, true))
+                ->pluck('id')
+                ->chunk(100)
+                ->each(function ($ids): void {
+                    Product::query()->whereKey($ids->all())->delete();
+                });
 
             foreach ($slugs as $index => $slug) {
                 $englishProduct = $englishProducts->get($slug, []);
@@ -61,6 +75,9 @@ class ProductSeeder extends Seeder
             'name' => Arr::get($product, 'name', ''),
             'excerpt' => Arr::get($product, 'excerpt', ''),
             'description' => Arr::get($product, 'description', ''),
+            'compare_at_price_value' => filled(Arr::get($product, 'compare_at_price_value'))
+                ? (float) Arr::get($product, 'compare_at_price_value')
+                : null,
             'origin' => Arr::get($product, 'origin', ''),
             'texture' => Arr::get($product, 'texture', ''),
             'size' => Arr::get($product, 'size', ''),

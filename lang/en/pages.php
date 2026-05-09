@@ -92,7 +92,7 @@ return [
             ],
             [
                 'question' => 'What makes White Sainfoin Honey special?',
-                'answer' => 'White Sainfoin Honey is one of the rarest honey varieties in the world. It has a distinctive pearl-white color, a luxuriously creamy texture, and a delicate floral taste. It crystallizes naturally into a smooth, butter-like consistency.',
+                'answer' => 'White Sainfoin Honey is known for its distinctive pearl-white color, luxuriously creamy texture, and delicate floral taste. It crystallizes naturally into a smooth, butter-like consistency.',
             ],
         ],
     ],

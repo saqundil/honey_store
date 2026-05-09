@@ -55,6 +55,9 @@ class ProductController extends Controller
             'status' => 'pending',
         ]);
 
+        $product->load('seller');
+        $product->seller?->refreshBalance();
+
         $productData = $product->toLocalizedArray();
 
         Log::info('Product order request received.', [

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\AuthenticateAdminPanel;
+use App\Http\Middleware\EnsurePanelRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'panel.auth' => AuthenticateAdminPanel::class,
+            'panel.role' => EnsurePanelRole::class,
+        ]);
+
         $middleware->web(append: [
             SetLocale::class,
         ]);

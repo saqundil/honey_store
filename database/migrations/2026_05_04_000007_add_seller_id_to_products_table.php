@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->foreignId('seller_id')
+                ->nullable()
+                ->after('id')
+                ->constrained('sellers')
+                ->nullOnDelete();
+
+            $table->index(['seller_id', 'sort_order']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropIndex(['seller_id', 'sort_order']);
+            $table->dropConstrainedForeignId('seller_id');
+        });
+    }
+};

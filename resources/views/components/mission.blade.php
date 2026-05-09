@@ -1,8 +1,12 @@
 {{-- resources/views/components/mission.blade.php --}}
-<article class="w-full lg:w-7/12 flex flex-col gap-6 pr-0 lg:pr-10">
+<article class="home-surface home-card-hover flex w-full flex-col gap-6 p-5 sm:p-6 lg:p-7">
+	<div>
+		<span class="home-eyebrow">{{ app()->isLocale('ar') ? 'رسالتنا' : 'Our mission' }}</span>
+		<h2 class="mt-3 home-title max-w-[14ch]">{{ __('home.mission.heading') }}</h2>
+	</div>
 
     {{-- Video / Image Thumbnail --}}
-    <div class="relative overflow-hidden rounded-[32px] bg-black shadow-lg">
+    <div class="about-figure relative overflow-hidden rounded-[1.7rem] border border-[#2c1b0b]/8 bg-[#f3eeea] shadow-[0_18px_40px_rgba(44,27,11,0.08)]">
         <video class="w-full aspect-video object-cover"
                controls
                playsinline
@@ -13,13 +17,9 @@
         </video>
     </div>
 
-    {{-- Section Heading --}}
-    <h2 class="font-condensed font-bold text-3xl md:text-4xl uppercase text-honey-dark leading-tight">
-        {{ __('home.mission.heading') }}
-    </h2>
-
     {{-- Body Text --}}
-    <div class="flex flex-col gap-6 text-honey-grey text-base md:text-lg leading-relaxed">
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_12rem] lg:items-start">
+        <div class="flex flex-col gap-6 home-copy">
         <p>
             {{ __('home.mission.paragraph_1_before') }}
             <strong class="font-bold text-honey-grey">{{ __('home.mission.population') }}</strong>
@@ -30,13 +30,17 @@
         <p>
             {{ __('home.mission.paragraph_2') }}
         </p>
-    </div>
+		</div>
 
-    {{-- Signature --}}
-    <div>
-        <img src="{{ asset('images/h1-img2.png') }}"
-             alt="{{ __('home.mission.signature_alt') }}"
-             class="h-11 w-auto">
+		<div class="home-surface-soft p-5">
+			<p class="home-eyebrow text-[0.7rem]">{{ app()->isLocale('ar') ? 'جوهر الفكرة' : 'Core idea' }}</p>
+			<p class="mt-3 text-sm leading-7 text-honey-grey">{{ app()->isLocale('ar') ? 'نربط بين أصل العسل وقيمته اليومية في تجربة أوضح وأكثر هدوءًا.' : 'We connect the honey’s origin to its everyday value through a clearer, calmer experience.' }}</p>
+			<div class="mt-5">
+				<img src="{{ asset('images/h1-img2.png') }}"
+					 alt="{{ __('home.mission.signature_alt') }}"
+					 class="h-11 w-auto">
+			</div>
+		</div>
     </div>
 
 </article>

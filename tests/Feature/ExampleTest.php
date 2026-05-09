@@ -68,13 +68,13 @@ class ExampleTest extends TestCase
                     'origin' => 'Mountains',
                     'texture' => 'Creamy',
                     'size' => '250 g',
-                    'category' => 'Rare Premium Honey',
+                    'category' => 'Premium Honey',
                     'tags' => ['Honey'],
-                    'highlights' => ['Rare harvest'],
+                    'highlights' => ['Creamy floral honey'],
                     'gallery' => [
                         ['src' => 'images/mountain-honey.png', 'alt' => 'Mountain Honey'],
                     ],
-                    'badge' => 'Rare',
+                    'badge' => 'Premium',
                 ],
             ],
         ]);

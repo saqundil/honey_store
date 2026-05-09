@@ -13,8 +13,15 @@
             ['src' => 'images/product-figma/thumb-5.png', 'alt' => $product['name'].' 5'],
         ];
         $displayGallery = collect($gallery)
-            ->merge($fallbackGallery)
+            ->filter(fn (array $item) => filled($item['src'] ?? null))
             ->unique('src')
+            ->values();
+
+        if ($displayGallery->isEmpty()) {
+            $displayGallery = collect($fallbackGallery);
+        }
+
+        $displayGallery = $displayGallery
             ->take(5)
             ->values()
             ->all();
@@ -37,13 +44,22 @@
                 ? $formattedValue.' '.$priceCurrency
                 : $priceCurrency.$formattedValue;
         };
+        $compareAtRaw = $product['compare_at_price_value'] ?? null;
+
+        if ($compareAtRaw === null && filled($product['compare_at_price'] ?? null)) {
+            $compareAtRaw = preg_replace('/[^\d.]/', '', $product['compare_at_price']);
+        }
+
+        $compareAtPrice = filled($compareAtRaw) ? (float) $compareAtRaw : null;
         $formattedUnitPrice = $formatPrice($unitPrice);
         $formattedTotal = $formatPrice($unitPrice * $startingQuantity);
-        $sku = $product['sku'] ?? '13';
+        $formattedCompareAtPrice = $compareAtPrice && $compareAtPrice > $unitPrice ? $formatPrice($compareAtPrice) : null;
         $category = $product['category'] ?? __('home.product_page.default_category');
-        $tags = implode(', ', $product['tags'] ?? [__('home.product_page.default_tag')]);
-        $shareUrl = urlencode(url()->current());
-        $shareText = urlencode($product['name'].' | '.__('home.meta.title'));
+        $heroFacts = collect([
+            $category,
+            $product['origin'] ?? null,
+            $product['size'] ?? null,
+        ])->filter()->unique()->take(3)->values();
         $titleBackground = asset('images/product-figma/title-bg.png');
     @endphp
 
@@ -51,22 +67,58 @@
         <img src="{{ $titleBackground }}"
              alt=""
              aria-hidden="true"
-             class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center select-none"
+             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-20 select-none"
              decoding="async"
              fetchpriority="high">
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(52,30,12,0.34),rgba(52,30,12,0.18))]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(246,193,90,0.14),transparent_28%),linear-gradient(180deg,rgba(251,247,241,0.92),rgba(251,247,241,0.98))]"></div>
         <div class="figma-product-title__inner mx-auto max-w-[1130px] px-6">
-            <div>
+            <div class="relative z-10">
                 <p class="figma-product-title__eyebrow">{{ __('home.product_page.eyebrow') }}</p>
-                <h1 class="figma-product-title__heading">{{ __('home.product_page.banner_title') }}</h1>
+                <h1 class="figma-product-title__heading">{{ $product['name'] }}</h1>
+                <p class="figma-product-title__summary">{{ $product['excerpt'] }}</p>
+
+                <div class="figma-product-title__meta">
+                    <div class="figma-product-title__price-stack">
+                        <div class="figma-product-title__price-row">
+                            <span class="figma-product-title__price">{{ $product['price'] }}</span>
+                            @if ($formattedCompareAtPrice)
+                                <span class="figma-product-title__price-compare">{{ $formattedCompareAtPrice }}</span>
+                            @endif
+                        </div>
+                        @if ($formattedCompareAtPrice)
+                            <span class="figma-product-title__offer">{{ __('home.product_page.opening_offer') }}</span>
+                        @endif
+                        @if ($formattedCompareAtPrice)
+                            <p class="figma-product-title__price-note">
+                                {{ __('home.product_page.opening_offer_note') }}
+                            </p>
+                        @endif
+                    </div>
+                    @if (!empty($product['badge']))
+                        <span class="figma-product-title__badge">{{ $product['badge'] }}</span>
+                    @endif
+                </div>
+
+                @if ($heroFacts->isNotEmpty())
+                    <div class="figma-product-title__facts">
+                        @foreach ($heroFacts as $fact)
+                            <span class="figma-product-title__fact">{{ $fact }}</span>
+                        @endforeach
+                    </div>
+                @endif
             </div>
-            <img src="{{ asset('images/product-figma/header-logo.png') }}"
-                 alt="{{ __('home.brand.logo_alt') }}"
-                 width="176"
-                 height="176"
-                 decoding="async"
-                 fetchpriority="high"
-                 class="hidden w-[9rem] opacity-90 lg:block xl:w-[11rem]">
+
+            <div class="figma-product-title__visual">
+                <div class="figma-product-title__visual-card">
+                    <img src="{{ asset($displayGallery[0]['src']) }}"
+                         alt="{{ $displayGallery[0]['alt'] }}"
+                         width="700"
+                         height="700"
+                         decoding="async"
+                         fetchpriority="high"
+                         class="h-full w-full object-cover">
+                </div>
+            </div>
         </div>
     </section>
 
@@ -147,14 +199,15 @@
 
                         <div class="figma-tab-panel" data-tab-panel="description">
                             <p class="figma-copy">{{ $product['description'] }}</p>
-                            <ul class="mt-6 space-y-4 text-honey-grey">
-                                @foreach ($product['highlights'] as $highlight)
-                                    <li class="flex items-start gap-3 leading-8">
-                                        <span class="mt-3 inline-block h-2 w-2 rounded-full bg-honey-orange"></span>
-                                        <span>{{ $highlight }}</span>
-                                    </li>
+
+                            <div class="figma-highlight-grid mt-8">
+                                @foreach ($product['highlights'] as $index => $highlight)
+                                    <article class="figma-highlight-card">
+                                        <span class="figma-highlight-card__index">{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                                        <p class="figma-highlight-card__text">{{ $highlight }}</p>
+                                    </article>
                                 @endforeach
-                            </ul>
+                            </div>
                         </div>
 
                         <div class="figma-tab-panel hidden" data-tab-panel="additional">
@@ -202,116 +255,131 @@
                 </div>
 
                 <aside class="figma-summary-shell">
-                    <div class="figma-summary-card">
-                        <p class="figma-kicker">{{ __('home.product_page.quality_chip') }}</p>
-                        <h2 class="figma-product-name">{{ $product['name'] }}</h2>
-                        <p class="figma-product-price">{{ $product['price'] }}</p>
-                        <p class="figma-copy mt-5">{{ $product['excerpt'] }}</p>
+                    <div class="figma-summary-card figma-order-sheet">
+                        <div class="figma-order-sheet__masthead">
+                            <h2 class="figma-order-sheet__title">{{ $product['name'] }}</h2>
+                            <p class="figma-order-sheet__summary">{{ $product['excerpt'] }}</p>
 
-                        <form action="{{ route('products.order', ['slug' => $product['slug']]) }}" method="POST" class="mt-8 space-y-6 product-form-grid">
+                            <div class="figma-order-sheet__chips">
+                                <span class="figma-order-sheet__chip">{{ $product['size'] }}</span>
+                                <span class="figma-order-sheet__chip">{{ $category }}</span>
+                                @if (!empty($product['badge']))
+                                    <span class="figma-order-sheet__chip figma-order-sheet__chip--accent">{{ $product['badge'] }}</span>
+                                @endif
+                            </div>
+
+                            <div class="figma-order-sheet__price">
+                                <span class="figma-order-sheet__price-label">{{ $formattedCompareAtPrice ? __('home.product_page.opening_offer') : __('home.product_page.starting_from') }}</span>
+                                <div class="figma-order-sheet__price-line">
+                                    <strong class="figma-order-sheet__price-value">{{ $product['price'] }}</strong>
+                                    @if ($formattedCompareAtPrice)
+                                        <span class="figma-order-sheet__price-compare">{{ $formattedCompareAtPrice }}</span>
+                                    @endif
+                                </div>
+                                @if ($formattedCompareAtPrice)
+                                    <p class="figma-order-sheet__price-note">
+                                        {{ __('home.product_page.opening_offer_note') }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <form action="{{ route('products.order', ['slug' => $product['slug']]) }}" method="POST" class="mt-7 space-y-6 product-form-grid figma-order-sheet__form">
                             @csrf
 
-                            <div class="figma-purchase-row">
-                                <div class="figma-quantity-box">
-                                    <label for="quantity" class="figma-quantity-box__label">{{ __('home.product_page.form.quantity') }}</label>
-                                    <div class="figma-quantity-box__controls">
-                                        <button type="button" class="figma-quantity-box__button" data-quantity-action="decrease" aria-label="{{ __('home.product_page.stepper_decrease') }}">-</button>
-                                        <input id="quantity" name="quantity" type="number" min="1" max="100" value="{{ $startingQuantity }}" class="figma-quantity-box__input" data-quantity-input required>
-                                        <button type="button" class="figma-quantity-box__button" data-quantity-action="increase" aria-label="{{ __('home.product_page.stepper_increase') }}">+</button>
+                            <section class="figma-order-step">
+                                <div class="figma-order-step__panel">
+                                    <div class="figma-order-step__header">
+                                        <p class="figma-order-step__title">{{ app()->isLocale('ar') ? 'اختيار الكمية' : 'Choose quantity' }}</p>
+                                        <p class="figma-order-step__hint">{{ app()->isLocale('ar') ? 'اختر عدد العبوات ثم أضفها مباشرة إلى الطلب.' : 'Pick the number of jars, then add them straight into the order.' }}</p>
                                     </div>
-                                </div>
 
-                                <button type="submit" class="figma-cart-button">{{ __('home.products.add_to_cart') }}</button>
-                            </div>
+                                    <div class="figma-order-builder">
+                                        <div class="figma-quantity-box">
+                                            <label for="quantity" class="figma-quantity-box__label">{{ __('home.product_page.form.quantity') }}</label>
+                                            <div class="figma-quantity-box__controls">
+                                                <button type="button" class="figma-quantity-box__button" data-quantity-action="decrease" aria-label="{{ __('home.product_page.stepper_decrease') }}">-</button>
+                                                <input id="quantity" name="quantity" type="number" min="1" max="100" value="{{ $startingQuantity }}" class="figma-quantity-box__input" data-quantity-input required>
+                                                <button type="button" class="figma-quantity-box__button" data-quantity-action="increase" aria-label="{{ __('home.product_page.stepper_increase') }}">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="figma-cart-button figma-cart-button--wide">{{ __('home.products.add_to_cart') }}</button>
+                                </div>
+                            </section>
                             @error('quantity')<p class="text-sm text-red-600">{{ $message }}</p>@enderror
 
-                            <div class="figma-order-card">
-                                <div class="figma-order-card__header">
-                                    <h3>{{ __('home.product_page.summary_heading') }}</h3>
-                                    <span>{{ __('home.product_page.starting_from') }} {{ $product['price'] }}</span>
-                                </div>
-
-                                <div class="mt-5 space-y-3">
-                                    <div class="product-summary-row">
-                                        <span>{{ __('home.product_page.summary_unit_price') }}</span>
-                                        <strong data-summary-unit>{{ $formattedUnitPrice }}</strong>
+                            <section class="figma-order-step figma-order-step--receipt">
+                                <div class="figma-order-step__panel">
+                                    <div class="figma-order-step__header">
+                                        <p class="figma-order-step__title">{{ __('home.product_page.summary_heading') }}</p>
+                                        <p class="figma-order-step__hint">{{ app()->isLocale('ar') ? 'ملخص مباشر يتغيّر مع كل تعديل على الكمية.' : 'A live summary that updates whenever the quantity changes.' }}</p>
                                     </div>
-                                    <div class="product-summary-row">
-                                        <span>{{ __('home.product_page.summary_quantity') }}</span>
-                                        <strong data-summary-quantity aria-live="polite">{{ $startingQuantity }}</strong>
+
+                                    <div class="figma-order-ledger">
+                                        <div class="figma-order-ledger__row">
+                                            <span>{{ __('home.product_page.summary_unit_price') }}</span>
+                                            <strong data-summary-unit>{{ $formattedUnitPrice }}</strong>
+                                        </div>
+                                        <div class="figma-order-ledger__row">
+                                            <span>{{ __('home.product_page.summary_quantity') }}</span>
+                                            <strong data-summary-quantity aria-live="polite">{{ $startingQuantity }}</strong>
+                                        </div>
+                                        <div class="figma-order-ledger__row figma-order-ledger__row--total">
+                                            <span>{{ __('home.product_page.summary_total') }}</span>
+                                            <strong data-summary-total aria-live="polite">{{ $formattedTotal }}</strong>
+                                        </div>
                                     </div>
-                                    <div class="product-summary-row border-t border-black/10 pt-3">
-                                        <span>{{ __('home.product_page.summary_total') }}</span>
-                                        <strong class="text-honey-orange" data-summary-total aria-live="polite">{{ $formattedTotal }}</strong>
+                                </div>
+                            </section>
+
+                            <section class="figma-order-step">
+                                <div class="figma-order-step__panel">
+                                    <div class="figma-order-step__header">
+                                        <p class="figma-form-heading">{{ __('home.product_page.request_details_heading') }}</p>
+                                        <p class="figma-form-section-copy">{{ __('home.product_page.request_details_text') }}</p>
+                                    </div>
+
+                                    <div class="grid gap-4 sm:grid-cols-2">
+                                        <div>
+                                            <label for="customer_name" class="figma-form-label">{{ __('home.product_page.form.name') }}</label>
+                                            <input id="customer_name" name="customer_name" type="text" value="{{ old('customer_name') }}" autocomplete="name" class="figma-form-input" data-customer-name required>
+                                            @error('customer_name')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                                        </div>
+                                        <div>
+                                            <label for="phone" class="figma-form-label">{{ __('home.product_page.form.phone') }}</label>
+                                            <input id="phone" name="phone" type="text" value="{{ old('phone') }}" autocomplete="tel" class="figma-form-input" data-customer-phone required>
+                                            @error('phone')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <label for="email" class="figma-form-label">{{ __('home.product_page.form.email') }}</label>
+                                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" class="figma-form-input" required>
+                                        @error('email')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <label for="notes" class="figma-form-label">{{ __('home.product_page.form.notes') }}</label>
+                                        <textarea id="notes" name="notes" rows="4" class="figma-form-textarea" data-order-notes>{{ old('notes') }}</textarea>
+                                        @error('notes')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                                     </div>
                                 </div>
-                            </div>
+                            </section>
 
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="customer_name" class="figma-form-label">{{ __('home.product_page.form.name') }}</label>
-                                    <input id="customer_name" name="customer_name" type="text" value="{{ old('customer_name') }}" autocomplete="name" class="figma-form-input" data-customer-name required>
-                                    @error('customer_name')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                                </div>
-                                <div>
-                                    <label for="phone" class="figma-form-label">{{ __('home.product_page.form.phone') }}</label>
-                                    <input id="phone" name="phone" type="text" value="{{ old('phone') }}" autocomplete="tel" class="figma-form-input" data-customer-phone required>
-                                    @error('phone')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="email" class="figma-form-label">{{ __('home.product_page.form.email') }}</label>
-                                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" class="figma-form-input" required>
-                                @error('email')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                            </div>
-
-                            <div>
-                                <p class="figma-form-heading">{{ __('home.product_page.request_details_heading') }}</p>
-                                <p class="mt-2 text-sm leading-7 text-honey-muted">{{ __('home.product_page.request_details_text') }}</p>
-                            </div>
-
-                            <div>
-                                <label for="notes" class="figma-form-label">{{ __('home.product_page.form.notes') }}</label>
-                                <textarea id="notes" name="notes" rows="4" class="figma-form-textarea" data-order-notes>{{ old('notes') }}</textarea>
-                                @error('notes')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                            </div>
-
-                            <div class="figma-meta-stack">
-                                <div class="figma-meta-row"><span>{{ __('home.product_page.meta.sku') }}</span><span>{{ $sku }}</span></div>
-                                <div class="figma-meta-row"><span>{{ __('home.product_page.meta.category') }}</span><span>{{ $category }}</span></div>
-                                <div class="figma-meta-row"><span>{{ __('home.product_page.meta.tags') }}</span><span>{{ $tags }}</span></div>
-                            </div>
-
-                            <div class="figma-share-row">
-                                <span>{{ __('home.product_page.share_product') }}</span>
-                                <div class="figma-share-icons">
-                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener" aria-label="Facebook">Fb</a>
-                                    <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}&text={{ $shareText }}" target="_blank" rel="noopener" aria-label="X">X</a>
-                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $shareUrl }}" target="_blank" rel="noopener" aria-label="LinkedIn">In</a>
-                                </div>
-                            </div>
-
-                            <div class="grid gap-3 sm:grid-cols-2">
-                                <button type="submit" class="figma-submit-button">{{ __('home.product_page.form.submit') }}</button>
-                                <a href="https://api.whatsapp.com/send?text=" target="_blank" rel="noopener" class="figma-whatsapp-button" data-whatsapp-link>{{ __('home.product_page.whatsapp_button') }}</a>
-                            </div>
-
-                            <p class="text-sm leading-7 text-honey-muted">{{ __('home.product_page.whatsapp_hint') }}</p>
-                            <p class="text-sm leading-7 text-honey-muted">{{ __('home.product_page.form.disclaimer') }}</p>
-
-                            {{-- Trust Signals --}}
-                            <div class="mt-2 grid grid-cols-3 gap-3 border-t border-black/5 pt-6">
-                                @foreach (__('home.product_page.micro_benefits') as $benefit)
-                                    <div class="flex flex-col items-center gap-2 text-center">
-                                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-honey-gold/12">
-                                            <svg class="h-4 w-4 text-honey-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                        </span>
-                                        <span class="font-condensed text-[11px] font-bold uppercase tracking-[0.12em] text-honey-muted">{{ $benefit }}</span>
+                            <div class="figma-order-sheet__foot">
+                                <div class="figma-order-sheet__actions">
+                                    <div class="grid gap-3 sm:grid-cols-2">
+                                        <button type="submit" class="figma-submit-button">{{ __('home.product_page.form.submit') }}</button>
+                                        <a href="https://api.whatsapp.com/send?text=" target="_blank" rel="noopener" class="figma-whatsapp-button" data-whatsapp-link>{{ __('home.product_page.whatsapp_button') }}</a>
                                     </div>
-                                @endforeach
+                                </div>
+
+                                <div class="figma-order-sheet__support">
+                                    <p class="text-sm leading-7 text-honey-muted">{{ __('home.product_page.whatsapp_hint') }}</p>
+                                    <p class="mt-2 text-sm leading-7 text-honey-muted">{{ __('home.product_page.form.disclaimer') }}</p>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -324,8 +392,9 @@
         <section class="figma-related-section">
             <div class="mx-auto max-w-[1130px] px-6 py-16 lg:py-20">
                 <div class="mx-auto max-w-3xl text-center">
-                    <h2 class="font-condensed text-5xl font-bold uppercase text-honey-dark">{{ __('home.products.heading') }}</h2>
-                    <p class="mt-4 text-lg leading-8 text-honey-grey">{{ __('home.product_page.related_description') }}</p>
+                    <span class="home-eyebrow mx-auto">{{ app()->isLocale('ar') ? 'اقتراحات قريبة' : 'Selected suggestions' }}</span>
+                    <h2 class="home-title mx-auto mt-3 max-w-[10ch]">{{ app()->isLocale('ar') ? 'قد يعجبك أيضًا' : 'You May Also Like' }}</h2>
+                    <p class="home-copy mx-auto mt-4">{{ __('home.product_page.related_description') }}</p>
                 </div>
 
                 <div class="mt-12 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">

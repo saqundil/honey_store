@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
@@ -12,6 +13,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'seller_id',
         'slug',
         'image',
         'sku',
@@ -46,6 +48,16 @@ class Product extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(Seller::class);
+    }
+
+    public function scopeOwnedBySeller(Builder $query, int $sellerId): Builder
+    {
+        return $query->where('seller_id', $sellerId);
+    }
+
     public function translation(?string $locale = null): array
     {
         $translations = $this->translations ?? [];
@@ -76,24 +88,49 @@ class Product extends Model
 
     public function formattedPrice(): string
     {
-        $value = number_format((float) $this->price_value, (int) $this->price_decimals);
+        return $this->formatAmount((float) $this->price_value);
+    }
+
+    public function formatAmount(float $value): string
+    {
+        $value = number_format($value, (int) $this->price_decimals);
 
         return $this->currency_position === 'suffix'
             ? $value.' '.$this->currency
             : $this->currency.$value;
     }
 
+    public function imageUrl(): string
+    {
+        if (blank($this->image)) {
+            return 'https://placehold.co/600x600?text=Honey';
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return asset(ltrim($this->image, '/'));
+    }
+
     public function toLocalizedArray(?string $locale = null): array
     {
         $translation = $this->translation($locale);
+        $compareAtPrice = filled($translation['compare_at_price_value'] ?? null)
+            ? (float) $translation['compare_at_price_value']
+            : null;
 
         return [
             'id' => $this->id,
+            'seller_id' => $this->seller_id,
             'slug' => $this->slug,
             'image' => $this->image,
+            'image_url' => $this->imageUrl(),
             'sku' => $this->sku,
             'price' => $this->formattedPrice(),
             'price_value' => (float) $this->price_value,
+            'compare_at_price' => $compareAtPrice ? $this->formatAmount($compareAtPrice) : null,
+            'compare_at_price_value' => $compareAtPrice,
             'currency' => $this->currency,
             'currency_position' => $this->currency_position,
             'price_decimals' => (int) $this->price_decimals,

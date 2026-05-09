@@ -5,36 +5,34 @@
 
 @php($productsBackground = asset('images/Section.png'))
 
-<section id="products" class="relative scroll-mt-[100px] overflow-hidden bg-honey-cream py-20 lg:scroll-mt-[116px] lg:py-28">
+<section id="products" class="relative scroll-mt-[100px] overflow-hidden bg-[#fbf7f1] py-18 lg:scroll-mt-[116px] lg:py-24">
 
     <img src="{{ $productsBackground }}"
          alt=""
          aria-hidden="true"
-         class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center select-none">
+         class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-30 select-none">
 
     {{-- Overlay --}}
-    <div class="absolute inset-0 bg-honey-cream/42"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(246,193,90,0.12),_transparent_42%),linear-gradient(180deg,rgba(251,247,241,0.64),rgba(251,247,241,0.96))]"></div>
 
     <div class="relative max-w-[1300px] mx-auto px-6">
+        <div class="home-surface relative overflow-hidden px-6 py-8 sm:p-8 lg:p-10">
+            <div class="mb-14 flex flex-col gap-4 text-center">
+                <span class="home-eyebrow mx-auto">{{ app()->isLocale('ar') ? 'مختاراتنا' : 'Our selection' }}</span>
+                <h2 class="home-title mx-auto max-w-[12ch]">{{ __('home.products.heading') }}</h2>
+                <p class="home-copy mx-auto max-w-2xl">
+                    {{ __('home.products.description') }}
+                </p>
+            </div>
 
-        {{-- Section Header --}}
-        <div class="text-center mb-14 flex flex-col gap-4">
-            <h2 class="font-condensed font-bold text-4xl md:text-5xl uppercase text-honey-dark leading-tight">
-                {{ __('home.products.heading') }}
-            </h2>
-            <p class="text-honey-grey text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-                {{ __('home.products.description') }}
-            </p>
-        </div>
-
-        {{-- Product Grid --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+            {{-- Product Grid --}}
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
             @foreach ($products as $product)
-            <article class="flex flex-col group">
+            <article class="home-surface-soft home-card-hover flex flex-col overflow-hidden p-4 sm:p-5 group">
 
                 {{-- Product Image --}}
                 <a href="{{ route('products.show', ['slug' => $product['slug']]) }}"
-                   class="relative overflow-hidden aspect-[4/4.5] bg-honey-card rounded-[1.5rem] block shadow-[0_12px_30px_rgba(44,27,11,0.06)] transition-shadow duration-300 group-hover:shadow-[0_18px_40px_rgba(44,27,11,0.12)]">
+                   class="relative block aspect-[4/4.5] overflow-hidden rounded-[1.6rem] border border-[#2c1b0b]/8 bg-[#f5eee6] shadow-[0_14px_30px_rgba(44,27,11,0.06)] transition-shadow duration-300 group-hover:shadow-[0_18px_40px_rgba(44,27,11,0.12)]">
                     <img src="{{ asset($product['image']) }}"
                          alt="{{ $product['name'] }}"
                          loading="lazy"
@@ -43,7 +41,7 @@
 
                     {{-- Badge --}}
                     @if ($product['badge'])
-                    <span class="absolute top-5 {{ app()->isLocale('ar') ? 'left-5' : 'right-5' }} rounded-full bg-honey-orange px-3 py-1 font-condensed text-[11px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(199,72,23,0.25)]">
+                    <span class="absolute top-5 {{ app()->isLocale('ar') ? 'left-5' : 'right-5' }} rounded-full border border-white/70 bg-white/88 px-3 py-1 font-condensed text-[11px] font-bold uppercase tracking-widest text-[#c74817] shadow-[0_8px_20px_rgba(44,27,11,0.08)]">
                         {{ $product['badge'] }}
                     </span>
                     @endif
@@ -53,18 +51,18 @@
                 </a>
 
                 {{-- Product Info --}}
-                <div class="flex flex-col items-center gap-2.5 pt-6 text-center">
-                    <h3 class="font-condensed text-[1.4rem] font-bold uppercase leading-tight text-honey-dark transition-colors group-hover:text-honey-orange">
+                <div class="flex flex-1 flex-col items-center gap-3 pt-6 text-center">
+                    <h3 class="font-condensed text-[1.45rem] font-bold uppercase leading-tight text-honey-dark transition-colors group-hover:text-honey-orange">
                         <a href="{{ route('products.show', ['slug' => $product['slug']]) }}">{{ $product['name'] }}</a>
                     </h3>
                     <p class="font-condensed text-xl font-bold text-honey-orange">
                         {{ $product['price'] }}
                     </p>
-                    <p class="text-honey-muted text-sm leading-relaxed max-w-[280px]">
+                    <p class="max-w-[280px] text-sm leading-7 text-honey-muted">
                         {{ Str::limit($product['excerpt'], 90) }}
                     </p>
                     <a href="{{ route('products.show', ['slug' => $product['slug']]) }}"
-                       class="mt-3 inline-flex items-center gap-2.5 rounded-full border border-honey-dark/15 px-5 py-2.5 font-condensed text-xs font-bold uppercase tracking-widest text-honey-dark transition-all duration-200 hover:bg-honey-orange hover:text-white hover:border-honey-orange hover:shadow-[0_10px_24px_rgba(199,72,23,0.2)]">
+                       class="mt-auto inline-flex items-center gap-2.5 rounded-full border border-honey-dark/15 px-5 py-2.5 font-condensed text-xs font-bold uppercase tracking-widest text-honey-dark transition-all duration-200 hover:bg-honey-orange hover:text-white hover:border-honey-orange hover:shadow-[0_10px_24px_rgba(199,72,23,0.2)]">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -74,6 +72,7 @@
 
             </article>
             @endforeach
+            </div>
         </div>
 
     </div>

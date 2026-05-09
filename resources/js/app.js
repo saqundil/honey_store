@@ -1,6 +1,10 @@
 import './bootstrap';
+import { Chart, registerables } from 'chart.js';
 import { gsap } from 'gsap';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+
+Chart.register(...registerables);
+window.Chart = Chart;
 
 gsap.registerPlugin(MotionPathPlugin);
 

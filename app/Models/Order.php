@@ -10,6 +10,12 @@ class Order extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_COMPLETED = 'completed';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'product_id',
         'customer_name',
@@ -34,8 +40,32 @@ class Order extends Model
         ];
     }
 
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_COMPLETED,
+            self::STATUS_CANCELLED,
+        ];
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function formattedAmount(float|string|null $amount = null): string
+    {
+        $amount ??= $this->total_price;
+        $value = number_format((float) $amount, (int) $this->price_decimals);
+
+        return $this->currency_position === 'suffix'
+            ? $value.' '.$this->currency
+            : $this->currency.$value;
+    }
+
+    public function formattedTotal(): string
+    {
+        return $this->formattedAmount($this->total_price);
     }
 }

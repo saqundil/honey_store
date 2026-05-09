@@ -22,6 +22,12 @@
 | POST   | /products/{slug}/order     | إرسال طلب شراء                    |
 | GET    | /locale/{locale}           | تبديل اللغة (en/ar)              |
 | GET    | /products → redirect /#products | توجيه لقسم المنتجات          |
+| GET    | /about                     | صفحة من نحن (PageController)      |
+| GET    | /contact                   | صفحة تواصل معنا (PageController)  |
+| GET    | /faq                       | صفحة الأسئلة الشائعة              |
+| GET    | /shipping                  | صفحة الشحن والتوصيل               |
+| GET    | /privacy                   | سياسة الخصوصية                    |
+| GET    | /terms                     | الشروط والأحكام                   |
 
 ### Models
 
@@ -42,6 +48,15 @@
 - **العلاقة**: belongsTo Product
 
 ### Controllers
+
+#### PageController
+- `about()`: صفحة من نحن
+- `contact()`: صفحة تواصل معنا
+- `faq()`: الأسئلة الشائعة
+- `shipping()`: الشحن والتوصيل
+- `privacy()`: سياسة الخصوصية
+- `terms()`: الشروط والأحكام
+- جميع الدوال ترجع View مباشرة بدون بيانات ديناميكية
 
 #### ProductController
 - `show($slug)`: يعرض صفحة المنتج مع 4 منتجات ذات صلة
@@ -67,6 +82,12 @@
 ### الصفحات:
 - **pages/home.blade.php**: الصفحة الرئيسية — تجمع كل الأقسام عبر components
 - **pages/product-show.blade.php**: صفحة تفاصيل المنتج — معرض صور (5 thumbnails)، 3 tabs (وصف، معلومات إضافية، مراجعات)، stepper للكمية مع حساب سعر ديناميكي، نموذج طلب، زر واتساب، منتجات مشابهة
+- **pages/about.blade.php**: صفحة من نحن — قصة الشركة وفريق العمل
+- **pages/contact.blade.php**: صفحة تواصل معنا — نموذج تواصل ومعلومات الاتصال
+- **pages/faq.blade.php**: الأسئلة الشائعة — accordion بالأسئلة والأجوبة
+- **pages/shipping.blade.php**: سياسة الشحن والتوصيل
+- **pages/privacy.blade.php**: سياسة الخصوصية
+- **pages/terms.blade.php**: الشروط والأحكام
 
 ### الـ Components:
 | Component            | الوظيفة                                       |
@@ -81,6 +102,7 @@
 | newsletter           | نموذج اشتراك بالنشرة البريدية                   |
 | honey-types          | 4 أنواع عسل (بطاقات)                            |
 | bees-section         | قسم ديكوري مع 8 نحلات متحركة                    |
+| page-hero            | بانر علوي للصفحات الداخلية (عنوان + breadcrumb)  |
 | footer               | 4 أعمدة: معلومات، منتجات، أخبار، روابط         |
 
 ---
