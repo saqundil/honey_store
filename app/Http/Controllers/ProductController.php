@@ -11,7 +11,7 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function show(string $slug): View
+    public function show(string $locale, string $slug): View
     {
         $product = Product::active()->where('slug', $slug)->firstOrFail();
         $relatedProducts = Product::active()
@@ -27,7 +27,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function order(Request $request, string $slug): RedirectResponse
+    public function order(Request $request, string $locale, string $slug): RedirectResponse
     {
         $product = Product::active()->where('slug', $slug)->firstOrFail();
 
@@ -68,7 +68,7 @@ class ProductController extends Controller
         ]);
 
         return redirect()
-            ->route('products.show', ['slug' => $slug])
+            ->route('products.show', ['locale' => $locale, 'slug' => $slug])
             ->with('order_success', __('home.product_page.order_success', ['product' => $productData['name']]));
     }
 }
