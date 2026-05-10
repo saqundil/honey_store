@@ -2,6 +2,8 @@
 @php
     $newsletterBackground = asset('images/Section_2.png');
     $types = trans('home.types.items');
+    $tradeHighlights = collect(__('home.newsletter.highlights'));
+    $tradeWhatsAppMessage = rawurlencode(__('home.newsletter.whatsapp_message'));
 @endphp
 
 <section class="relative overflow-hidden bg-[#fbf7f1] py-16 lg:py-24">
@@ -12,7 +14,7 @@
          class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-30 select-none">
 
     {{-- Overlay --}}
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(246,193,90,0.12),_transparent_38%),linear-gradient(180deg,rgba(251,247,241,0.64),rgba(251,247,241,0.96))]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(246,193,90,0.16),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(199,72,23,0.08),_transparent_34%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_8%,rgba(255,244,224,0.95)_22%,rgba(255,238,210,0.88)_44%,rgba(251,247,241,0.96)_100%)]"></div>
 
     <div class="relative mx-auto max-w-[1300px] px-6">
         <div class="flex w-full flex-col gap-16 lg:gap-20">
@@ -25,30 +27,43 @@
                          class="w-full max-w-[590px] rounded-[1.8rem] border border-[#2c1b0b]/8 bg-[#f4ede5] object-cover shadow-[0_18px_42px_rgba(44,27,11,0.08)]">
                 </div>
 
-                {{-- Right: Form Content --}}
+                {{-- Right: Wholesale / Supply Content --}}
                 <div class="flex w-full flex-col gap-6">
-                    <span class="home-eyebrow">{{ app()->isLocale('ar') ? 'ابقَ قريبًا' : 'Stay close' }}</span>
-                    <h2 class="home-title max-w-[12ch]">
+                    <span class="home-eyebrow">{{ __('home.newsletter.eyebrow') }}</span>
+                    <h2 class="home-title {{ app()->isLocale('ar') ? 'max-w-none whitespace-nowrap' : 'max-w-[12ch]' }}">
                         {{ __('home.newsletter.heading') }}
                     </h2>
                     <p class="home-copy max-w-[34rem]">
                         {{ __('home.newsletter.description') }}
                     </p>
 
-                    <form action="{{ url('/newsletter/subscribe') }}" method="POST" class="mt-2 flex flex-col gap-3 sm:flex-row">
-                        @csrf
-                        <label for="newsletter-email" class="sr-only">{{ __('home.newsletter.email_label') }}</label>
-                        <input id="newsletter-email"
-                               type="email"
-                               name="email"
-                               placeholder="{{ __('home.newsletter.email_placeholder') }}"
-                               required
-                               class="flex-1 rounded-full border border-[#2c1b0b]/10 bg-white px-5 py-4 text-base text-honey-grey placeholder:text-honey-grey/70 outline-none transition-colors focus:border-honey-orange focus:ring-4 focus:ring-honey-orange/10">
-                        <button type="submit"
-                                class="rounded-full bg-honey-orange px-10 py-4 font-condensed font-bold text-sm uppercase tracking-widest text-white transition-opacity hover:opacity-90 whitespace-nowrap">
-                            {{ __('home.newsletter.submit') }}
-                        </button>
-                    </form>
+                    @if ($tradeHighlights->isNotEmpty())
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            @foreach ($tradeHighlights as $highlight)
+                                <article class="home-surface-soft p-4 sm:p-5">
+                                    <p class="font-condensed text-[1.02rem] font-bold uppercase leading-tight text-honey-dark">
+                                        {{ $highlight['title'] }}
+                                    </p>
+                                    <p class="mt-2 text-sm leading-7 text-honey-muted">
+                                        {{ $highlight['excerpt'] }}
+                                    </p>
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                        <a href="https://api.whatsapp.com/send?phone={{ __('home.product_page.whatsapp_phone') }}&text={{ $tradeWhatsAppMessage }}"
+                           target="_blank"
+                           rel="noopener"
+                           class="inline-flex items-center justify-center rounded-full bg-honey-orange px-8 py-4 font-condensed text-sm font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-90">
+                            {{ __('home.newsletter.primary_cta') }}
+                        </a>
+                        <a href="{{ route('contact') }}"
+                           class="inline-flex items-center justify-center rounded-full border border-[#2c1b0b]/10 bg-white px-8 py-4 font-condensed text-sm font-bold uppercase tracking-widest text-[#2c1b0b] transition duration-300 hover:-translate-y-0.5 hover:border-[#c74817]/22 hover:text-[#c74817]">
+                            {{ __('home.newsletter.secondary_cta') }}
+                        </a>
+                    </div>
                 </div>
             </div>
 

@@ -23,7 +23,7 @@
             <section class="mt-10 lg:mt-12">
                 <div class="static-page-grid lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
                     <div class="static-page-card p-7 sm:p-9">
-                        <span class="static-page-kicker">{{ __('pages.contact.title') }}</span>
+
                         <h2 class="static-page-title max-w-[12ch]">{{ __('pages.contact.form_heading') }}</h2>
 
                         <form action="#" method="POST" class="mt-8 space-y-5">
@@ -56,18 +56,10 @@
                     <aside class="grid gap-5 lg:sticky lg:top-28">
                         <div class="static-page-card p-7 sm:p-8">
                             <span class="static-page-kicker">{{ __('pages.contact.title') }}</span>
-                            <h3 class="static-page-title max-w-[11ch]">{{ __('pages.contact.info_heading') }}</h3>
+                            <h3 class="static-page-title {{ app()->isLocale('ar') ? 'max-w-none whitespace-nowrap' : 'max-w-[11ch]' }}">{{ __('pages.contact.info_heading') }}</h3>
 
                             <ul class="static-page-divider-list mt-6" role="list">
-                                <li class="flex items-start gap-4">
-                                    <span class="static-page-icon">
-                                        <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current"><path d="M12 2 3 9v11h6v-6h6v6h6V9l-9-7Zm0 2.46 7 5.45V18h-2v-6H7v6H5V9.91l7-5.45Z"/></svg>
-                                    </span>
-                                    <div>
-                                        <p class="font-condensed text-xs font-bold uppercase tracking-[0.18em] text-honey-dark">{{ __('pages.contact.info_address_label') }}</p>
-                                        <p class="mt-2 text-[0.98rem] leading-8 text-honey-grey">{{ __('home.footer.address_line_1') }}, {{ __('home.footer.address_line_2') }}</p>
-                                    </div>
-                                </li>
+
                                 <li class="flex items-start gap-4">
                                     <span class="static-page-icon">
                                         <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.32.56 3.57.56a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.19 2.45.56 3.57a1 1 0 0 1-.24 1.02l-2.2 2.2Z"/></svg>

@@ -3,10 +3,10 @@
     'items' => trans('home.news.items')
 ])
 
-<aside class="home-surface flex w-full flex-col gap-6 p-6 sm:p-7 lg:p-8">
+<aside class="home-surface flex h-full w-full flex-col gap-6 p-6 sm:p-7 lg:p-8">
 	<div>
 		<span class="home-eyebrow">{{ __('home.news.eyebrow') }}</span>
-		<h2 class="mt-3 home-title max-w-[10ch]">{{ __('home.news.heading') }}</h2>
+        <h2 class="mt-3 home-title {{ app()->isLocale('ar') ? 'max-w-none whitespace-nowrap' : 'max-w-[10ch]' }}">{{ __('home.news.heading') }}</h2>
 	</div>
 
     {{-- Feature List --}}

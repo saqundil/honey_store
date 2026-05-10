@@ -1,5 +1,5 @@
 {{-- resources/views/components/mission.blade.php --}}
-<article class="home-surface home-card-hover flex w-full flex-col gap-6 p-5 sm:p-6 lg:p-7">
+<article class="home-surface home-card-hover flex h-full w-full flex-col gap-6 p-5 sm:p-6 lg:p-7">
 	<div>
 		<span class="home-eyebrow">{{ app()->isLocale('ar') ? 'رسالتنا' : 'Our mission' }}</span>
 		<h2 class="mt-3 home-title max-w-[14ch]">{{ __('home.mission.heading') }}</h2>
@@ -34,7 +34,7 @@
 
 		<div class="home-surface-soft p-5">
 			<p class="home-eyebrow text-[0.7rem]">{{ app()->isLocale('ar') ? 'جوهر الفكرة' : 'Core idea' }}</p>
-			<p class="mt-3 text-sm leading-7 text-honey-grey">{{ app()->isLocale('ar') ? 'نربط بين أصل العسل وقيمته اليومية في تجربة أوضح وأكثر هدوءًا.' : 'We connect the honey’s origin to its everyday value through a clearer, calmer experience.' }}</p>
+            <p class="mt-3 text-sm leading-7 text-honey-grey">{{ app()->isLocale('ar') ? 'رسالتنا أن يصل العسل الأصيل بمصدر واضح وتقديم يليق به.' : 'Our mission is to offer authentic honey with a clear source and presentation worthy of it.' }}</p>
 			<div class="mt-5">
 				<img src="{{ asset('images/h1-img2.png') }}"
 					 alt="{{ __('home.mission.signature_alt') }}"

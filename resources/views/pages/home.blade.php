@@ -6,15 +6,15 @@
     {{-- 1. Hero --}}
     <x-hero />
 
-    <div class="relative overflow-hidden bg-[#fbf7f1]" id="homeStoryTheme">
-        <div class="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.18),_transparent_44%),radial-gradient(circle_at_top_right,_rgba(199,72,23,0.12),_transparent_34%),linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(251,247,241,0.82)_52%,_rgba(251,247,241,1)_100%)]"></div>
+    <div class="relative -mt-px overflow-hidden bg-[#fbf7f1]" id="homeStoryTheme">
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_22%,rgba(246,193,90,0.24),transparent_30%),radial-gradient(circle_at_88%_18%,rgba(199,72,23,0.14),transparent_24%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_7%,rgba(255,245,226,0.98)_16%,rgba(255,236,205,0.90)_34%,rgba(255,244,224,0.82)_56%,rgba(251,247,241,1)_100%)]"></div>
         <div class="pointer-events-none absolute -left-16 top-24 h-48 w-48 rounded-full bg-[#f6c15a]/20 blur-3xl"></div>
         <div class="pointer-events-none absolute -right-20 top-44 h-64 w-64 rounded-full bg-[#c74817]/10 blur-3xl"></div>
 
         {{-- 3. Mission + News --}}
         <section class="relative py-16 lg:py-24">
             <div class="mx-auto max-w-[1300px] px-6">
-                <div class="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)] lg:items-start">
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)] lg:items-stretch">
                     <x-mission />
                     <x-news />
                 </div>

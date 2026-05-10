@@ -25,13 +25,6 @@
             ->take(5)
             ->values()
             ->all();
-        $relatedProducts = collect($relatedProducts ?? [])->values();
-        $relatedVisuals = [
-            'images/product-figma/related-1.png',
-            'images/product-figma/related-2.png',
-            'images/product-figma/related-3.png',
-            'images/product-figma/related-4.png',
-        ];
         $startingQuantity = max(1, (int) old('quantity', 1));
         $unitPrice = (float) ($product['price_value'] ?? preg_replace('/[^\d.]/', '', $product['price']));
         $priceCurrency = $product['currency'] ?? '$';
@@ -94,9 +87,6 @@
                             </p>
                         @endif
                     </div>
-                    @if (!empty($product['badge']))
-                        <span class="figma-product-title__badge">{{ $product['badge'] }}</span>
-                    @endif
                 </div>
 
                 @if ($heroFacts->isNotEmpty())
@@ -184,9 +174,6 @@
                                  class="h-full w-full object-cover"
                                  data-product-main-image>
 
-                            @if (!empty($product['badge']))
-                                <span class="figma-status-chip">{{ $product['badge'] }}</span>
-                            @endif
                         </div>
                     </div>
 
@@ -263,9 +250,6 @@
                             <div class="figma-order-sheet__chips">
                                 <span class="figma-order-sheet__chip">{{ $product['size'] }}</span>
                                 <span class="figma-order-sheet__chip">{{ $category }}</span>
-                                @if (!empty($product['badge']))
-                                    <span class="figma-order-sheet__chip figma-order-sheet__chip--accent">{{ $product['badge'] }}</span>
-                                @endif
                             </div>
 
                             <div class="figma-order-sheet__price">
@@ -387,44 +371,6 @@
             </div>
         </div>
     </section>
-
-    @if ($relatedProducts->isNotEmpty())
-        <section class="figma-related-section">
-            <div class="mx-auto max-w-[1130px] px-6 py-16 lg:py-20">
-                <div class="mx-auto max-w-3xl text-center">
-                    <span class="home-eyebrow mx-auto">{{ app()->isLocale('ar') ? 'اقتراحات قريبة' : 'Selected suggestions' }}</span>
-                    <h2 class="home-title mx-auto mt-3 max-w-[10ch]">{{ app()->isLocale('ar') ? 'قد يعجبك أيضًا' : 'You May Also Like' }}</h2>
-                    <p class="home-copy mx-auto mt-4">{{ __('home.product_page.related_description') }}</p>
-                </div>
-
-                <div class="mt-12 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-                    @foreach ($relatedProducts as $index => $relatedProduct)
-                        <article class="figma-related-card">
-                            <div class="figma-related-card__media">
-                                <img src="{{ asset($relatedVisuals[$index] ?? $relatedProduct['image']) }}"
-                                     alt="{{ $relatedProduct['name'] }}"
-                                       loading="lazy"
-                                       decoding="async"
-                                       width="420"
-                                       height="420"
-                                       sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
-                                     class="h-full w-full object-cover">
-
-                                @if (!empty($relatedProduct['badge']))
-                                    <span class="figma-status-chip figma-status-chip--small">{{ $relatedProduct['badge'] }}</span>
-                                @endif
-                            </div>
-                            <div class="figma-related-card__content">
-                                <h3>{{ $relatedProduct['name'] }}</h3>
-                                <p>{{ $relatedProduct['price'] }}</p>
-                                <a href="{{ route('products.show', ['slug' => $relatedProduct['slug']]) }}">{{ __('home.products.view_and_order') }}</a>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

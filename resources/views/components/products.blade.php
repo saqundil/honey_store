@@ -3,7 +3,15 @@
     'products' => []
 ])
 
-@php($productsBackground = asset('images/Section.png'))
+@php
+    $productsBackground = asset('images/Section2.png');
+    $productCount = collect($products)->count();
+    $productGridClasses = match (true) {
+        $productCount <= 1 => 'mx-auto max-w-[34rem] grid-cols-1',
+        $productCount === 2 => 'mx-auto max-w-[980px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8',
+        default => 'grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7',
+    };
+@endphp
 
 <section id="products" class="relative scroll-mt-[100px] overflow-hidden bg-[#fbf7f1] py-18 lg:scroll-mt-[116px] lg:py-24">
 
@@ -13,7 +21,7 @@
          class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-30 select-none">
 
     {{-- Overlay --}}
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(246,193,90,0.12),_transparent_42%),linear-gradient(180deg,rgba(251,247,241,0.64),rgba(251,247,241,0.96))]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(246,193,90,0.18),_transparent_36%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_8%,rgba(255,244,223,0.96)_22%,rgba(255,236,205,0.88)_44%,rgba(251,247,241,0.96)_100%)]"></div>
 
     <div class="relative max-w-[1300px] mx-auto px-6">
         <div class="home-surface relative overflow-hidden px-6 py-8 sm:p-8 lg:p-10">
@@ -26,7 +34,7 @@
             </div>
 
             {{-- Product Grid --}}
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+            <div class="grid {{ $productGridClasses }}">
             @foreach ($products as $product)
             <article class="home-surface-soft home-card-hover flex flex-col overflow-hidden p-4 sm:p-5 group">
 

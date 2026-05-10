@@ -12,7 +12,7 @@
             class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain object-top select-none">
 
     {{-- Overlay --}}
-    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,_rgba(199,72,23,0.08),_transparent_38%),linear-gradient(180deg,rgba(251,247,241,0.56),rgba(251,247,241,0.9))]"></div>
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,_rgba(199,72,23,0.12),_transparent_32%),radial-gradient(circle_at_top_left,_rgba(246,193,90,0.10),_transparent_34%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_8%,rgba(255,243,221,0.95)_24%,rgba(255,235,214,0.86)_46%,rgba(251,247,241,0.94)_100%)]"></div>
 
     <div class="relative z-[2] mx-auto max-w-[1300px] px-6">
         <div class="flex flex-col gap-14 lg:gap-16">

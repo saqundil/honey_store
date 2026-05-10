@@ -14,16 +14,9 @@ class ProductController extends Controller
     public function show(string $locale, string $slug): View
     {
         $product = Product::active()->where('slug', $slug)->firstOrFail();
-        $relatedProducts = Product::active()
-            ->where('id', '!=', $product->id)
-            ->limit(4)
-            ->get()
-            ->map(fn (Product $relatedProduct) => $relatedProduct->toLocalizedArray())
-            ->all();
 
         return view('pages.product-show', [
             'product' => $product->toLocalizedArray(),
-            'relatedProducts' => $relatedProducts,
         ]);
     }
 
