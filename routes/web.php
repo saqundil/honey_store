@@ -31,6 +31,74 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('/sitemap.xml', function () {
+    $urls = collect([
+        [
+            'loc' => route('home'),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ],
+        [
+            'loc' => route('about'),
+            'changefreq' => 'monthly',
+            'priority' => '0.8',
+        ],
+        [
+            'loc' => route('contact'),
+            'changefreq' => 'monthly',
+            'priority' => '0.7',
+        ],
+        [
+            'loc' => route('faq'),
+            'changefreq' => 'monthly',
+            'priority' => '0.7',
+        ],
+        [
+            'loc' => route('shipping'),
+            'changefreq' => 'monthly',
+            'priority' => '0.6',
+        ],
+        [
+            'loc' => route('privacy'),
+            'changefreq' => 'yearly',
+            'priority' => '0.4',
+        ],
+        [
+            'loc' => route('terms'),
+            'changefreq' => 'yearly',
+            'priority' => '0.4',
+        ],
+    ])->concat(
+        Product::active()
+            ->get(['slug', 'updated_at'])
+            ->map(fn (Product $product) => [
+                'loc' => route('products.show', ['slug' => $product->slug]),
+                'lastmod' => $product->updated_at?->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.9',
+            ])
+    );
+
+    $xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
+
+    foreach ($urls as $url) {
+        $xml[] = '    <url>';
+        $xml[] = '        <loc>'.htmlspecialchars($url['loc'], ENT_XML1).'</loc>';
+
+        if (! empty($url['lastmod'])) {
+            $xml[] = '        <lastmod>'.htmlspecialchars($url['lastmod'], ENT_XML1).'</lastmod>';
+        }
+
+        $xml[] = '        <changefreq>'.htmlspecialchars($url['changefreq'], ENT_XML1).'</changefreq>';
+        $xml[] = '        <priority>'.htmlspecialchars($url['priority'], ENT_XML1).'</priority>';
+        $xml[] = '    </url>';
+    }
+
+    $xml[] = '</urlset>';
+
+    return response(implode("\n", $xml), 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');
+
 Route::redirect('/products', '/#products')->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/products/{slug}/order', [ProductController::class, 'order'])->name('products.order');

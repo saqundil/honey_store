@@ -1,6 +1,6 @@
 @php
     $products = collect(trans('home.products.items'))->take(6);
-    $articles = collect(trans('home.news.articles'))->take(3);
+    $highlights = collect(trans('home.news.items'))->take(3);
     $footerBackground = asset('images/Footer [qodef-page-footer].webp');
     $phoneValue = __('home.footer.phone_value');
     $emailValue = __('home.footer.email');
@@ -129,13 +129,13 @@
                     </h3>
 
                     <div class="space-y-4">
-                        @foreach ($articles as $article)
+                        @foreach ($highlights as $highlight)
                             <article class="rounded-[1.35rem] border border-white/10 bg-white/6 p-4 backdrop-blur-sm transition duration-300 hover:border-[#f6c15a]/24 hover:bg-white/9">
                                 <p class="font-condensed text-[12px] font-bold uppercase tracking-[0.2em] text-[#f6c15a]">
-                                    {{ $article['date'] }}
+                                    {{ $highlight['badge'] }}
                                 </p>
                                 <p class="mt-3 font-condensed text-[1.35rem] font-bold uppercase leading-[1.15] text-white">
-                                    {{ $article['title'] }}
+                                    {{ $highlight['title'] }}
                                 </p>
                             </article>
                         @endforeach

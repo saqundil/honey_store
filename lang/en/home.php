@@ -6,7 +6,11 @@ return [
         'logo_alt' => 'Treasures Kyrgyzstan',
     ],
     'meta' => [
-        'title' => 'Treasures Kyrgyzstan',
+        'title' => 'Treasures Kyrgyzstan | Premium Natural Honey from Kyrgyzstan',
+        'description' => 'Treasures Kyrgyzstan offers premium natural honey selected from Kyrgyz landscapes, with a focus on purity, quality, and authentic taste.',
+        'keywords' => 'honey, natural honey, premium honey, Kyrgyzstan honey, white honey, sainfoin honey, honey store, buy honey online',
+        'site_name' => 'Treasures Kyrgyzstan',
+        'og_image' => 'images/products/white-sainfoin/front-view.png',
     ],
     'nav' => [
         'home' => 'Home',
@@ -40,23 +44,24 @@ return [
         'signature_alt' => 'Signature',
     ],
     'news' => [
-        'heading' => 'Latest News',
-        'show_more' => 'Read More News',
-        'articles' => [
+        'eyebrow' => 'What makes us different',
+        'heading' => 'Why customers choose us',
+        'show_more' => 'Learn more about us',
+        'items' => [
             [
-                'date' => 'May 14, 2020',
-                'title' => 'Fresh Raw Honey, Carefully Packed',
-                'excerpt' => 'Explore naturally rich honey prepared with care and presented in packaging designed to preserve its purity.',
+                'badge' => 'Trusted origin',
+                'title' => 'Honey selected from natural Kyrgyz landscapes',
+                'excerpt' => 'We focus on honey with a clearer source story and a taste shaped by clean mountain meadows in Kyrgyzstan.',
             ],
             [
-                'date' => 'May 14, 2020',
-                'title' => 'Raw Honey Products and Beekeeping Insights',
-                'excerpt' => 'Discover handcrafted honey selections and practical stories from the world of mindful beekeeping.',
+                'badge' => 'Careful presentation',
+                'title' => 'Packaging and presentation that protect quality',
+                'excerpt' => 'We care about presentation and product handling so the experience feels considered from the first look to the final taste.',
             ],
             [
-                'date' => 'May 13, 2020',
-                'title' => 'A Simple Guide to Bees and Healthy Hives',
-                'excerpt' => 'Learn the essentials of bee care, hive health, and the foundations of responsible beekeeping.',
+                'badge' => 'Direct support',
+                'title' => 'Easy ordering with faster communication',
+                'excerpt' => 'The website and WhatsApp flow make it easier to confirm orders, delivery details, and customer questions quickly.',
             ],
         ],
     ],
