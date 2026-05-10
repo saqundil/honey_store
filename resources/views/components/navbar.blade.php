@@ -2,6 +2,7 @@
 @php
     $currentLocale = app()->currentLocale();
     $currentRoute = Route::currentRouteName();
+    $currentParameters = collect(request()->route()?->parameters() ?? [])->except('locale')->all();
     $desktopNavItem = fn (string ...$routes) => collect($routes)->contains($currentRoute)
         ? 'bg-[#2c1b0b] text-white shadow-[0_14px_28px_rgba(44,27,11,0.14)]'
         : 'text-honey-nav hover:bg-[#2c1b0b]/5 hover:text-honey-orange';
@@ -11,6 +12,13 @@
     $localePill = fn (string $locale) => $currentLocale === $locale
         ? 'bg-honey-orange text-white shadow-[0_12px_24px_rgba(199,72,23,0.18)]'
         : 'text-honey-nav hover:bg-[#2c1b0b]/5 hover:text-honey-orange';
+    $localizedUrl = function (string $locale) use ($currentRoute, $currentParameters) {
+        if (! $currentRoute || str_starts_with($currentRoute, 'admin.')) {
+            return route('home', ['locale' => $locale]);
+        }
+
+        return route($currentRoute, array_merge($currentParameters, ['locale' => $locale]));
+    };
 @endphp
 
 <header class="fixed left-0 right-0 top-0 z-50 border-b border-[#2c1b0b]/8 bg-[linear-gradient(180deg,rgba(251,247,241,0.94),rgba(251,247,241,0.82))] backdrop-blur-xl shadow-[0_1px_0_rgba(44,27,11,0.04)] transition-shadow duration-300" id="site-header">
@@ -49,11 +57,11 @@
 
             <div class="hidden lg:flex items-center gap-4 xl:gap-5">
                 <div class="flex items-center gap-1 rounded-full border border-[#2c1b0b]/8 bg-[#fbf7f1]/88 p-1 font-condensed text-xs font-bold uppercase tracking-[0.2em] text-honey-nav">
-                    <a href="{{ route('locale.switch', ['locale' => 'en']) }}"
+                    <a href="{{ $localizedUrl('en') }}"
                        class="rounded-full px-3 py-2 transition-all duration-200 {{ $localePill('en') }}">
                         {{ __('home.nav.languages.en') }}
                     </a>
-                    <a href="{{ route('locale.switch', ['locale' => 'ar']) }}"
+                    <a href="{{ $localizedUrl('ar') }}"
                        class="rounded-full px-3 py-2 transition-all duration-200 {{ $localePill('ar') }}">
                         {{ __('home.nav.languages.ar') }}
                     </a>
@@ -105,11 +113,11 @@
 
                 <div class="mt-4 flex items-center justify-between border-t border-[#2c1b0b]/8 pt-4">
                     <div class="flex items-center gap-2 rounded-full border border-[#2c1b0b]/8 bg-[#fbf7f1] p-1 font-condensed font-bold text-sm uppercase tracking-widest text-honey-nav">
-                        <a href="{{ route('locale.switch', ['locale' => 'en']) }}"
+                        <a href="{{ $localizedUrl('en') }}"
                            class="rounded-full px-3 py-1.5 transition-all {{ $localePill('en') }}">
                             {{ __('home.nav.languages.en') }}
                         </a>
-                        <a href="{{ route('locale.switch', ['locale' => 'ar']) }}"
+                        <a href="{{ $localizedUrl('ar') }}"
                            class="rounded-full px-3 py-1.5 transition-all {{ $localePill('ar') }}">
                             {{ __('home.nav.languages.ar') }}
                         </a>

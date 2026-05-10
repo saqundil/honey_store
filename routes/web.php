@@ -12,72 +12,90 @@ use App\Http\Controllers\ProductController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/locale/{locale}', function (string $locale) {
-    abort_unless(in_array($locale, config('app.available_locales', ['en', 'ar']), true), 404);
+$availableLocales = config('app.available_locales', ['en', 'ar']);
+$resolvePreferredLocale = static function () use ($availableLocales): string {
+    $locale = session('locale', config('app.locale'));
 
+    return in_array($locale, $availableLocales, true)
+        ? $locale
+        : config('app.fallback_locale', 'en');
+};
+
+Route::get('/locale/{locale}', function (string $locale) use ($availableLocales) {
+    abort_unless(in_array($locale, $availableLocales, true), 404);
     session(['locale' => $locale]);
 
-    return redirect()->back();
+    return redirect()->route('home', ['locale' => $locale]);
 })->name('locale.switch');
 
-Route::get('/', function () {
-    $products = Product::active()
-        ->get()
-        ->map(fn (Product $product) => $product->toLocalizedArray())
-        ->all();
+Route::get('/', function () use ($resolvePreferredLocale) {
+    return redirect()->route('home', ['locale' => $resolvePreferredLocale()]);
+});
 
-    return view('pages.home', [
-        'products' => $products,
-    ]);
-})->name('home');
+Route::get('/about', fn () => redirect()->route('about', ['locale' => $resolvePreferredLocale()]));
+Route::get('/contact', fn () => redirect()->route('contact', ['locale' => $resolvePreferredLocale()]));
+Route::get('/faq', fn () => redirect()->route('faq', ['locale' => $resolvePreferredLocale()]));
+Route::get('/shipping', fn () => redirect()->route('shipping', ['locale' => $resolvePreferredLocale()]));
+Route::get('/privacy', fn () => redirect()->route('privacy', ['locale' => $resolvePreferredLocale()]));
+Route::get('/terms', fn () => redirect()->route('terms', ['locale' => $resolvePreferredLocale()]));
+Route::get('/products', fn () => redirect(route('home', ['locale' => $resolvePreferredLocale()]).'#products'))->name('products.index.redirect');
+Route::get('/products/{slug}', fn (string $slug) => redirect()->route('products.show', ['locale' => $resolvePreferredLocale(), 'slug' => $slug]));
+
+Route::prefix('{locale}')
+    ->whereIn('locale', $availableLocales)
+    ->middleware('locale')
+    ->group(function () use ($availableLocales) {
+        Route::get('/', function () {
+            $products = Product::active()
+                ->get()
+                ->map(fn (Product $product) => $product->toLocalizedArray())
+                ->all();
+
+            return view('pages.home', [
+                'products' => $products,
+            ]);
+        })->name('home');
+
+        Route::get('/products', fn () => redirect(route('home', ['locale' => app()->currentLocale()]).'#products'))->name('products.index');
+        Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+        Route::post('/products/{slug}/order', [ProductController::class, 'order'])->name('products.order');
+
+        Route::get('/about', [PageController::class, 'about'])->name('about');
+        Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+        Route::get('/faq', [PageController::class, 'faq'])->name('faq');
+        Route::get('/shipping', [PageController::class, 'shipping'])->name('shipping');
+        Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
+        Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+    });
 
 Route::get('/sitemap.xml', function () {
-    $urls = collect([
-        [
-            'loc' => route('home'),
-            'changefreq' => 'daily',
-            'priority' => '1.0',
-        ],
-        [
-            'loc' => route('about'),
-            'changefreq' => 'monthly',
-            'priority' => '0.8',
-        ],
-        [
-            'loc' => route('contact'),
-            'changefreq' => 'monthly',
-            'priority' => '0.7',
-        ],
-        [
-            'loc' => route('faq'),
-            'changefreq' => 'monthly',
-            'priority' => '0.7',
-        ],
-        [
-            'loc' => route('shipping'),
-            'changefreq' => 'monthly',
-            'priority' => '0.6',
-        ],
-        [
-            'loc' => route('privacy'),
-            'changefreq' => 'yearly',
-            'priority' => '0.4',
-        ],
-        [
-            'loc' => route('terms'),
-            'changefreq' => 'yearly',
-            'priority' => '0.4',
-        ],
-    ])->concat(
-        Product::active()
-            ->get(['slug', 'updated_at'])
-            ->map(fn (Product $product) => [
-                'loc' => route('products.show', ['slug' => $product->slug]),
-                'lastmod' => $product->updated_at?->toAtomString(),
-                'changefreq' => 'weekly',
-                'priority' => '0.9',
-            ])
-    );
+    $locales = config('app.available_locales', ['en', 'ar']);
+    $staticRoutes = collect([
+        ['name' => 'home', 'changefreq' => 'daily', 'priority' => '1.0'],
+        ['name' => 'about', 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['name' => 'contact', 'changefreq' => 'monthly', 'priority' => '0.7'],
+        ['name' => 'faq', 'changefreq' => 'monthly', 'priority' => '0.7'],
+        ['name' => 'shipping', 'changefreq' => 'monthly', 'priority' => '0.6'],
+        ['name' => 'privacy', 'changefreq' => 'yearly', 'priority' => '0.4'],
+        ['name' => 'terms', 'changefreq' => 'yearly', 'priority' => '0.4'],
+    ]);
+
+    $urls = collect($locales)
+        ->flatMap(fn (string $locale) => $staticRoutes->map(fn (array $route) => [
+            'loc' => route($route['name'], ['locale' => $locale]),
+            'changefreq' => $route['changefreq'],
+            'priority' => $route['priority'],
+        ]))
+        ->concat(
+            Product::active()
+                ->get(['slug', 'updated_at'])
+                ->flatMap(fn (Product $product) => collect($locales)->map(fn (string $locale) => [
+                    'loc' => route('products.show', ['locale' => $locale, 'slug' => $product->slug]),
+                    'lastmod' => $product->updated_at?->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.9',
+                ]))
+        );
 
     $xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
 
@@ -98,17 +116,6 @@ Route::get('/sitemap.xml', function () {
 
     return response(implode("\n", $xml), 200, ['Content-Type' => 'application/xml']);
 })->name('sitemap');
-
-Route::redirect('/products', '/#products')->name('products.index');
-Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
-Route::post('/products/{slug}/order', [ProductController::class, 'order'])->name('products.order');
-
-Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::get('/faq', [PageController::class, 'faq'])->name('faq');
-Route::get('/shipping', [PageController::class, 'shipping'])->name('shipping');
-Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
-Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'create'])->name('login');

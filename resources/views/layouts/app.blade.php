@@ -8,6 +8,18 @@
     $shareImage = asset(__('home.meta.og_image'));
     $faviconUrl = asset('favicon.svg');
     $localeCode = app()->getLocale() === 'ar' ? 'ar_JO' : 'en_US';
+    $availableLocales = config('app.available_locales', ['en', 'ar']);
+    $defaultIndexedLocale = config('app.fallback_locale', 'en');
+    $currentRoute = request()->route();
+    $currentRouteName = $currentRoute?->getName();
+    $currentRouteParameters = collect($currentRoute?->parameters() ?? [])->except('locale')->all();
+    $alternateLocaleUrls = collect($availableLocales)->mapWithKeys(function (string $locale) use ($currentRouteName, $currentRouteParameters) {
+        if (! $currentRouteName || str_starts_with($currentRouteName, 'admin.')) {
+            return [$locale => url('/'.$locale)];
+        }
+
+        return [$locale => route($currentRouteName, array_merge($currentRouteParameters, ['locale' => $locale]))];
+    });
     $organizationLd = [
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
@@ -42,6 +54,10 @@
     <meta name="twitter:description" content="{{ $metaDescription }}">
     <meta name="twitter:image" content="{{ $shareImage }}">
     <link rel="canonical" href="{{ $currentUrl }}">
+    @foreach ($alternateLocaleUrls as $alternateLocale => $alternateUrl)
+        <link rel="alternate" hreflang="{{ $alternateLocale }}" href="{{ $alternateUrl }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ $alternateLocaleUrls[$defaultIndexedLocale] ?? url('/') }}">
     <link rel="icon" type="image/svg+xml" href="{{ $faviconUrl }}">
     <link rel="shortcut icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">

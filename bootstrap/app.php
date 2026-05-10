@@ -15,12 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'locale' => SetLocale::class,
             'panel.auth' => AuthenticateAdminPanel::class,
             'panel.role' => EnsurePanelRole::class,
-        ]);
-
-        $middleware->web(append: [
-            SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
