@@ -75,6 +75,7 @@ class ProductSeeder extends Seeder
             'name' => Arr::get($product, 'name', ''),
             'excerpt' => Arr::get($product, 'excerpt', ''),
             'description' => Arr::get($product, 'description', ''),
+            'hero_image' => Arr::get($product, 'hero_image'),
             'compare_at_price_value' => filled(Arr::get($product, 'compare_at_price_value'))
                 ? (float) Arr::get($product, 'compare_at_price_value')
                 : null,

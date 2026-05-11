@@ -74,6 +74,7 @@ return [
             [
                 'slug' => 'white-sainfoin-honey',
                 'image' => 'images/products/white-sainfoin/front-view.png',
+                'hero_image' => 'images/products/white-sainfoin/lifestyle-view.png',
                 'name' => 'White Sainfoin Honey',
                 'price' => '9 JOD',
                 'price_value' => 9,
@@ -109,7 +110,8 @@ return [
             ],
             [
                 'slug' => 'mountain-honey',
-                'image' => 'images/h1product2.png',
+                'image' => 'images/products/mountain-honey/front-main-view.png',
+                'hero_image' => 'images/products/mountain-honey/lifestyle-view.png',
                 'name' => 'Mountain Honey',
                 'price' => '9 JOD',
                 'price_value' => 9,
@@ -127,9 +129,9 @@ return [
                 'category' => 'Mountain Honey',
                 'tags' => ['Mountain Honey', 'Highlands', 'Kyrgyzstan'],
                 'gallery' => [
-                    ['src' => 'images/h1product2.png', 'alt' => 'Front view of the Mountain Honey jar'],
-                    ['src' => 'images/h1product1.png', 'alt' => 'Additional mountain honey visual with honeycomb'],
-                    ['src' => 'images/h1product3.png', 'alt' => 'Natural honey jar from the Kyrgyz selection'],
+                    ['src' => 'images/products/mountain-honey/front-main-view.png', 'alt' => 'Main front view of the Mountain Honey jar'],
+                    ['src' => 'images/products/mountain-honey/front-view.png', 'alt' => 'Front view of the Mountain Honey jar'],
+                    ['src' => 'images/products/mountain-honey/top-view.png', 'alt' => 'Top angle view of the Mountain Honey jar'],
                 ],
                 'highlights' => [
                     'Rich amber color.',

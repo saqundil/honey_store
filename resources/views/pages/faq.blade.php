@@ -54,7 +54,7 @@
 
                 <div class="static-page-card mt-8 p-8 text-center sm:p-10">
                     <span class="static-page-kicker mx-auto">{{ __('pages.faq.title') }}</span>
-                    <h3 class="static-page-title mx-auto max-w-[10ch]">{{ $isRtl ? 'لم تجد إجابتك؟' : 'Still have questions?' }}</h3>
+                    <h3 class="static-page-title mx-auto {{ $isRtl ? '' : 'max-w-[10ch]' }}" @if($isRtl) style="max-width:none; white-space:nowrap;" @endif>{{ $isRtl ? 'لم تجد إجابتك؟' : 'Still have questions?' }}</h3>
                     <p class="mx-auto mt-4 max-w-[34rem] text-base leading-8 text-honey-grey">{{ $isRtl ? 'تواصل معنا وسنكون سعداء بمساعدتك.' : 'Get in touch and we\'ll be happy to help.' }}</p>
                     <a href="{{ route('contact') }}" class="static-page-cta mt-6">{{ __('home.nav.contact') }}</a>
                 </div>

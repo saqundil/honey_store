@@ -125,6 +125,7 @@ class Product extends Model
             'seller_id' => $this->seller_id,
             'slug' => $this->slug,
             'image' => $this->image,
+            'hero_image' => $translation['hero_image'] ?? null,
             'image_url' => $this->imageUrl(),
             'sku' => $this->sku,
             'price' => $this->formattedPrice(),

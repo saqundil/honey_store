@@ -54,7 +54,7 @@ return [
         'info_phone_label' => 'اتصل بنا',
         'info_email_label' => 'راسلنا',
         'info_hours_label' => 'ساعات العمل',
-        'info_hours_value' => 'الاثنين–الجمعة: 9:00 صباحاً – 6:00 مساءً',
+        'info_hours_value' => 'السبت–الخميس: 9:00 صباحاً – 9:00 مساءً',
         'social_heading' => 'تابعنا',
     ],
     'faq' => [

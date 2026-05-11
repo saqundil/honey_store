@@ -70,6 +70,14 @@
     ];
 @endphp
 
+<style>
+    @media (min-width: 1024px) {
+        #aboutPage .about-origin-panel-body {
+            padding-bottom: 1rem;
+        }
+    }
+</style>
+
 <div class="relative isolate overflow-hidden bg-[#fbf7f1]" id="aboutPage">
     <div class="pointer-events-none absolute inset-x-0 top-0 h-[38rem] bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.22),_transparent_45%),radial-gradient(circle_at_top_right,_rgba(199,72,23,0.16),_transparent_34%),linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(251,247,241,0.78)_56%,_rgba(251,247,241,1)_100%)]"></div>
     <div class="pointer-events-none absolute -left-16 top-24 h-48 w-48 rounded-full bg-[#f6c15a]/30 blur-3xl"></div>
@@ -82,7 +90,7 @@
             <span class="text-honey-dark">{{ __('pages.about.title') }}</span>
         </nav>
 
-        <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-start lg:gap-12">
+        <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-stretch lg:gap-12">
             <div class="about-reveal is-revealed">
                 <span class="inline-flex rounded-full border border-[#c74817]/12 bg-white/70 px-4 py-2 font-condensed text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#c74817] shadow-[0_12px_32px_rgba(199,72,23,0.08)] backdrop-blur-sm">
                     {{ __('pages.about.hero_eyebrow') }}
@@ -133,11 +141,11 @@
                 </div>
             </div>
 
-            <div class="about-reveal is-revealed relative">
-                <div class="relative overflow-hidden rounded-[2.2rem] border border-[#2c1b0b]/8 bg-white/82 shadow-[0_30px_80px_rgba(44,27,11,0.12)] backdrop-blur-sm">
+            <div class="about-reveal is-revealed relative h-full">
+                <div class="relative h-full overflow-hidden rounded-[2.2rem] border border-[#2c1b0b]/8 bg-white/82 shadow-[0_30px_80px_rgba(44,27,11,0.12)] backdrop-blur-sm">
                     <div class="absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(246,193,90,0.16),transparent)]"></div>
-                    <div class="relative grid gap-5 p-5 sm:p-6">
-                        <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-stretch">
+                    <div class="about-origin-panel-body relative h-full p-5 sm:p-6">
+                        <div class="flex h-full flex-col gap-5">
                             <figure class="relative overflow-hidden rounded-[1.7rem] border border-[#2c1b0b]/8 bg-[#f3eeea] shadow-[0_14px_34px_rgba(44,27,11,0.07)]">
                                 <div class="pointer-events-none absolute inset-x-0 top-0 z-[1] h-28 bg-[linear-gradient(180deg,rgba(246,193,90,0.18),transparent)]"></div>
                                 <div class="absolute left-4 top-4 z-[2] rounded-full border border-white/70 bg-white/84 px-3 py-2 font-condensed text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#c74817] shadow-[0_10px_24px_rgba(44,27,11,0.08)] backdrop-blur-sm">
@@ -145,31 +153,21 @@
                                 </div>
                                 <img src="{{ asset('images/h1-img6.png') }}"
                                      alt="{{ __('pages.about.intro_heading') }}"
-                                     class="h-full min-h-[22rem] w-full object-cover"
+                                      class="h-full w-full object-cover"
+                                      style="min-height: clamp(15rem, 28vw, 22rem);"
                                      loading="lazy"
                                      decoding="async">
-                                <div class="absolute inset-x-4 bottom-4 z-[2] rounded-[1rem] border border-white/75 bg-white/82 px-4 py-3 shadow-[0_10px_24px_rgba(44,27,11,0.08)] backdrop-blur-sm">
-                                    <p class="font-condensed text-[0.62rem] font-bold uppercase tracking-[0.22em] text-[#c74817]">{{ $isRtl ? 'موطن العسل' : 'Land of origin' }}</p>
-                                    <p class="mt-1 text-xs font-semibold text-[#2c1b0b]">{{ $isRtl ? 'خريطة سريعة للمشهد القرغيزي الذي تبدأ منه حكاية العسل.' : 'A quick map of the Kyrgyz landscape where our honey story begins.' }}</p>
-                                </div>
                             </figure>
 
-                            <div class="flex flex-col gap-4">
-                                <div class="rounded-[1.4rem] border border-[#2c1b0b]/8 bg-[#fff8ee] p-5 sm:p-6">
-                                    <p class="font-condensed text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#c74817]">{{ $isRtl ? 'من أين نبدأ' : 'Where we begin' }}</p>
-                                    <h2 class="mt-2 font-condensed text-[1.45rem] font-bold uppercase leading-tight text-[#2c1b0b] sm:text-[1.6rem]">{{ __('pages.about.origin_heading') }}</h2>
-                                    <p class="mt-3 text-[0.98rem] leading-8 text-honey-grey">{{ __('pages.about.origin_text') }}</p>
-                                </div>
-
-                                <div class="flex items-start gap-3 rounded-[1.4rem] border border-[#c74817]/10 bg-white p-5 shadow-[0_12px_24px_rgba(44,27,11,0.05)] sm:p-6">
+                            <div class="rounded-[1.4rem] border border-[#c74817]/10 bg-white p-5 shadow-[0_12px_24px_rgba(44,27,11,0.05)] sm:p-6 lg:flex lg:flex-col lg:justify-center {{ $isRtl ? 'text-right' : 'text-left' }}" style="flex: 1 1 0%;">
+                                <div class="flex items-center gap-3 {{ $isRtl ? 'justify-start' : 'justify-start' }}">
                                     <span class="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#c74817]/10">
                                         <img src="{{ asset('images/bee.png') }}" alt="" class="h-7 w-7 object-contain" loading="lazy" decoding="async">
                                     </span>
-                                    <div>
-                                        <p class="font-condensed text-[0.72rem] font-bold uppercase tracking-[0.22em] text-[#c74817]">{{ $isRtl ? 'لماذا يهم' : 'Why it matters' }}</p>
-                                        <p class="mt-2 text-[0.96rem] font-semibold leading-7 text-[#2c1b0b]">{{ $isRtl ? 'الأرض التي يبدأ منها العسل تصنع فرقًا في الرائحة والطعم والملمس داخل كل عبوة.' : 'The land where the honey begins shapes the aroma, flavor, and texture carried in every jar.' }}</p>
-                                    </div>
+                                    <p class="font-condensed text-[0.72rem] font-bold uppercase tracking-[0.22em] text-[#c74817]">{{ $isRtl ? 'من أين نبدأ' : 'Where we begin' }}</p>
                                 </div>
+                                <h2 class="mt-2 font-condensed text-[1.45rem] font-bold uppercase leading-tight text-[#2c1b0b] sm:text-[1.6rem]">{{ __('pages.about.origin_heading') }}</h2>
+                                <p class="mt-3 text-[0.98rem] leading-8 text-honey-grey">{{ __('pages.about.origin_text') }}</p>
                             </div>
                         </div>
 

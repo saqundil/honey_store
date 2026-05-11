@@ -21,6 +21,11 @@
             $displayGallery = collect($fallbackGallery);
         }
 
+        $heroImage = [
+            'src' => $product['hero_image'] ?? $product['image'] ?? $displayGallery->first()['src'] ?? $fallbackGallery[0]['src'],
+            'alt' => $product['name'],
+        ];
+
         $displayGallery = $displayGallery
             ->take(5)
             ->values()
@@ -100,8 +105,8 @@
 
             <div class="figma-product-title__visual">
                 <div class="figma-product-title__visual-card">
-                    <img src="{{ asset($displayGallery[0]['src']) }}"
-                         alt="{{ $displayGallery[0]['alt'] }}"
+                    <img src="{{ asset($heroImage['src']) }}"
+                         alt="{{ $heroImage['alt'] }}"
                          width="700"
                          height="700"
                          decoding="async"

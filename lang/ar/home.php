@@ -74,6 +74,7 @@ return [
             [
                 'slug' => 'white-sainfoin-honey',
                 'image' => 'images/products/white-sainfoin/front-view.png',
+                'hero_image' => 'images/products/white-sainfoin/lifestyle-view.png',
                 'name' => 'عسل السنفون الأبيض القرغيزستاني',
                 'price' => '9 د.أ',
                 'price_value' => 9,
@@ -109,7 +110,8 @@ return [
             ],
             [
                 'slug' => 'mountain-honey',
-                'image' => 'images/h1product2.png',
+                'image' => 'images/products/mountain-honey/front-main-view.png',
+                'hero_image' => 'images/products/mountain-honey/lifestyle-view.png',
                 'name' => 'العسل الجبلي القرغيزستاني',
                 'price' => '9 د.أ',
                 'price_value' => 9,
@@ -127,9 +129,9 @@ return [
                 'category' => 'عسل جبلي',
                 'tags' => ['عسل جبلي', 'جبال', 'قرغيزستان'],
                 'gallery' => [
-                    ['src' => 'images/h1product2.png', 'alt' => 'الواجهة الأمامية لعبوة العسل الجبلي القرغيزستاني'],
-                    ['src' => 'images/h1product1.png', 'alt' => 'زاوية إضافية للعسل الجبلي مع قرص عسل'],
-                    ['src' => 'images/h1product3.png', 'alt' => 'عبوة فاتحة ضمن عرض العسل الطبيعي القرغيزي'],
+                    ['src' => 'images/products/mountain-honey/front-main-view.png', 'alt' => 'الواجهة الرئيسية لعبوة العسل الجبلي القرغيزستاني'],
+                    ['src' => 'images/products/mountain-honey/front-view.png', 'alt' => 'الواجهة الأمامية لعبوة العسل الجبلي القرغيزستاني'],
+                    ['src' => 'images/products/mountain-honey/top-view.png', 'alt' => 'زاوية علوية لعبوة العسل الجبلي القرغيزستاني'],
                 ],
                 'highlights' => [
                     'لون عنبري غني.',
