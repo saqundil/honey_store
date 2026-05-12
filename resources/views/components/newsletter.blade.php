@@ -6,17 +6,17 @@
     $tradeWhatsAppMessage = rawurlencode(__('home.newsletter.whatsapp_message'));
 @endphp
 
-<section class="relative overflow-hidden bg-[#fbf7f1] py-16 lg:py-24">
+<section class="relative isolate overflow-hidden bg-[#fbf7f1] py-16 lg:py-24">
 
     <img src="{{ $newsletterBackground }}"
          alt=""
          aria-hidden="true"
-         class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-30 select-none">
+            class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain object-center opacity-30 select-none">
 
     {{-- Overlay --}}
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(246,193,90,0.16),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(199,72,23,0.08),_transparent_34%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_8%,rgba(255,244,224,0.95)_22%,rgba(255,238,210,0.88)_44%,rgba(251,247,241,0.96)_100%)]"></div>
+        <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(246,193,90,0.16),_transparent_38%),radial-gradient(circle_at_top_right,_rgba(199,72,23,0.08),_transparent_34%),linear-gradient(180deg,#fbf7f1_0%,#fbf7f1_8%,rgba(255,244,224,0.95)_22%,rgba(255,238,210,0.88)_44%,rgba(251,247,241,0.96)_100%)]"></div>
 
-    <div class="relative mx-auto max-w-[1300px] px-6">
+        <div class="relative z-[2] mx-auto max-w-[1300px] px-6">
         <div class="flex w-full flex-col gap-16 lg:gap-20">
             <div class="home-surface grid w-full gap-10 px-6 py-8 sm:p-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-center lg:gap-12 lg:p-10">
 

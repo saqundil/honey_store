@@ -5,16 +5,16 @@
 
 @php($typesBackground = asset('images/Section_2.png'))
 
-<section class="relative overflow-hidden bg-honey-cream py-16 md:min-h-[32rem] lg:min-h-[38rem] xl:aspect-[1920/1345] xl:min-h-0 xl:py-0">
+<section class="relative isolate overflow-hidden bg-honey-cream py-16 md:min-h-[32rem] lg:min-h-[38rem] xl:aspect-[1920/1345] xl:min-h-0 xl:py-0">
 
     <img src="{{ $typesBackground }}"
          alt=""
          aria-hidden="true"
-         class="pointer-events-none absolute inset-0 h-full w-full object-contain object-center select-none">
+            class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain object-center select-none">
 
-    <div class="absolute inset-0 bg-honey-cream/36"></div>
+        <div class="absolute inset-0 z-0 bg-honey-cream/36"></div>
 
-    <div class="relative mx-auto flex min-h-[32rem] max-w-[1300px] items-center px-6 py-16 lg:min-h-[38rem] lg:py-24 xl:h-full xl:min-h-0 xl:py-0">
+        <div class="relative z-[2] mx-auto flex min-h-[32rem] max-w-[1300px] items-center px-6 py-16 lg:min-h-[38rem] lg:py-24 xl:h-full xl:min-h-0 xl:py-0">
         <div class="w-full">
 
         {{-- Section Header --}}
