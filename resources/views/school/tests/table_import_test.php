@@ -48,6 +48,16 @@ $expected = [
 ];
 foreach ($expected as $label => $type) assert($guessType->invoke($import, $label) === $type, "{$label} => {$type}");
 
+$bracketedMarks = $import->fromRows([[
+    $import->cell('التسلسل'),
+    $import->cell('اسم الطالب'),
+    $import->cell('القراءة (10)'),
+    $import->cell('المجموع (40)'),
+    $import->cell('النسبة % (100)'),
+]], 'رؤوس بعلامات');
+assert(array_column($bracketedMarks['columns'], 'name') === ['التسلسل', 'اسم الطالب', 'القراءة', 'المجموع', 'النسبة %']);
+assert(array_column($bracketedMarks['columns'], 'max_mark') === ['', '', '10', '10', '100']);
+
 // جدول Word نموذجي: رؤوس مدمجة، صف علامات قصوى، ثم صفوف فارغة للتعبئة
 $word = <<<'HTML'
 <table>
@@ -283,6 +293,34 @@ if ($extractor->isAvailable()) {
 } else {
     echo "pdftotext غير متاح؛ تم تخطي اختبار استخراج PDF.\n";
 }
+
+if (class_exists(\Smalot\PdfParser\Parser::class)) {
+    $fallback = new PdfTableExtractor('definitely-missing-pdftotext');
+    $fallbackRows = $fallback->rows(__DIR__ . '/fixtures/grade-sheet.pdf', 1, false);
+    assert(count($fallbackRows) === 5);
+    assert(count($fallbackRows[0]) === 6);
+    assert(array_column($fallbackRows[2], 'text') === ['1', 'Ahmad Ali', '8', '9', '18', '35']);
+    $assertSaveable($import->fromRows($fallbackRows, 'كشف من محلل PHP'));
+    echo "Pure-PHP PDF coordinate extraction checked.\n";
+}
+
+$tableBlock = new ReflectionMethod(PdfTableExtractor::class, 'tableBlock');
+$pageWithHeading = "نموذج قراءة وكتابة تجريبي    مبحث اللغة العربية\n"
+    . "السادس أ                      الفصل الدراسي\n"
+    . "2026/2027                    بيانات سابقة\n__PDF_BLOCK_GAP__\n"
+    . "التسلسل  اسم الطالب    القراءة  الكتابة\n"
+    . "1         أحمد          8        9\n"
+    . "2         سارة          7        10\n"
+    . "3         ليان          9        8\n";
+$detectedBlock = $tableBlock->invoke($extractor, $pageWithHeading);
+assert(!str_contains(implode('', $detectedBlock[0]), 'نموذج'));
+assert(str_contains(implode('', $detectedBlock[0]), 'التسلسل'));
+
+$canonicalHeader = new ReflectionMethod(PdfTableExtractor::class, 'canonicalHeader');
+assert($canonicalHeader->invoke($extractor, 'لتسلسل2027') === 'التسلسل');
+assert($canonicalHeader->invoke($extractor, 'سم الطالبا') === 'اسم الطالب');
+assert($canonicalHeader->invoke($extractor, 'لقراءة (10)ا') === 'القراءة (10)');
+assert($canonicalHeader->invoke($extractor, 'لنسبة % (100)ا') === 'النسبة % (100)');
 
 // المسودة تمر فعليًا عبر TemplateService::save، وهي البوابة التي تحرس القالب
 try {

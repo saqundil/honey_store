@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('الملف ليس PDF صالحًا.');
             }
             if (!$pdfReady) {
-                throw new RuntimeException('أداة pdftotext غير متوفرة على هذا الخادم، فلا يمكن قراءة الـPDF. استخدم لصق الجدول من Word أو Excel، أو اضبط PDFTOTEXT_PATH.');
+                throw new RuntimeException('لا يتوفر محرك لقراءة PDF على هذا الخادم. استخدم لصق الجدول من Word أو Excel.');
             }
             $direction = (string) ($_POST['direction'] ?? 'auto');
             $rows = $extractor->rows($file['tmp_name'], (int) ($_POST['page'] ?? 1), $direction === 'auto' ? null : $direction === 'rtl');
@@ -120,13 +120,12 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                 <p>
                     للـPDF النصي فقط. الـPDF لا يخزّن جدولًا بل نصًا بإحداثيات، فتُستنتج الأعمدة من
                     مواضع الكتابة؛ توقّع مراجعة أكثر، وقد لا تظهر مجموعات الرؤوس.
-                    الملف الممسوح ضوئيًا (صورة) غير مدعوم.
+                    يعمل محلل PHP تلقائيًا عند غياب <code>pdftotext</code>، أما الملف الممسوح ضوئيًا (صورة) فغير مدعوم.
                 </p>
 
                 <?php if (!$pdfReady): ?>
                     <p class="hint warn">
-                        أداة <code>pdftotext</code> غير متوفرة على هذا الخادم. ثبّت poppler أو Xpdf،
-                        أو اضبط <code>PDFTOTEXT_PATH</code> على مسارها، أو استخدم اللصق.
+                        لا يتوفر محرك لقراءة PDF على هذا الخادم؛ استخدم اللصق من Word أو Excel.
                     </p>
                 <?php endif; ?>
 

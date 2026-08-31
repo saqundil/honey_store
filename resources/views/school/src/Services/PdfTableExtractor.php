@@ -19,6 +19,7 @@ use RuntimeException;
 final class PdfTableExtractor
 {
     private const MIN_GAP = 2;
+    private const BLOCK_GAP = '__PDF_BLOCK_GAP__';
 
     private string $binary;
 
@@ -30,10 +31,15 @@ final class PdfTableExtractor
     /** Xpdf's pdftotext exits 99 on -v while poppler's exits 0, so only the banner is checked. */
     public function isAvailable(): bool
     {
+        return $this->hasBinary() || class_exists(\Smalot\PdfParser\Parser::class);
+    }
+
+    private function hasBinary(): bool
+    {
         try {
             [, $output, $error] = $this->execute([$this->binary, '-v']);
             return stripos($output . $error, 'pdftotext') !== false;
-        } catch (RuntimeException) {
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -43,6 +49,10 @@ final class PdfTableExtractor
      */
     public function rows(string $path, int $page = 1, ?bool $rtl = null): array
     {
+        if (!$this->hasBinary() && class_exists(\Smalot\PdfParser\Parser::class)) {
+            return $this->coordinateRows($this->phpPage($path, $page), $rtl);
+        }
+
         $text = $this->text($path, $page);
         if (trim($text) === '') {
             throw new RuntimeException('لا يحتوي هذا الـPDF على نص قابل للقراءة. الأرجح أنه ممسوح ضوئيًا كصورة؛ استخدم لصق الجدول من Word أو Excel.');
@@ -69,7 +79,233 @@ final class PdfTableExtractor
     public function text(string $path, int $page = 1): string
     {
         $page = max(1, $page);
-        return $this->run([$this->binary, '-layout', '-nopgbrk', '-enc', 'UTF-8', '-f', (string) $page, '-l', (string) $page, $path, '-']);
+        if ($this->hasBinary()) {
+            return $this->run([$this->binary, '-layout', '-nopgbrk', '-enc', 'UTF-8', '-f', (string) $page, '-l', (string) $page, $path, '-']);
+        }
+
+        if (!class_exists(\Smalot\PdfParser\Parser::class)) {
+            throw new RuntimeException('لا يتوفر محرك لقراءة PDF على هذا الخادم. استخدم لصق الجدول من Word أو Excel.');
+        }
+
+        try {
+            return $this->coordinateLayout($this->phpPage($path, $page));
+        } catch (RuntimeException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            throw new RuntimeException('تعذر قراءة نص PDF بواسطة محلل PHP. قد يكون الملف مشفرًا أو ممسوحًا ضوئيًا.', 0, $exception);
+        }
+    }
+
+    private function phpPage(string $path, int $page): \Smalot\PdfParser\Page
+    {
+        $pages = (new \Smalot\PdfParser\Parser())->parseFile($path)->getPages();
+        if (!isset($pages[$page - 1])) {
+            throw new RuntimeException("صفحة PDF رقم {$page} غير موجودة.");
+        }
+
+        return $pages[$page - 1];
+    }
+
+    /** @return list<list<array{text:string,colspan:int,rowspan:int,header:bool}>> */
+    private function coordinateRows(\Smalot\PdfParser\Page $page, ?bool $rtl): array
+    {
+        $lines = $this->coordinateLines($page);
+        if (!$lines) throw new RuntimeException('لا يحتوي هذا الـPDF على نص قابل للقراءة.');
+
+        $gaps = [];
+        for ($index = 1; $index < count($lines); $index++) {
+            $gaps[] = abs($lines[$index - 1]['y'] - $lines[$index]['y']);
+        }
+        sort($gaps);
+        $medianGap = $gaps ? $gaps[(int) floor(count($gaps) / 2)] : 0;
+        $blocks = [[]];
+        foreach ($lines as $index => $line) {
+            if ($index > 0 && $medianGap > 0 && abs($lines[$index - 1]['y'] - $line['y']) > max(18, $medianGap * 1.6)) {
+                $blocks[] = [];
+            }
+            $blocks[array_key_last($blocks)][] = $line;
+        }
+        usort($blocks, static fn(array $left, array $right): int => count($right) <=> count($left));
+        $table = $blocks[0] ?? [];
+        if (count($table) < 2) throw new RuntimeException('تعذر تمييز جدول في هذه الصفحة.');
+
+        $threshold = 15.0;
+        $richest = [];
+        foreach ($table as $line) {
+            $runs = $this->coordinateRuns($line['items'], $threshold);
+            if (count($runs) > count($richest)) $richest = $runs;
+        }
+        if (count($richest) < 2) throw new RuntimeException('تعذر تمييز أعمدة الجدول من إحداثيات النص.');
+
+        $centers = array_map(static fn(array $run): float => ($run['from'] + $run['to']) / 2, $richest);
+        $boundaries = [];
+        for ($index = 1; $index < count($centers); $index++) {
+            $boundaries[] = ($centers[$index - 1] + $centers[$index]) / 2;
+        }
+        $rightToLeft = $rtl ?? $this->looksArabic(implode(' ', array_column($richest, 'text')));
+
+        $rows = [];
+        foreach ($table as $lineIndex => $line) {
+            $cells = array_fill(0, count($centers), '');
+            foreach ($line['items'] as $item) {
+                $slot = 0;
+                while (isset($boundaries[$slot]) && $item['x'] > $boundaries[$slot]) $slot++;
+                $cells[$slot] .= $item['text'];
+            }
+            $row = array_map(fn(string $text): array => [
+                'text' => $rightToLeft ? $this->logicalRtl($text) : trim($text),
+                'colspan' => 1,
+                'rowspan' => 1,
+                'header' => $lineIndex === 0,
+            ], $cells);
+            $rows[] = $rightToLeft ? array_reverse($row) : $row;
+        }
+
+        if ($rightToLeft && $rows) {
+            foreach ($rows[0] as &$cell) $cell['text'] = $this->canonicalHeader($cell['text']);
+            unset($cell);
+            foreach (array_slice($rows, 1, null, true) as $index => $row) {
+                $identity = trim(($row[0]['text'] ?? '').($row[1]['text'] ?? ''));
+                if (preg_match('/^(.*?)(\d+)$/u', $identity, $match)) {
+                    $rows[$index][0]['text'] = $match[2];
+                    $rows[$index][1]['text'] = trim($match[1]);
+                }
+            }
+        }
+
+        return $rows;
+    }
+
+    /** @return list<array{y:float,items:list<array{x:float,text:string}>}> */
+    private function coordinateLines(\Smalot\PdfParser\Page $page): array
+    {
+        $lines = [];
+        foreach ($page->getDataTm() as $entry) {
+            $matrix = $entry[0] ?? null;
+            $text = (string) ($entry[1] ?? '');
+            if (!is_array($matrix) || count($matrix) < 6 || $text === '') continue;
+            $y = (float) $matrix[5];
+            $lineIndex = null;
+            foreach ($lines as $index => $line) {
+                if (abs($line['y'] - $y) <= 5) { $lineIndex = $index; break; }
+            }
+            if ($lineIndex === null) {
+                $lineIndex = count($lines);
+                $lines[] = ['y' => $y, 'items' => []];
+            }
+            $lines[$lineIndex]['items'][] = ['x' => (float) $matrix[4], 'text' => $text];
+        }
+        usort($lines, static fn(array $left, array $right): int => $right['y'] <=> $left['y']);
+        foreach ($lines as &$line) usort($line['items'], static fn(array $left, array $right): int => $left['x'] <=> $right['x']);
+        unset($line);
+        return $lines;
+    }
+
+    /** @return list<array{from:float,to:float,text:string}> */
+    private function coordinateRuns(array $items, float $threshold): array
+    {
+        $runs = [];
+        foreach ($items as $item) {
+            $last = array_key_last($runs);
+            if ($last === null || $item['x'] - $runs[$last]['to'] > $threshold) {
+                $runs[] = ['from' => $item['x'], 'to' => $item['x'], 'text' => $item['text']];
+            } else {
+                $runs[$last]['to'] = $item['x'];
+                $runs[$last]['text'] .= $item['text'];
+            }
+        }
+        return $runs;
+    }
+
+    private function logicalRtl(string $text): string
+    {
+        $logical = implode('', array_reverse(mb_str_split(trim($text))));
+        $logical = preg_replace_callback('/[\d\/.]+/', static fn(array $match): string => strrev($match[0]), $logical) ?? $logical;
+        return strtr($logical, ['(' => ')', ')' => '(']);
+    }
+
+    private function canonicalHeader(string $text): string
+    {
+        $compact = preg_replace('/\s+/u', '', $text) ?? $text;
+        $mark = preg_match('/\(?\s*(\d+)\s*\)?/u', $compact, $match) ? " ({$match[1]})" : '';
+
+        return match (true) {
+            str_contains($compact, 'تسلسل') => 'التسلسل',
+            str_contains($compact, 'سمالطالب') => 'اسم الطالب',
+            str_contains($compact, 'قراءة') => 'القراءة'.$mark,
+            str_contains($compact, 'كتابة') => 'الكتابة'.$mark,
+            str_contains($compact, 'قواعد') => 'القواعد'.$mark,
+            str_contains($compact, 'ملاء') => 'الإملاء'.$mark,
+            str_contains($compact, 'مجموع') => 'المجموع'.$mark,
+            str_contains($compact, 'نسبة') => 'النسبة %'.$mark,
+            default => preg_replace('/\b20\d{2}\b/u', '', trim($text)) ?? trim($text),
+        };
+    }
+
+    private function coordinateLayout(\Smalot\PdfParser\Page $page): string
+    {
+        $items = [];
+        foreach ($page->getDataTm() as $entry) {
+            $matrix = $entry[0] ?? null;
+            $text = trim((string) ($entry[1] ?? ''));
+            if (!is_array($matrix) || count($matrix) < 6 || $text === '') continue;
+
+            $items[] = [
+                'x' => (float) $matrix[4],
+                'y' => (float) $matrix[5],
+                'text' => preg_replace('/\s+/u', ' ', $text) ?: $text,
+            ];
+        }
+        if (!$items) return $page->getText();
+
+        usort($items, static fn(array $left, array $right): int =>
+            abs($left['y'] - $right['y']) <= 2
+                ? $left['x'] <=> $right['x']
+                : $right['y'] <=> $left['y']
+        );
+
+        $minimumX = min(array_column($items, 'x'));
+        $lines = [];
+        foreach ($items as $item) {
+            $lineKey = null;
+            foreach (array_keys($lines) as $y) {
+                if (abs((float) $y - $item['y']) <= 2) {
+                    $lineKey = $y;
+                    break;
+                }
+            }
+            $lineKey ??= (string) $item['y'];
+            $lines[$lineKey] ??= ['y' => $item['y'], 'items' => []];
+            $lines[$lineKey]['items'][] = $item;
+        }
+
+        $verticalGaps = [];
+        $lineValues = array_values($lines);
+        for ($index = 1; $index < count($lineValues); $index++) {
+            $verticalGaps[] = abs($lineValues[$index - 1]['y'] - $lineValues[$index]['y']);
+        }
+        sort($verticalGaps);
+        $medianGap = $verticalGaps ? $verticalGaps[(int) floor(count($verticalGaps) / 2)] : 0;
+
+        $rendered = [];
+        $previousY = null;
+        foreach ($lineValues as $lineData) {
+            if ($previousY !== null && $medianGap > 0 && abs($previousY - $lineData['y']) > max(18, $medianGap * 1.6)) {
+                $rendered[] = self::BLOCK_GAP;
+            }
+            $previousY = $lineData['y'];
+            $line = $lineData['items'];
+            usort($line, static fn(array $left, array $right): int => $left['x'] <=> $right['x']);
+            $text = '';
+            foreach ($line as $item) {
+                $column = max(0, (int) round(($item['x'] - $minimumX) / 6));
+                $text .= str_repeat(' ', max(0, $column - mb_strlen($text)));
+                $text .= $item['text'];
+            }
+            $rendered[] = rtrim($text);
+        }
+
+        return implode("\n", $rendered);
     }
 
     // ---------------------------------------------------------------- layout

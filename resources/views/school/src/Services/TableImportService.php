@@ -331,11 +331,12 @@ final class TableImportService
         $columns = [];
         foreach ($raw as $index => $item) {
             $label = $item['label'] !== '' ? $item['label'] : 'عمود ' . ($index + 1);
+            $maxMark = $this->maxMarkFromLabel($label);
             $columns[] = [
-                'label' => $label,
+                'label' => $maxMark !== '' ? $this->withoutMaxMark($label) : $label,
                 'type' => $this->guessType($label),
                 'header_group_key' => $item['group'],
-                'max_mark' => $this->maxMarkFromLabel($label),
+                'max_mark' => $maxMark,
                 'source_column' => $index,
                 'vertical' => $item['vertical'] ?? false,
                 'width_mm' => $item['width_mm'] ?? null,
@@ -368,6 +369,12 @@ final class TableImportService
         if ($this->ratioInLabel($text)) return ''; // «المجموع 8/2» نسبة قسمة لا علامة قصوى
         if (preg_match('/(?:من|\/|out of)\s*(\d+(?:\.\d+)?)/ui', $text, $match)) return $match[1];
         return '';
+    }
+
+    private function withoutMaxMark(string $label): string
+    {
+        $clean = preg_replace('/\s*[\(\[\{]\s*[\d\x{0660}-\x{0669}\x{06F0}-\x{06F9}]+(?:[.,\x{066B}][\d\x{0660}-\x{0669}\x{06F0}-\x{06F9}]+)?\s*[\)\]\}]\s*/u', ' ', $label);
+        return trim(preg_replace('/\s+/u', ' ', $clean ?? $label));
     }
 
     /**
