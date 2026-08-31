@@ -42,6 +42,9 @@ Route::get('/terms', fn () => redirect()->route('terms', ['locale' => $resolvePr
 Route::get('/products', fn () => redirect(route('home', ['locale' => $resolvePreferredLocale()]).'#products'))->name('products.index.redirect');
 Route::get('/products/{slug}', fn (string $slug) => redirect()->route('products.show', ['locale' => $resolvePreferredLocale(), 'slug' => $slug]));
 
+Route::get('/school-assets/{asset}', [SchoolPageController::class, 'asset'])
+    ->where('asset', '.*')
+    ->name('school.asset');
 Route::get('/school', SchoolPageController::class)
     ->defaults('page', 'index.php')
     ->name('school.home');
