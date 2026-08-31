@@ -1,0 +1,8 @@
+.student-row[hidden] {
+  display: none;
+}
+
+.student-row > input {
+  width: 1px;
+  height: 1px;
+}

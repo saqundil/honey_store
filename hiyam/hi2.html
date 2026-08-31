@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>تقييم مهارة الكتابة</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Libre+Baskerville:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --frame-outer-gap: 6mm;
+            --frame-inner-gap: 4mm;
+            --frame-width: 7px;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px;
+            background: #eeeeee;
+            font-family: "Amiri", "Times New Roman", serif;
+            color: #111;
+        }
+
+        .actions {
+            width: min(222mm, 100%);
+            margin: 0 auto 12px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .print-button {
+            border: 1px solid #111;
+            padding: 8px 18px;
+            background: #fff;
+            color: #111;
+            font: 700 17px "Amiri", serif;
+            cursor: pointer;
+        }
+
+        .print-button:hover,
+        .print-button:focus-visible {
+            background: #111;
+            color: #fff;
+        }
+
+        .page {
+            width: min(222mm, 100%);
+            min-height: 314mm;
+            margin: auto;
+            padding: calc(var(--frame-outer-gap) + var(--frame-width) + var(--frame-inner-gap));
+            background: #fff;
+            position: relative;
+            box-shadow: 0 0 8px rgba(0, 0, 0, .15);
+        }
+
+        .page::before {
+            content: "";
+            position: absolute;
+            inset: var(--frame-outer-gap);
+            border: var(--frame-width) double #111;
+            pointer-events: none;
+        }
+
+        .page > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+            align-items: center;
+            direction: ltr;
+            min-height: 82px;
+            margin: 0 7px 5px;
+        }
+
+        .school-en {
+            direction: ltr;
+            text-align: left;
+
+            font-family: "Libre Baskerville", Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: #484533;
+            white-space: nowrap;
+        }
+
+        .school-ar {
+            direction: rtl;
+            text-align: right;
+            font-size: 25px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* الشعار */
+        .logo {
+            width: 88px;
+            height: 88px;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* =========================================
+           REPORT INFO
+        ========================================= */
+
+        .info {
+            display: grid;
+            grid-template-columns: .8fr .9fr 3.2fr 1fr;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 1px 9px 9px;
+            white-space: nowrap;
+        }
+
+        .info div:nth-child(1) {
+            text-align: right;
+        }
+
+        .info div:nth-child(2) {
+            text-align: right;
+        }
+
+        .info div:nth-child(3) {
+            text-align: center;
+        }
+
+        .info div:nth-child(4) {
+            text-align: left;
+        }
+
+        .underline {
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           TABLE
+        ========================================= */
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            border: 4px solid #111;
+            font-size: 17px;
+        }
+
+        .grades-table th,
+        .grades-table td {
+            border: 1.5px solid #111;
+        }
+
+        /* =========================================
+           COLUMN WIDTHS
+        ========================================= */
+
+        .col-number {
+            width: 5%;
+        }
+
+        .col-student {
+            width: 34%;
+        }
+
+        .col-criterion {
+            width: 5.6%;
+        }
+
+        .col-final {
+            width: 5%;
+        }
+
+        /* =========================================
+           MAIN HEADER
+        ========================================= */
+
+        .main-header {
+            height: 270px;
+            border-bottom-width: 4px !important;
+        }
+
+        .student-header {
+            font-size: 31px;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+            border-left-width: 4px !important;
+        }
+
+        .number-header {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* =========================================
+           MONTH HEADER
+        ========================================= */
+
+        .month-title {
+            height: 58px;
+            text-align: center;
+            vertical-align: middle;
+            background: #f4f4f4;
+            border-right-width: 4px !important;
+            border-left-width: 4px !important;
+            border-bottom-width: 4px !important;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .criteria-row {
+            height: 212px;
+        }
+
+        .criteria {
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+
+            height: 212px;
+        }
+
+        .criteria-content {
+            width: 100%;
+            height: 208px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            line-height: 1.2;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .criteria-content .red {
+            color: red;
+        }
+
+        .total {
+            font-size: 17px;
+            background: #f5f5f5;
+        }
+
+        .criteria-row .criteria:nth-child(5),
+        .criteria-row .criteria:nth-child(10) {
+            border-left-width: 4px;
+        }
+
+        /* =========================================
+           FINAL COLUMN
+        ========================================= */
+
+        .final-header {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 19px;
+            font-weight: bold;
+            background: #f4f4f4;
+        }
+
+        .final-header-content {
+            display: inline-block;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+        }
+
+        .final-header .red {
+            color: red;
+        }
+
+        /* =========================================
+           STUDENT ROWS
+        ========================================= */
+
+        tbody .student-row {
+            height: 35px;
+        }
+
+        .student-name {
+            padding: 1px 9px;
+            text-align: right;
+            border-left-width: 4px !important;
+            font-size: 17px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .number {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .mark-cell {
+            text-align: center;
+            vertical-align: middle;
+            background: #fff;
+        }
+
+        .mark-input {
+            width: 100%;
+            height: 31px;
+            padding: 0;
+            border: 0;
+            border-bottom: 1px solid transparent;
+            outline: 0;
+            background: transparent;
+            color: #174a8b;
+            direction: ltr;
+            text-align: center;
+            font: 400 16px "Segoe Script", "Bradley Hand ITC", cursive;
+            appearance: textfield;
+        }
+
+        .mark-input::-webkit-inner-spin-button,
+        .mark-input::-webkit-outer-spin-button {
+            margin: 0;
+            appearance: none;
+        }
+
+        .mark-input:focus {
+            border-bottom-color: #111;
+        }
+
+        .mark-input.is-invalid {
+            color: #a40000;
+            border-bottom-color: #a40000;
+        }
+
+        .calculated-mark {
+            direction: ltr;
+            font-family: "Segoe Script", "Bradley Hand ITC", cursive;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .student-row .mark-cell:last-child {
+            background: #f4f4f4;
+        }
+
+        .student-row td:nth-child(7),
+        .student-row td:nth-child(12) {
+            border-left-width: 4px;
+            background: #f4f4f4;
+        }
+
+        .empty-mark {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 9px;
+            font-size: 15px;
+        }
+
+        /* =========================================
+           PRINT
+        ========================================= */
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            .actions {
+                display: none;
+            }
+
+            .mark-input {
+                height: auto;
+                border: 0;
+            }
+
+            .page {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media screen and (max-width: 700px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .page {
+                width: 100%;
+                margin: 0;
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .school-en,
+            .school-ar {
+                text-align: center;
+                white-space: normal;
+            }
+
+            .info {
+                grid-template-columns: 1fr;
+                text-align: center;
+                white-space: normal;
+                gap: 5px;
+            }
+
+            .info div {
+                text-align: center !important;
+            }
+
+            .grades-table {
+                font-size: 14px;
+            }
+
+            .criteria-content {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="actions" aria-label="إجراءات التقرير">
+    <button class="print-button" type="button" id="print-report">طباعة التقرير</button>
+</div>
+
+<div class="page">
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="school-en">
+            Al-Jami’a Schools Group
+        </div>
+
+        <div class="logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQu3HSSf0XPREcuQF9f4ETheeEzuEeq2JT0fNGoIE-1yuPE0GlXjs5bDzQT&amp;s=10" alt="شعار مجموعة مدارس الجامعة">
+        </div>
+
+        <div class="school-ar">
+            مجموعة مدارس الجامعة
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         REPORT INFORMATION
+    ========================================== -->
+
+    <section class="info">
+
+        <div>
+            اللغة العربية
+        </div>
+
+        <div>
+            الفصل: الثاني
+        </div>
+
+        <div>
+            <span class="underline">
+                مهارة الكتابة ( التعبير )
+            </span>
+            &nbsp;
+            ( تقييم الشهر 1 + الشهر 2 )
+        </div>
+
+        <div>
+            الصف: السادس ب
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         GRADES TABLE
+    ========================================== -->
+
+    <table class="grades-table">
+
+        <colgroup>
+
+            <col class="col-number">
+            <col class="col-student">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-criterion">
+            <col class="col-final">
+
+        </colgroup>
+
+
+        <thead>
+
+            <!-- أسماء الأشهر -->
+            <tr>
+
+                <th rowspan="2"
+                    class="number-header main-header">
+                </th>
+
+                <th rowspan="2"
+                    class="student-header main-header">
+
+                    اسم الطالب
+
+                </th>
+
+                <th colspan="5"
+                    class="month-title">
+
+                    الشهر الأول
+
+                </th>
+
+                <th colspan="5"
+                    class="month-title">
+
+                    الشهر الثاني
+
+                </th>
+
+                <th rowspan="2"
+                    class="final-header main-header">
+                    <span class="final-header-content">
+                        مجموع الشهرين <span class="red">(8)</span>
+                    </span>
+                </th>
+
+            </tr>
+
+
+            <!-- معايير التقييم -->
+            <tr class="criteria-row">
+
+                <!-- الشهر الأول -->
+
+                <th class="criteria">
+                    <div class="criteria-content">
+                        <span>
+                            تنظيم الأفكار وتسلسل الفقرات
+                            <span class="red">(علامة)</span>
+                        </span>
+                    </div>
+                </th>
+
+                <th class="criteria"><div class="criteria-content"><span>الترابط بين الجمل <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria"><div class="criteria-content"><span>سلامة اللغة <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria"><div class="criteria-content"><span>الأسلوب واستخدام المفردات <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria total"><div class="criteria-content"><span>المجموع (4)</span></div></th>
+
+
+                <!-- الشهر الثاني -->
+
+                <th class="criteria">
+                    <div class="criteria-content">
+                        <span>
+                            تنظيم الأفكار وتسلسل الفقرات
+                            <span class="red">(علامة)</span>
+                        </span>
+                    </div>
+                </th>
+
+                <th class="criteria"><div class="criteria-content"><span>الترابط بين الجمل <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria"><div class="criteria-content"><span>سلامة اللغة <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria"><div class="criteria-content"><span>الأسلوب واستخدام المفردات <span class="red">(علامة)</span></span></div></th>
+                <th class="criteria total"><div class="criteria-content"><span>المجموع (4)</span></div></th>
+
+            </tr>
+
+        </thead>
+
+
+        <!-- =====================================
+             STUDENTS
+        ====================================== -->
+
+        <tbody>
+
+            <tr class="student-row">
+
+                <td class="number">1.</td>
+
+                <td class="student-name">
+                    إبراهيم أمين إبراهيم العتر
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">2.</td>
+
+                <td class="student-name">
+                    آدم خالد عناد كناعنة
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">3.</td>
+
+                <td class="student-name">
+                    آر أحمد محمد الرشود
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">4.</td>
+
+                <td class="student-name">
+                    باسل سري مسلم عوينه
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">5.</td>
+
+                <td class="student-name">
+                    أحمد محمد
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">6.</td>
+
+                <td class="student-name">
+                    الطالب السادس
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">7.</td>
+
+                <td class="student-name">
+                    الطالب السابع
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">8.</td>
+
+                <td class="student-name">
+                    الطالب الثامن
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">9.</td>
+
+                <td class="student-name">
+                    الطالب التاسع
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">10.</td>
+
+                <td class="student-name">
+                    الطالب العاشر
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">11.</td>
+
+                <td class="student-name">
+                    الطالب الحادي عشر
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+
+            <tr class="student-row">
+
+                <td class="number">12.</td>
+
+                <td class="student-name">
+                    الطالب الثاني عشر
+                </td>
+
+                <td class="mark-cell"></td>
+                <td class="mark-cell"></td>
+
+                <td class="mark-cell"></td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <div class="footer">
+
+        <span>
+            المعلم: ______________________
+        </span>
+
+        <span>
+            التاريخ: ____ / ____ / ______
+        </span>
+
+    </div>
+
+</div>
+
+<script>
+    const storageKey = "writing-assessment-marks-v1";
+    let savedMarks = {};
+
+    try {
+        savedMarks = JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch {
+        savedMarks = {};
+    }
+
+    const formatMark = value => Number(value.toFixed(2)).toString();
+
+    const readMark = input => {
+        if (input.value === "") {
+            input.classList.remove("is-invalid");
+            input.removeAttribute("aria-invalid");
+            return null;
+        }
+
+        const value = Number(input.value);
+        const isValid = Number.isFinite(value) && value >= 0 && value <= 1;
+        input.classList.toggle("is-invalid", !isValid);
+
+        if (isValid) {
+            input.removeAttribute("aria-invalid");
+            return value;
+        }
+
+        input.setAttribute("aria-invalid", "true");
+        return undefined;
+    };
+
+    const saveRows = () => {
+        const data = {};
+
+        document.querySelectorAll("tbody .student-row").forEach(row => {
+            const name = row.querySelector(".student-name").textContent.trim();
+            data[name] = [...row.querySelectorAll(".mark-input")].map(input => input.value);
+        });
+
+        localStorage.setItem(storageKey, JSON.stringify(data));
+    };
+
+    const calculateMonth = inputs => {
+        const marks = inputs.map(readMark);
+        return marks.every(mark => typeof mark === "number")
+            ? marks.reduce((total, mark) => total + mark, 0)
+            : null;
+    };
+
+    const updateTotals = (row, persist = true) => {
+        const inputs = [...row.querySelectorAll(".mark-input")];
+        const monthOne = calculateMonth(inputs.slice(0, 4));
+        const monthTwo = calculateMonth(inputs.slice(4, 8));
+        const cells = row.cells;
+
+        cells[6].textContent = monthOne === null ? "" : formatMark(monthOne);
+        cells[11].textContent = monthTwo === null ? "" : formatMark(monthTwo);
+        cells[12].textContent = monthOne === null || monthTwo === null
+            ? ""
+            : formatMark(monthOne + monthTwo);
+
+        if (persist && !inputs.some(input => input.classList.contains("is-invalid"))) {
+            saveRows();
+        }
+    };
+
+    document.querySelectorAll("tbody .student-row").forEach(row => {
+        const name = row.querySelector(".student-name").textContent.trim();
+        const stored = savedMarks[name] || Array(8).fill("");
+        row.querySelectorAll(".mark-cell").forEach(cell => cell.remove());
+
+        const markCells = Array.from({ length: 11 }, (_, markCellIndex) => {
+            const cell = document.createElement("td");
+            cell.className = "mark-cell";
+
+            if (markCellIndex < 4 || (markCellIndex > 4 && markCellIndex < 9)) {
+                const inputIndex = markCellIndex < 4 ? markCellIndex : markCellIndex - 1;
+                const month = inputIndex < 4 ? 1 : 2;
+                const criterion = inputIndex % 4 + 1;
+                const input = document.createElement("input");
+                input.className = "mark-input";
+                input.type = "number";
+                input.min = "0";
+                input.max = "1";
+                input.step = "0.25";
+                input.inputMode = "decimal";
+                input.value = stored[inputIndex] || "";
+                input.setAttribute("aria-label", `علامة معيار ${criterion} للشهر ${month} للطالب ${name}`);
+                input.addEventListener("input", () => updateTotals(row));
+                input.addEventListener("keydown", event => {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    const inputs = [...document.querySelectorAll(".mark-input")];
+                    inputs[inputs.indexOf(input) + 1]?.focus();
+                });
+                cell.append(input);
+            } else {
+                cell.classList.add("calculated-mark");
+            }
+
+            return cell;
+        });
+
+        row.append(...markCells);
+        updateTotals(row, false);
+    });
+
+    document.getElementById("print-report").addEventListener("click", () => window.print());
+</script>
+
+</body>
+</html>

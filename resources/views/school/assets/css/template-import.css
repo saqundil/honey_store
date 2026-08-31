@@ -1,0 +1,437 @@
+/* ============================================================
+ * template-import.css — استيراد قالب من جدول ملصوق أو PDF
+ * يعتمد على core.css + admin.css
+ *
+ * صفحة مهمة واحدة، لا لوحة بيانات: تُحصر في عمود مقروء بدل أن
+ * تُفرد على عرض الشاشة فتترك فراغًا بلا وظيفة. اللصق هو المسار،
+ * والـPDF مخرج طوارئ مطوي لا خيار موازٍ.
+ * ============================================================ */
+
+/* عمودان: الشرح ثابت عند حافة البداية (اليمين في RTL)،
+   والنموذج يشغل بقية العرض. بذلك يُستثمر العرض في محتوى
+   حقيقي بدل أن يبقى فراغًا. */
+.import-page {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: var(--sp-8);
+  align-items: start;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+/* ============================================================
+ * الترويسة
+ * ============================================================ */
+
+/* يلاحق النموذج عند التمرير لأن الشرح مرجع أثناء العمل لا مقدمة تُقرأ مرة */
+.import-header {
+  position: sticky;
+  top: calc(var(--shell-header) + var(--sp-6));
+}
+
+.import-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.import-back:hover { color: var(--brand); }
+[dir="rtl"] .import-back span { transform: rotate(180deg); }
+
+.import-header h2 {
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-2xl);
+}
+
+.import-header p {
+  max-width: 46ch;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+}
+
+.import-header strong { color: var(--ink-2); }
+
+/* ============================================================
+ * البطاقة الأساسية — اللصق
+ * ============================================================ */
+
+.import-form {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.import-card {
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--brand);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+}
+
+.import-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.import-card-head h3 { font-size: var(--fs-lg); }
+
+.import-card-lede {
+  max-width: 72ch;
+  margin: var(--sp-2) 0 var(--sp-4);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+}
+
+/* ============================================================
+ * منطقة اللصق — بطل الصفحة
+ * ============================================================ */
+
+.paste-area {
+  min-height: 240px;
+  max-height: 420px;
+  overflow: auto;
+  padding: var(--sp-3);
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+  transition: border-color var(--dur-1) var(--ease),
+              background var(--dur-1) var(--ease),
+              box-shadow var(--dur-1) var(--ease);
+}
+
+.paste-area:hover { border-color: var(--line-ink); }
+
+.paste-area:focus {
+  outline: none;
+  border-style: solid;
+  border-color: var(--focus);
+  background: var(--surface);
+  box-shadow: var(--focus-ring);
+}
+
+/* حالة فارغة توسّط الدعوة بدل تلميح صغير في الزاوية.
+   ‎:empty‎ يعني أن التوسيط يزول تلقائيًا أول ما يصل محتوى،
+   فلا يتعارض grid مع تحرير النص داخل contenteditable. */
+.paste-area:empty {
+  display: grid;
+  place-items: center;
+}
+
+.paste-area:empty::before {
+  content: attr(data-placeholder) " — Ctrl + V";
+  padding: var(--sp-4);
+  color: var(--ink-4);
+  font-size: var(--fs-md);
+  text-align: center;
+}
+
+.paste-area.has-content {
+  border-style: solid;
+  border-color: var(--brand-line);
+  background: var(--surface);
+}
+
+/* الجدول الملصوق يُعرض بالشكل الذي سيُقرأ به */
+.paste-area table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-xs);
+}
+
+.paste-area th,
+.paste-area td {
+  padding: 4px 6px;
+  border: 1px solid var(--line-strong);
+  text-align: center;
+}
+
+.paste-area th {
+  background: var(--surface-3);
+  font-weight: 700;
+}
+
+/* ============================================================
+ * صف الاسم + الإرسال
+ * ============================================================ */
+
+.import-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+
+.import-name {
+  flex: 1 1 320px;
+  min-width: 0;
+  margin: 0;
+}
+
+.import-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: none;
+}
+
+/* ============================================================
+ * التلميحات
+ * ============================================================ */
+
+.hint {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+}
+
+.hint code {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  background: var(--surface);
+}
+
+.hint.warn {
+  display: block;
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--warn-line);
+  border-inline-start: 3px solid var(--warn);
+  border-radius: var(--r-sm);
+  background: var(--warn-soft);
+  color: #5A3810;
+  font-weight: 500;
+}
+
+.hint.is-ready {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.hint.is-ready::before {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-size: 10px;
+}
+
+/* ============================================================
+ * مخرج الطوارئ — PDF مطوي
+ * ============================================================ */
+
+.import-fallback {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.import-fallback > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--r-md);
+}
+
+.import-fallback > summary::-webkit-details-marker { display: none; }
+
+.import-fallback > summary::before {
+  content: "›";
+  flex: none;
+  color: var(--ink-4);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: transform var(--dur-2) var(--ease);
+}
+
+[dir="rtl"] .import-fallback > summary::before { transform: rotate(180deg); }
+[dir="rtl"] .import-fallback[open] > summary::before { transform: rotate(270deg); }
+
+.import-fallback > summary:hover { color: var(--ink); }
+
+.import-fallback > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.import-fallback-title { flex: 1; min-width: 0; }
+
+.import-fallback-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  border-top: 1px solid var(--line);
+  padding-top: var(--sp-4);
+}
+
+.import-fallback-body > p {
+  max-width: 72ch;
+  margin-bottom: var(--sp-4);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+}
+
+.import-pdf-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+/* ============================================================
+ * ملاحظات المسودة المستوردة (تُعرض داخل المحرّر)
+ * ------------------------------------------------------------
+ * شريط بسطر واحد يُطوى: التحذير الأهم يبقى ظاهرًا دائمًا،
+ * والتفاصيل تُفتح عند المراجعة فلا تسرق ارتفاع الاستوديو.
+ * ============================================================ */
+
+.import-notes {
+  margin: var(--sp-3) var(--sp-6) 0;
+  border: 1px solid var(--warn-line);
+  border-inline-start: 3px solid var(--warn);
+  border-radius: var(--r-md);
+  background: var(--warn-soft);
+  color: #5A3810;
+  font-size: var(--fs-sm);
+}
+
+.import-notes > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--r-md);
+}
+
+.import-notes > summary::-webkit-details-marker { display: none; }
+
+.import-notes-mark {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 17px; height: 17px;
+  border-radius: 50%;
+  background: var(--warn);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.import-notes > summary strong {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-notes-count {
+  flex: none;
+  padding: 2px 10px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, .6);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* السهم يدور عند الفتح */
+.import-notes > summary::after {
+  content: "›";
+  flex: none;
+  color: var(--warn);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: transform var(--dur-2) var(--ease);
+}
+
+[dir="rtl"] .import-notes > summary::after { transform: rotate(90deg); }
+[dir="rtl"] .import-notes[open] > summary::after { transform: rotate(270deg); }
+
+.import-notes > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.import-notes ul {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0 var(--sp-4) var(--sp-3);
+  padding: var(--sp-3) var(--sp-5) 0;
+  border-top: 1px solid var(--warn-line);
+  padding-inline-start: calc(var(--sp-5) + var(--sp-3));
+  list-style: disc;
+  line-height: var(--lh-snug);
+}
+
+/* ============================================================
+ * Responsive
+ * ============================================================ */
+
+/* تحت هذا العرض لا يتّسع عمودان، فيعود الشرح فوق النموذج */
+@media (max-width: 940px) {
+  .import-page {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+    max-width: 760px;
+  }
+
+  .import-header {
+    position: static;
+    top: auto;
+  }
+
+  .import-header p { max-width: 68ch; }
+}
+
+@media (max-width: 700px) {
+  .import-card { padding: var(--sp-4); }
+
+  .paste-area { min-height: 190px; }
+  .paste-area:empty::before { padding-block: var(--sp-10); }
+
+  .import-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .import-submit {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .import-pdf-fields { grid-template-columns: 1fr; }
+
+  .import-notes { margin-inline: var(--sp-4); }
+}

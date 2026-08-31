@@ -1,0 +1,505 @@
+/* ============================================================
+ * report-create.css — معالج إنشاء التقرير (إعداد + اختيار الطلاب)
+ * يعتمد على core.css + admin.css
+ * ============================================================ */
+
+.report-create-page {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+/* --- الترويسة --- */
+
+.report-create-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.report-create-header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.report-create-header a:hover { color: var(--brand); }
+
+.report-create-header h2 {
+  margin: var(--sp-1) 0 var(--sp-2);
+  font-size: var(--fs-2xl);
+}
+
+.report-create-header > div:first-child > p:last-child {
+  max-width: 52ch;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+/* مؤشر الخطوتين */
+.header-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  box-shadow: var(--sh-xs);
+}
+
+.header-progress span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-4);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.header-progress b {
+  display: grid;
+  place-items: center;
+  width: 20px; height: 20px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.header-progress .active { color: var(--brand); }
+
+.header-progress .active b {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+
+.header-progress i {
+  width: 24px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+/* --- التخطيط --- */
+
+.report-create-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  gap: var(--sp-5);
+  align-items: start;
+}
+
+.report-setup {
+  display: grid;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+/* --- بطاقة خطوة --- */
+
+.create-card {
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+}
+
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.card-heading > span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px; height: 32px;
+  border-radius: var(--r-md);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-heading h3 { font-size: var(--fs-lg); }
+
+.card-heading p {
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+.create-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-4);
+}
+
+.field-wide { grid-column: 1 / -1; }
+
+/* ملاحظة القالب */
+.template-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--info-line);
+  border-radius: var(--r-md);
+  background: var(--info-soft);
+}
+
+.template-note span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 18px; height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--info);
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.template-note p {
+  color: var(--info);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+
+/* --- لوحة اختيار الطلاب --- */
+
+.student-selection {
+  position: sticky;
+  top: calc(var(--shell-header) + var(--sp-4));
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--shell-header) - var(--sp-8));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+}
+
+.student-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.student-panel-head > div {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.student-panel-head > div > span {
+  display: grid;
+  place-items: center;
+  width: 24px; height: 24px;
+  border-radius: var(--r-sm);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.student-panel-head h3 { font-size: var(--fs-md); }
+
+.student-panel-head > strong {
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* أدوات البحث والتحديد */
+.student-tools {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.student-search { position: relative; }
+
+.student-search span {
+  position: absolute;
+  inset-inline-start: var(--sp-3);
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-4);
+  font-size: var(--fs-lg);
+  pointer-events: none;
+}
+
+.student-search input { padding-inline-start: var(--sp-8); }
+
+.student-tools > div {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.student-tools button {
+  flex: 1;
+  min-height: 32px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease),
+              color var(--dur-1) var(--ease);
+}
+
+.student-tools button:hover {
+  background: var(--surface-2);
+  border-color: var(--line-ink);
+  color: var(--ink);
+}
+
+/* قائمة الطلاب */
+.student-list {
+  flex: 1;
+  min-height: 160px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-2);
+}
+
+.student-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  font-weight: 400;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
+}
+
+.student-row:hover { background: var(--surface-2); }
+
+.student-row:has(input:checked) { background: var(--brand-soft); }
+
+.student-row:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.student-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.student-row:has(input:checked) .student-avatar {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+.student-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-info strong {
+  display: block;
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-info small {
+  display: block;
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+}
+
+.custom-check {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px; height: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: transparent;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  transition: background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease),
+              color var(--dur-1) var(--ease);
+}
+
+.student-row input:checked ~ .custom-check {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.students-empty {
+  padding: var(--sp-6) var(--sp-4);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+/* --- ذيل الإنشاء --- */
+
+.create-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: saturate(1.4) blur(8px);
+  box-shadow: var(--sh-lg);
+}
+
+.report-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+.report-summary strong { color: var(--ink); font-weight: 700; }
+.report-summary strong b { font-variant-numeric: tabular-nums; }
+
+.report-summary i {
+  width: 1px;
+  height: 16px;
+  background: var(--line-strong);
+}
+
+.report-summary > span:last-child {
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 30ch;
+}
+
+.create-report-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 48px;
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--brand);
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--brand-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--sh-sm);
+  transition: background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease),
+              transform var(--dur-1) var(--ease);
+}
+
+.create-report-button:hover {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  transform: translateY(-1px);
+}
+
+.create-report-button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.create-report-button > span { font-size: var(--fs-md); }
+
+.create-report-button > small {
+  color: rgba(255, 255, 255, .72);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+
+.create-report-button > b { font-size: var(--fs-lg); }
+[dir="rtl"] .create-report-button > b { transform: none; }
+
+/* --- Responsive --- */
+
+@media (max-width: 1100px) {
+  .report-create-layout { grid-template-columns: 1fr; }
+
+  .student-selection {
+    position: static;
+    max-height: none;
+  }
+
+  .student-list { max-height: 380px; }
+}
+
+@media (max-width: 850px) {
+  .report-create-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+}
+
+@media (max-width: 650px) {
+  .create-card { padding: var(--sp-4); }
+  .create-fields { grid-template-columns: 1fr; }
+
+  .create-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .create-report-button { justify-content: center; width: 100%; }
+
+  .report-summary { justify-content: center; flex-wrap: wrap; }
+
+  .header-progress { width: 100%; justify-content: center; }
+}

@@ -1,0 +1,201 @@
+/* ============================================================
+ * teacher-setup.css — معالج إعداد حساب المعلم (ثلاث خطوات)
+ * يعتمد على core.css + admin.css
+ * ============================================================ */
+
+.setup-shell {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+/* --- الترويسة --- */
+
+.setup-heading {
+  margin-bottom: var(--sp-6);
+  text-align: center;
+}
+
+.setup-heading h2 {
+  margin: var(--sp-1) 0 var(--sp-2);
+  font-size: var(--fs-3xl);
+}
+
+.setup-heading p:last-child {
+  max-width: 54ch;
+  margin-inline: auto;
+  color: var(--ink-3);
+  font-size: var(--fs-md);
+}
+
+/* --- مؤشر التقدّم --- */
+
+.setup-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  list-style: none;
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+}
+
+.setup-progress li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  color: var(--ink-4);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.setup-progress li > span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px; height: 24px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.setup-progress .active {
+  background: var(--brand-soft);
+  color: var(--brand-700);
+}
+
+.setup-progress .done { color: var(--success); }
+
+.setup-progress .done > span {
+  border-color: var(--success);
+  background: var(--success);
+  color: #fff;
+  font-size: 0;
+}
+
+.setup-progress .done > span::before {
+  content: "✓";
+  font-size: 12px;
+}
+
+/* --- خطوة --- */
+
+.setup-step {
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  transition: opacity var(--dur-2) var(--ease);
+}
+
+.setup-step.is-disabled {
+  opacity: .55;
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.step-title {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.step-title > span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px; height: 34px;
+  border-radius: var(--r-md);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.step-title h3 { font-size: var(--fs-lg); }
+
+.step-title p {
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+/* شبكة الخطوة فقط؛ الخطوة الثانية تستعمل .inline-form ولا يجب أن تتأثر */
+.form-grid.setup-form { align-items: end; }
+
+.form-grid.setup-form button { justify-self: start; }
+
+/* --- ما أُضيف حتى الآن --- */
+
+.setup-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px dashed var(--line);
+}
+
+.setup-items span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--success-line);
+  border-radius: var(--r-full);
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.setup-items span::before {
+  content: "✓";
+  font-size: 10px;
+}
+
+/* --- الإنهاء --- */
+
+.setup-finish {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.setup-finish .button { min-height: 46px; padding-inline: var(--sp-8); }
+
+/* --- Responsive --- */
+
+@media (max-width: 720px) {
+  .setup-heading h2 { font-size: var(--fs-2xl); }
+
+  .setup-progress {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .setup-progress li { flex: none; }
+
+  .setup-step { padding: var(--sp-4); }
+
+  .step-title { margin-bottom: var(--sp-4); }
+}

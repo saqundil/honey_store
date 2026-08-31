@@ -1,0 +1,254 @@
+/* ============================================================
+ * teacher.css — قوقعة واجهة المعلم
+ * ------------------------------------------------------------
+ * يعتمد على core.css (توكنز + مكونات مشتركة). يُحمَّل بعده.
+ *
+ * توكنز ‎--t-*‎ التاريخية مربوطة هنا بتوكنز core، فتبقى ملفات
+ * شاشات المعلم (classes / class / entry) تعمل كما هي، وتَرِث
+ * نظام التصميم الموحّد تلقائيًا.
+ * ============================================================ */
+
+:root {
+  /* --- ربط توكنز المعلم بالنظام الموحّد --- */
+  --t-bg:           var(--canvas);
+  --t-surface:      var(--surface);
+  --t-surface-sunk: var(--surface-2);
+  --t-paper:        var(--surface);
+
+  --t-line:         var(--line);
+  --t-line-strong:  var(--line-strong);
+
+  --t-ink:          var(--ink);
+  --t-ink-soft:     var(--ink-2);
+  --t-ink-muted:    var(--ink-3);
+  --t-ink-faint:    var(--ink-4);
+
+  --t-primary:      var(--brand);
+  --t-primary-ink:  var(--brand-ink);
+  --t-primary-soft: var(--brand-soft);
+  --t-primary-line: var(--brand-line);
+
+  --t-success:      var(--success);
+  --t-success-soft: var(--success-soft);
+  --t-warn:         var(--warn);
+  --t-warn-soft:    var(--warn-soft);
+  --t-danger:       var(--danger);
+  --t-danger-soft:  var(--danger-soft);
+
+  --t-focus:        var(--focus);
+  --t-focus-soft:   var(--focus-soft);
+  --t-focus-soft-2: var(--focus-soft-2);
+
+  /* سلّم المسافات القديم */
+  --s-1: var(--sp-1);
+  --s-2: var(--sp-2);
+  --s-3: var(--sp-3);
+  --s-4: var(--sp-4);
+  --s-6: var(--sp-6);
+  --s-8: var(--sp-8);
+
+  /* المقياس الطباعي القديم */
+  --f-xs:  var(--fs-xs);
+  --f-sm:  var(--fs-sm);
+  --f-md:  var(--fs-md);
+  --f-lg:  var(--fs-lg);
+  --f-xl:  var(--fs-xl);
+  --f-2xl: var(--fs-2xl);
+
+  --sh-1: var(--sh-xs);
+  --sh-2: var(--sh-sm);
+  --sh-3: var(--sh-lg);
+
+  /* قياسات قوقعة المعلم */
+  --shell-topbar-h: 56px;
+  --shell-subbar-h: 44px;
+  --t-max: 1200px;
+}
+
+/* ============================================================
+ * قوقعة المعلم — الشريط العلوي
+ * ============================================================ */
+
+.tshell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.tshell-topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  height: var(--shell-topbar-h);
+  padding-inline: var(--sp-6);
+  background: rgba(255, 255, 255, .9);
+  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.tshell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+  color: var(--ink);
+  font-weight: 700;
+  border-radius: var(--r-sm);
+}
+
+.tshell-brand:hover { color: var(--brand); }
+
+.tshell-brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: var(--fs-sm);
+  line-height: 1;
+}
+
+.tshell-brand span:last-child {
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+
+/* --- فتات التصفح --- */
+
+.tshell-crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 0;
+  padding-inline-start: var(--sp-4);
+  border-inline-start: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  overflow: hidden;
+}
+
+.tshell-crumbs a {
+  color: var(--ink-3);
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: var(--r-xs);
+  transition: color var(--dur-1) var(--ease);
+}
+
+.tshell-crumbs a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tshell-crumbs .sep {
+  color: var(--ink-4);
+  flex: none;
+}
+
+.tshell-crumbs .here {
+  min-width: 0;
+  color: var(--ink);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- كتلة المستخدم --- */
+
+.tshell-user {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: none;
+  font-size: var(--fs-sm);
+}
+
+.tshell-user-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-3);
+}
+
+.tshell-user strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tshell-user a {
+  padding: 5px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  transition: background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease),
+              color var(--dur-1) var(--ease);
+}
+
+.tshell-user a:hover {
+  background: var(--surface-2);
+  border-color: var(--line-ink);
+  color: var(--ink);
+}
+
+/* --- منطقة المحتوى --- */
+
+.tshell-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: var(--sp-10);
+}
+
+.tshell-page {
+  width: 100%;
+  max-width: var(--t-max);
+  margin-inline: auto;
+  padding: var(--sp-6);
+}
+
+/* ============================================================
+ * Responsive
+ * ============================================================ */
+
+@media (max-width: 780px) {
+  .tshell-topbar {
+    gap: var(--sp-3);
+    padding-inline: var(--sp-4);
+  }
+
+  .tshell-brand span:last-child { display: none; }
+
+  .tshell-crumbs {
+    padding-inline-start: var(--sp-3);
+    font-size: var(--fs-xs);
+  }
+
+  .tshell-user-label { max-width: 110px; }
+
+  .tshell-page { padding: var(--sp-4); }
+}
+
+@media (max-width: 480px) {
+  .tshell-crumbs a:not(.up) { display: none; }
+
+  .tshell-user-label {
+    max-width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+}

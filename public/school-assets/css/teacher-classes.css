@@ -1,0 +1,360 @@
+/* ============================================================
+ * teacher-classes.css — شاشة "صفوفي" (نقطة الدخول)
+ * يعتمد على core.css + teacher.css
+ * ============================================================ */
+
+/* --- شريط السياق العلوي --- */
+
+.classes-hero {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.classes-hero-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  max-width: var(--t-max);
+  margin-inline: auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-6);
+}
+
+.classes-hero h1 {
+  font-size: var(--fs-3xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+.classes-hero p {
+  margin-top: var(--sp-2);
+  color: var(--ink-3);
+  font-size: var(--fs-md);
+}
+
+.classes-hero-user {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  text-align: end;
+}
+
+.classes-hero-user strong {
+  font-size: var(--fs-sm);
+  color: var(--ink);
+}
+
+.classes-hero-user span {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- الحاوية --- */
+
+.classes-wrap {
+  width: 100%;
+  max-width: var(--t-max);
+  margin: var(--sp-6) auto;
+  padding-inline: var(--sp-6);
+}
+
+/* --- شبكة البطاقات --- */
+
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--sp-4);
+}
+
+.class-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: inherit;
+  box-shadow: var(--sh-sm);
+  transition: border-color var(--dur-1) var(--ease),
+              box-shadow var(--dur-2) var(--ease),
+              transform var(--dur-2) var(--ease);
+}
+
+/* شريط الهوية عند حافة البداية — هادئ حتى التمرير */
+.class-card::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  background: var(--brand-soft-2);
+  transition: background var(--dur-2) var(--ease);
+}
+
+.class-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--sh-md);
+  transform: translateY(-2px);
+}
+
+.class-card:hover::before { background: var(--brand); }
+
+.class-card[data-empty="true"]::before { background: var(--line-strong); }
+.class-card[data-empty="true"]:hover::before { background: var(--ink-4); }
+
+.class-card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* --- رأس البطاقة --- */
+
+.class-card-head {
+  padding-block-end: var(--sp-3);
+  border-bottom: 1px dashed var(--line);
+}
+
+.class-card-name {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+
+.class-card-sub {
+  margin-top: var(--sp-1);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+}
+
+/* --- سكة الإحصاءات --- */
+
+.class-card-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+}
+
+.stat-students {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding-inline-end: var(--sp-4);
+  border-inline-end: 1px solid var(--line);
+}
+
+.stat-students strong {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-students small {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+}
+
+.stat-exams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stat-exams-none {
+  color: var(--ink-4);
+  font-size: var(--fs-xs);
+}
+
+.stat-exam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.stat-exam-chip .n {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-exam-chip[data-kind="open"] {
+  background: var(--success-soft);
+  border-color: var(--success-line);
+  color: var(--success);
+}
+
+.stat-exam-chip[data-kind="locked"] {
+  background: var(--warn-soft);
+  border-color: var(--warn-line);
+  color: var(--warn);
+}
+
+.stat-exam-chip[data-kind="draft"] {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+  color: var(--ink-3);
+}
+
+/* --- شريط تحذير الصفوف غير المهيّأة --- */
+
+.class-card-warn {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;   /* عنصر شبكة: بدونها يتمدّد على العرض كاملًا */
+  gap: 6px;
+  margin-top: var(--sp-1);
+  padding: 4px 10px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--r-sm);
+  background: var(--warn-soft);
+  color: #6E4614;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.class-card-warn::before {
+  content: "!";
+  display: inline-grid;
+  place-items: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--warn);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* --- ذيل البطاقة --- */
+
+.class-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--line);
+}
+
+.class-card-foot time {
+  color: var(--ink-4);
+  font-size: var(--fs-xs);
+}
+
+.class-card-foot .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: transform var(--dur-2) var(--ease);
+}
+
+.class-card-foot .go .arrow {
+  transition: transform var(--dur-2) var(--ease);
+}
+
+[dir="rtl"] .class-card-foot .go .arrow { transform: rotate(180deg); }
+
+.class-card:hover .class-card-foot .go .arrow { transform: translateX(3px); }
+[dir="rtl"] .class-card:hover .class-card-foot .go .arrow { transform: rotate(180deg) translateX(3px); }
+
+/* --- الحالة الفارغة --- */
+
+.classes-empty {
+  display: grid;
+  justify-items: center;
+  max-width: 520px;
+  margin: var(--sp-10) auto;
+  padding: var(--sp-10) var(--sp-6);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: center;
+}
+
+.classes-empty-mark {
+  display: grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  margin-bottom: var(--sp-4);
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.classes-empty h2 {
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-xl);
+}
+
+.classes-empty p {
+  max-width: 44ch;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+.classes-empty .tbtn { margin-top: var(--sp-5); }
+
+/* --- Responsive --- */
+
+@media (max-width: 780px) {
+  .classes-hero-inner {
+    align-items: flex-start;
+    gap: var(--sp-4);
+    padding: var(--sp-6) var(--sp-4) var(--sp-5);
+  }
+
+  .classes-hero h1 { font-size: var(--fs-2xl); }
+  .classes-hero-user { text-align: start; }
+
+  .classes-wrap {
+    margin-block: var(--sp-5);
+    padding-inline: var(--sp-4);
+  }
+
+  .classes-grid { grid-template-columns: 1fr; }
+
+  .classes-empty {
+    margin-block: var(--sp-6);
+    padding: var(--sp-8) var(--sp-5);
+  }
+}
+
+@media (max-width: 420px) {
+  .class-card { padding: var(--sp-4); }
+  .class-card-name { font-size: var(--fs-lg); }
+
+  .class-card-stats {
+    grid-template-columns: 1fr;
+    gap: var(--sp-2);
+  }
+
+  .stat-students {
+    padding-inline-end: 0;
+    border-inline-end: 0;
+  }
+}

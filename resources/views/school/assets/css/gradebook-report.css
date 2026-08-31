@@ -1,0 +1,328 @@
+/* ============================================================
+ * gradebook-report.css
+ * ------------------------------------------------------------
+ * قسمان منفصلان عمدًا:
+ *   (أ) مركز التقارير داخل لوحة الإدارة — يتبع نظام التصميم.
+ *   (ب) أوراق الطباعة — قياسات ورقية ثابتة، لا تتأثر بالتوكنز.
+ * ============================================================ */
+
+/* ============================================================
+ * (أ) مركز التقارير — شاشة
+ * ============================================================ */
+
+.report-hub {
+  display: grid;
+  gap: var(--sp-5);
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+.report-hub-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+  overflow: hidden;
+  padding: var(--sp-6);
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, #14372C 0%, #0E2820 100%);
+  color: #fff;
+  box-shadow: var(--sh-md);
+}
+
+.report-hub-head::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--accent), rgba(181, 138, 52, .25));
+}
+
+.report-hub-head .eyebrow { color: #D9B45F; }
+
+.report-hub-head h2 {
+  margin: var(--sp-1) 0 var(--sp-1);
+  font-size: var(--fs-2xl);
+  color: #fff;
+}
+
+.report-hub-head p:last-child {
+  margin: 0;
+  color: #C7D6CF;
+  font-size: var(--fs-sm);
+}
+
+.orientation-actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+/* الأزرار داخل الترويسة الداكنة تحتاج لوحة معكوسة */
+.report-hub-head .button {
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(255, 255, 255, .24);
+  color: #fff;
+}
+
+.report-hub-head .button:hover {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .5);
+  color: #fff;
+}
+
+.report-hub-head .button.primary {
+  background: #fff;
+  border-color: #fff;
+  color: var(--brand-700);
+}
+
+.report-hub-head .button.primary:hover {
+  background: #EDF2EE;
+  border-color: #EDF2EE;
+  color: var(--brand-700);
+}
+
+/* --- لوحة الملخص --- */
+
+.summary-panel { padding: 0; overflow: hidden; }
+
+.summary-panel .section-head {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 1px solid var(--line);
+}
+
+.summary-panel .section-head h3,
+.assessment-report-list h3 { margin: 0; }
+
+.summary-panel .section-head > span {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.grade-summary-table { min-width: 820px; }
+.grade-summary-table th { text-align: center; }
+.grade-summary-table td { text-align: center; }
+
+.grade-summary-table th:nth-child(2),
+.grade-summary-table td:nth-child(2) {
+  min-width: 170px;
+  text-align: start;
+}
+
+.grade-summary-table small {
+  display: block;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.grade-summary-table th small {
+  margin-top: 2px;
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- كشوف القوالب --- */
+
+.assessment-report-list { display: grid; gap: 0; }
+
+.assessment-report-list article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.assessment-report-list article:first-of-type { border-top: 0; }
+
+.assessment-report-list article strong {
+  display: block;
+  font-size: var(--fs-md);
+}
+
+.assessment-report-list article small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+}
+
+.assessment-report-list article > div:last-child {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.assessment-report-list article a {
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  color: var(--brand);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+
+.assessment-report-list article a:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+}
+
+.assignment-report-link {
+  display: inline-block;
+  margin-top: var(--sp-2);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+/* ============================================================
+ * (ب) أوراق الطباعة — قياسات ورقية ثابتة، لا تُمسّ
+ * ============================================================ */
+
+/* شريط الإجراءات موحّد في report.css؛ لا حاجة لتجاوزه هنا. */
+
+.gradebook-print-sheet {
+  width: 210mm;
+  min-height: 296mm;
+  margin: 0 auto 12px;
+  background: #fff;
+  padding: 7mm 14mm;
+  position: relative;
+  box-shadow: 0 0 8px #0002;
+}
+
+.gradebook-print.landscape .gradebook-print-sheet {
+  width: 297mm;
+  min-height: 209mm;
+}
+
+.gradebook-print-frame {
+  position: relative;
+  min-height: calc(296mm - 14mm);
+  padding: 5mm;
+}
+
+.gradebook-print.landscape .gradebook-print-frame { min-height: calc(209mm - 14mm); }
+
+.gradebook-print-frame:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 7px double #111;
+  pointer-events: none;
+}
+
+.gradebook-print-frame > * { position: relative; }
+
+.print-report-caption {
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.grade-summary-print {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-size: 13px;
+}
+
+.grade-summary-print th,
+.grade-summary-print td {
+  border: 1.4px solid #111;
+  text-align: center;
+  padding: 4px 3px;
+  height: 28px;
+}
+
+.grade-summary-print thead { border: 3px solid #111; }
+.grade-summary-print th { background: #ededed; }
+
+.grade-summary-print th:nth-child(2),
+.grade-summary-print td:nth-child(2) {
+  text-align: right;
+  min-width: 35mm;
+}
+
+.grade-summary-print small { display: block; color: #9d1d18; }
+
+.student-report-identity {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #111;
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+
+.student-summary-print { font-size: 16px; }
+.student-summary-print th,
+.student-summary-print td { height: 34px; }
+
+.student-summary-print th:first-child,
+.student-summary-print td:first-child { text-align: right; }
+
+.assessment-print-sheet .dynamic-report-table { font-size: 13px; }
+.assessment-print-sheet .dynamic-report-table td { height: 28px; }
+
+@media print {
+  .gradebook-print { padding: 0; background: #fff; }
+
+  .gradebook-print-sheet {
+    margin: 0;
+    box-shadow: none;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .gradebook-print-sheet:last-of-type {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .gradebook-print.portrait .gradebook-print-sheet { width: 210mm; height: 296mm; min-height: 0; }
+  .gradebook-print.landscape .gradebook-print-sheet { width: 297mm; height: 209mm; min-height: 0; }
+  .gradebook-print-frame { height: 100%; min-height: 0; }
+  .gradebook-print .school-header { margin-bottom: 3px; }
+}
+
+@media screen and (max-width: 800px) {
+  .report-hub-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .orientation-actions { flex-wrap: wrap; }
+  .orientation-actions .button { flex: 1 1 auto; justify-content: center; }
+
+  .gradebook-print-sheet,
+  .gradebook-print.landscape .gradebook-print-sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 8mm;
+    overflow: auto;
+  }
+
+  .gradebook-print-frame,
+  .gradebook-print.landscape .gradebook-print-frame { min-height: 260mm; }
+
+  .assessment-report-list article {
+    align-items: flex-start;
+    gap: var(--sp-3);
+  }
+}
+
+/* في وضع البطاقات (‎≤620px‎) يتحوّل الجدول إلى كتل، فلا معنى
+   لعرض أدنى 820px — وإلا ظهر تمرير أفقي زائف. */
+@media screen and (max-width: 620px) {
+  .grade-summary-table.is-stacked { min-width: 0; }
+  .grade-summary-table.is-stacked th:nth-child(2),
+  .grade-summary-table.is-stacked td:nth-child(2) { min-width: 0; }
+  .grade-summary-table.is-stacked tbody td { text-align: end; }
+}

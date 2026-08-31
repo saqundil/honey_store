@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1); require dirname(__DIR__,2).'/includes/bootstrap.php'; require_admin(); verify_csrf($_SERVER['HTTP_X_CSRF_TOKEN']??null);
+try{$id=(new App\Services\TemplateService(db(),new App\Repositories\TemplateRepository(db(),current_user_id(),is_super_admin())))->save(request_json(),current_user_id());json_response(['ok'=>true,'id'=>$id]);}catch(InvalidArgumentException $e){json_response(['ok'=>false,'message'=>$e->getMessage()],422);}catch(Throwable $e){error_log($e->getMessage());json_response(['ok'=>false,'message'=>'تعذر حفظ القالب.'],500);}

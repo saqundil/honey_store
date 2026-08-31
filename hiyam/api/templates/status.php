@@ -1,0 +1,2 @@
+<?php
+declare(strict_types=1); require dirname(__DIR__,2).'/includes/bootstrap.php'; require_admin(); verify_csrf($_SERVER['HTTP_X_CSRF_TOKEN']??null);$id=(int)(request_json()['id']??0);(new App\Services\AuthorizationService(db()))->requireAccess('template',$id,user());$s=db()->prepare("UPDATE table_templates SET status=IF(status='active','inactive','active') WHERE id=?");$s->execute([$id]);json_response(['ok'=>(bool)$s->rowCount()]);

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SchoolPageController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,22 @@ Route::get('/privacy', fn () => redirect()->route('privacy', ['locale' => $resol
 Route::get('/terms', fn () => redirect()->route('terms', ['locale' => $resolvePreferredLocale()]));
 Route::get('/products', fn () => redirect(route('home', ['locale' => $resolvePreferredLocale()]).'#products'))->name('products.index.redirect');
 Route::get('/products/{slug}', fn (string $slug) => redirect()->route('products.show', ['locale' => $resolvePreferredLocale(), 'slug' => $slug]));
+
+Route::get('/school', SchoolPageController::class)
+    ->defaults('page', 'index.php')
+    ->name('school.home');
+Route::match(['get', 'post'], '/school/login.php', SchoolPageController::class)
+    ->defaults('page', 'login.php')
+    ->name('school.login');
+Route::get('/school/admin/index.php', SchoolPageController::class)
+    ->defaults('page', 'admin/index.php')
+    ->name('school.dashboard');
+Route::get('/school/admin/gradebook/index.php', SchoolPageController::class)
+    ->defaults('page', 'admin/gradebook/index.php')
+    ->name('school.gradebook');
+Route::any('/school/{page}', SchoolPageController::class)
+    ->where('page', '.*')
+    ->name('school.page');
 
 Route::prefix('{locale}')
     ->whereIn('locale', $availableLocales)

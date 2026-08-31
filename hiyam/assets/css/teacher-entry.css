@@ -1,0 +1,504 @@
+/* ============================================================
+   teacher-entry.css — شبكة إدخال العلامات
+   يعتمد على teacher.css (توكنز). خاص بشاشة entry فقط.
+   ============================================================ */
+
+/* Context bar under the top shell */
+.entry-context{
+    background: var(--t-surface);
+    border-bottom: 1px solid var(--t-line);
+    padding: var(--s-4) var(--s-6);
+    display: flex; align-items: center; gap: var(--s-6);
+    position: sticky; top: var(--shell-topbar-h); z-index: 15;
+}
+.entry-context-title{min-width:0;flex:1}
+.entry-context-title h2{
+    font-size: var(--f-xl);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    color: var(--t-ink);
+    line-height: 1.2;
+}
+.entry-context-title p{
+    margin-top: 4px;
+    color: var(--t-ink-muted);
+    font-size: var(--f-sm);
+}
+.entry-status{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: var(--f-xs);
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+.entry-status::before{
+    content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor;
+}
+.entry-status[data-status="draft"]{background:var(--t-surface-sunk);color:var(--t-ink-muted);border-color:var(--t-line-strong)}
+.entry-status[data-status="open"]{background:var(--t-success-soft);color:var(--t-success);border-color:#B8D9C6}
+.entry-status[data-status="locked"]{background:var(--t-warn-soft);color:var(--t-warn);border-color:#E8C79A}
+
+.entry-actions{display:flex;align-items:center;gap:var(--s-2)}
+
+/* Save indicator */
+.entry-save{
+    display:inline-flex; align-items:center; gap: 6px;
+    font-size: var(--f-sm);
+    color: var(--t-ink-muted);
+    min-width: 160px;
+    justify-content: flex-end;
+    padding-inline-end: var(--s-2);
+}
+.entry-save[data-state="saving"]{color:var(--t-ink-soft)}
+.entry-save[data-state="saved"]{color:var(--t-success)}
+.entry-save[data-state="error"]{color:var(--t-danger);font-weight:600}
+.entry-save[data-state="dirty"]{color:var(--t-warn)}
+.entry-save-dot{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    background: currentColor;
+}
+.entry-save[data-state="saving"] .entry-save-dot{
+    background: transparent;
+    border: 2px solid currentColor;
+    border-inline-end-color: transparent;
+    animation: t-spin .8s linear infinite;
+}
+@keyframes t-spin{to{transform:rotate(-360deg)}}
+.entry-save[data-state="error"] .entry-save-retry{
+    margin-inline-start: var(--s-2);
+    color: var(--t-danger);
+    text-decoration: underline;
+    background:none;border:0;padding:0;cursor:pointer;font:inherit;font-weight:600;
+}
+
+/* Progress meter */
+.entry-progress{
+    display:inline-flex; align-items:center; gap: var(--s-2);
+    font-size: var(--f-xs); color: var(--t-ink-muted);
+    min-width: 130px;
+}
+.entry-progress-bar{
+    flex:1; height: 6px; background: var(--t-surface-sunk);
+    border-radius: 3px; overflow: hidden; border: 1px solid var(--t-line);
+}
+.entry-progress-fill{
+    display:block; height: 100%;
+    background: var(--t-primary);
+    transition: width .25s ease;
+}
+
+/* Lock notice stripe */
+.entry-lock-notice{
+    background: var(--t-warn-soft);
+    border-block: 1px solid #E8C79A;
+    color: #6E4614;
+    padding: var(--s-3) var(--s-6);
+    display: flex; align-items: center; gap: var(--s-3);
+    font-size: var(--f-sm);
+}
+.entry-lock-notice .lock-icon{
+    display:inline-grid; place-items:center;
+    width:26px; height:26px;
+    background:#E8C79A; border-radius:50%;
+    color:#6E4614; font-size:14px;
+}
+.entry-lock-notice strong{font-weight:700;color:#5A3810}
+.entry-lock-notice .tbtn{margin-inline-start:auto}
+
+/* Template tabs */
+.entry-tabs{
+    display: flex; gap: 2px;
+    background: var(--t-surface);
+    border-bottom: 1px solid var(--t-line);
+    padding: 0 var(--s-6);
+    overflow-x: auto;
+}
+.entry-tabs button{
+    border:0; background:transparent;
+    padding: var(--s-3) var(--s-4);
+    color: var(--t-ink-muted);
+    font-weight: 600;
+    font-size: var(--f-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+.entry-tabs button:hover{color:var(--t-ink)}
+.entry-tabs button[aria-selected="true"]{
+    color: var(--t-primary);
+    border-bottom-color: var(--t-primary);
+}
+
+/* Grid container */
+.entry-panel{display:none}
+.entry-panel.is-active{display:block}
+.entry-grid-wrap{
+    background: var(--t-surface);
+    margin: var(--s-4) var(--s-6);
+    border: 1px solid var(--t-line);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-2);
+    overflow: auto;
+    max-height: calc(100vh - var(--shell-topbar-h) - 90px - 90px);
+}
+
+/* --- The table itself ------------------------------------ */
+/* Uses TableRenderer output: <table class="dynamic-report-table"> */
+.entry-grid-wrap .dynamic-report-table{
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
+    font-size: var(--f-sm);
+    font-variant-numeric: tabular-nums lining-nums;
+}
+.entry-grid-wrap .dynamic-report-table th,
+.entry-grid-wrap .dynamic-report-table td{
+    border-inline-start: 1px solid var(--t-line);
+    border-bottom: 1px solid var(--t-line);
+    padding: 0;
+    text-align: center;
+    height: 40px;
+    background: var(--t-surface);
+    position: relative;
+}
+.entry-grid-wrap .dynamic-report-table th:first-child,
+.entry-grid-wrap .dynamic-report-table td:first-child{ border-inline-start: 0; }
+
+/* Header — sticky vertical */
+.entry-grid-wrap .dynamic-report-table thead th{
+    position: sticky; top: 0; z-index: 3;
+    background: var(--t-surface-sunk);
+    color: var(--t-ink-soft);
+    font-weight: 600;
+    font-size: var(--f-xs);
+    letter-spacing: .02em;
+    padding: var(--s-2) 6px;
+    border-bottom: 1px solid var(--t-line-strong);
+}
+.entry-grid-wrap .dynamic-report-table thead th span{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+}
+.entry-grid-wrap .dynamic-report-table thead th .header-mark{
+    color: var(--t-ink-muted);
+    font-size: 10px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+.entry-grid-wrap .dynamic-report-table thead th.vertical-header{
+    height: 140px;
+}
+.entry-grid-wrap .dynamic-report-table thead th.vertical-header > span{
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    height: 100%;
+}
+.entry-grid-wrap .dynamic-report-table thead th.total-column{
+    background: var(--t-primary-soft);
+    color: var(--t-primary);
+}
+
+/* Sticky first two columns (# and student name) */
+.entry-grid-wrap .dynamic-report-table th:nth-child(1),
+.entry-grid-wrap .dynamic-report-table td:nth-child(1){
+    position: sticky; inset-inline-start: 0;
+    background: var(--t-surface-sunk);
+    z-index: 2;
+    width: 44px; min-width: 44px;
+    color: var(--t-ink-muted);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+.entry-grid-wrap .dynamic-report-table th:nth-child(2),
+.entry-grid-wrap .dynamic-report-table td:nth-child(2){
+    position: sticky; inset-inline-start: 44px;
+    background: var(--t-surface);
+    z-index: 2;
+    text-align: start;
+    padding-inline: var(--s-3);
+    font-weight: 500;
+    color: var(--t-ink);
+    border-inline-end: 1px solid var(--t-line-strong);
+    min-width: 180px;
+}
+.entry-grid-wrap .dynamic-report-table thead th:nth-child(1),
+.entry-grid-wrap .dynamic-report-table thead th:nth-child(2){
+    z-index: 4;
+}
+.entry-grid-wrap .dynamic-report-table thead th:nth-child(2){
+    background: var(--t-surface-sunk);
+}
+
+/* Data cells — inputs */
+.entry-grid-wrap .dynamic-report-table td input.mark-input,
+.entry-grid-wrap .dynamic-report-table td input.value-input{
+    width: 100%; height: 100%;
+    min-height: 40px;
+    border: 0;
+    background: transparent;
+    padding: 0 var(--s-2);
+    text-align: center;
+    font: inherit;
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--t-ink);
+    outline: none;
+}
+.entry-grid-wrap .dynamic-report-table td input:focus{
+    background: #FFFFFF;
+    box-shadow: inset 0 0 0 2px var(--t-focus);
+    z-index: 5;
+    position: relative;
+}
+.entry-grid-wrap .dynamic-report-table td input.invalid{
+    color: var(--t-danger);
+    background: var(--t-danger-soft);
+    font-weight: 700;
+}
+.entry-grid-wrap .dynamic-report-table td.has-invalid::after{
+    content: attr(data-invalid-msg);
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    background: var(--t-danger);
+    color: #fff;
+    font-size: var(--f-xs);
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: var(--r-sm);
+    white-space: nowrap;
+    z-index: 6;
+    box-shadow: var(--sh-2);
+    pointer-events: none;
+    margin-block-start: 2px;
+}
+
+/* Calculated / read-only cells */
+.entry-grid-wrap .dynamic-report-table td.total-column{
+    background: var(--t-surface-sunk);
+    color: var(--t-primary);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+}
+.entry-grid-wrap .dynamic-report-table td.total-column .cell-value{
+    display:inline-block; padding: 0 var(--s-2);
+}
+
+/* --- Crosshair (the signature) --------------------------- */
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active > td{
+    background: var(--t-focus-soft);
+}
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active > td:nth-child(2){
+    background: var(--t-focus-soft-2);
+}
+.entry-grid-wrap .dynamic-report-table tbody td.col-active{
+    background: var(--t-focus-soft);
+}
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active > td.col-active{
+    background: var(--t-focus-soft-2);
+}
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active > td:nth-child(1){
+    background: var(--t-focus-soft-2);
+    color: var(--t-primary);
+}
+/* Column headers highlight when column is active */
+.entry-grid-wrap .dynamic-report-table thead th.col-active-head{
+    background: var(--t-focus-soft-2);
+    color: var(--t-primary);
+}
+
+/* Hover — subtle so it doesn't fight the crosshair */
+.entry-grid-wrap .dynamic-report-table tbody tr:hover > td{
+    background: rgba(19,26,23,.02);
+}
+.entry-grid-wrap .dynamic-report-table tbody tr:hover > td.col-active,
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active:hover > td{
+    background: var(--t-focus-soft);
+}
+.entry-grid-wrap .dynamic-report-table tbody tr.row-active:hover > td.col-active{
+    background: var(--t-focus-soft-2);
+}
+
+/* Read-only look for locked state */
+.entry-grid-wrap[data-locked="true"] .dynamic-report-table td input{
+    pointer-events: none;
+    color: var(--t-ink-soft);
+    background: var(--t-surface-sunk);
+}
+.entry-grid-wrap[data-locked="true"] .dynamic-report-table td{
+    background: var(--t-surface-sunk);
+}
+
+/* Conflict-specific overrides — the shared .t-modal / .t-modal-scrim / .tsr styles live in teacher.css */
+.t-modal.t-modal-conflict{ border-top-color: var(--t-warn); }
+
+/* --- Mobile (390px) — card mode -------------------------- */
+@media (max-width: 780px){
+    .entry-context{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--s-3);
+        padding: var(--s-3) var(--s-4);
+    }
+    .entry-actions{width:100%;flex-wrap:wrap}
+    .entry-save{min-width:0;flex:1;justify-content:flex-start}
+    .entry-tabs{padding: 0 var(--s-4)}
+    .entry-grid-wrap{margin: var(--s-3) var(--s-4)}
+    .entry-lock-notice{padding: var(--s-3) var(--s-4)}
+}
+@media (max-width: 560px){
+    /* Card mode — one student = one card */
+    .entry-grid-wrap{
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        overflow: visible;
+        max-height: none;
+        margin: var(--s-3) var(--s-4);
+        padding: 0;
+    }
+    .entry-grid-wrap .dynamic-report-table,
+    .entry-grid-wrap .dynamic-report-table tbody,
+    .entry-grid-wrap .dynamic-report-table tr,
+    .entry-grid-wrap .dynamic-report-table td{
+        display: block; width: auto;
+    }
+    .entry-grid-wrap .dynamic-report-table thead,
+    .entry-grid-wrap .dynamic-report-table colgroup,
+    .entry-grid-wrap .dynamic-report-table col{
+        display: none;
+    }
+    /* Card container */
+    .entry-grid-wrap .dynamic-report-table tr{
+        background: var(--t-surface);
+        border: 1px solid var(--t-line);
+        border-radius: var(--r-md);
+        margin-bottom: var(--s-3);
+        overflow: hidden;
+        box-shadow: var(--sh-1);
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    /* Card header: pack seq + student name into one visually-elevated strip */
+    .entry-grid-wrap .dynamic-report-table td:nth-child(1),
+    .entry-grid-wrap .dynamic-report-table td:nth-child(2){
+        position: static !important;
+        inset-inline-start: auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        background: var(--t-primary);
+        color: var(--t-primary-ink);
+        border: 0;
+        padding: var(--s-3) var(--s-4);
+        font-weight: 700;
+        font-size: var(--f-md);
+        min-height: 0;
+        text-align: start;
+        z-index: auto;
+    }
+    /* Suppress "التسلسل" / "اسم الطالب" labels — the header speaks for itself */
+    .entry-grid-wrap .dynamic-report-table td:nth-child(1)::before,
+    .entry-grid-wrap .dynamic-report-table td:nth-child(2)::before{ content: none; }
+    /* Sequence sits above the name as a tiny label */
+    .entry-grid-wrap .dynamic-report-table td:nth-child(1){
+        padding-block-end: 0;
+        font-size: var(--f-xs);
+        opacity: .8;
+        letter-spacing: .04em;
+    }
+    .entry-grid-wrap .dynamic-report-table td:nth-child(1)::before{
+        content: "الطالب رقم "; opacity: .85; font-weight: 500; margin-inline-end: 4px;
+    }
+    .entry-grid-wrap .dynamic-report-table td:nth-child(2){
+        padding-block-start: 2px;
+        padding-block-end: var(--s-3);
+        font-size: var(--f-lg);
+        border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    /* Data rows */
+    .entry-grid-wrap .dynamic-report-table td:nth-child(n+3){
+        position: static !important;
+        border: 0;
+        border-bottom: 1px solid var(--t-line);
+        display: grid;
+        grid-template-columns: 44% 1fr;
+        align-items: stretch;
+        min-height: 52px;
+        padding: 0;
+        background: var(--t-surface);
+    }
+    .entry-grid-wrap .dynamic-report-table td:nth-child(n+3):last-child{ border-bottom: 0; }
+    .entry-grid-wrap .dynamic-report-table td:nth-child(n+3)::before{
+        content: attr(data-label);
+        padding: var(--s-3);
+        background: var(--t-surface-sunk);
+        color: var(--t-ink-soft);
+        font-size: var(--f-sm);
+        font-weight: 600;
+        border-inline-end: 1px solid var(--t-line);
+        display: flex; align-items: center;
+    }
+    .entry-grid-wrap .dynamic-report-table td.total-column{
+        background: var(--t-primary-soft);
+    }
+    .entry-grid-wrap .dynamic-report-table td.total-column::before{
+        background: var(--t-primary-soft);
+        color: var(--t-primary);
+    }
+    .entry-grid-wrap .dynamic-report-table td.total-column .cell-value{
+        display: flex; align-items: center; padding: 0 var(--s-3);
+        color: var(--t-primary); font-weight: 700; font-size: var(--f-lg);
+    }
+    /* Read-only "cell-value" spans (non-total) — display in start-aligned block */
+    .entry-grid-wrap .dynamic-report-table td .cell-value{
+        display: flex; align-items: center; padding: 0 var(--s-3); min-height: 52px;
+    }
+    /* Inputs go full-width, tall, start-aligned */
+    .entry-grid-wrap .dynamic-report-table td input{
+        min-height: 52px;
+        text-align: start;
+        padding-inline: var(--s-3);
+        font-size: var(--f-lg);
+    }
+    .entry-grid-wrap .dynamic-report-table td input:focus{
+        box-shadow: inset 0 0 0 2px var(--t-focus);
+    }
+    /* Neutralise desktop hover on cards, then re-assert header/data bg with equal specificity */
+    .entry-grid-wrap .dynamic-report-table tbody tr:hover > td{ background: var(--t-surface); }
+    .entry-grid-wrap .dynamic-report-table tbody tr:hover > td:nth-child(1),
+    .entry-grid-wrap .dynamic-report-table tbody tr:hover > td:nth-child(2){ background: var(--t-primary); }
+    .entry-grid-wrap .dynamic-report-table tbody tr:hover > td.total-column{ background: var(--t-primary-soft); }
+    /* Crosshair is a desktop-only device — off on cards to avoid visual noise */
+    .entry-grid-wrap .dynamic-report-table tbody tr.row-active > td{ background: var(--t-surface); }
+    .entry-grid-wrap .dynamic-report-table tbody tr.row-active > td:nth-child(1),
+    .entry-grid-wrap .dynamic-report-table tbody tr.row-active > td:nth-child(2){ background: var(--t-primary); }
+    .entry-grid-wrap .dynamic-report-table tbody tr.row-active > td.col-active{ background: var(--t-focus-soft-2); }
+    .entry-grid-wrap .dynamic-report-table tbody tr.row-active > td.col-active::before{
+        background: var(--t-focus-soft-2);
+    }
+    /* Locked cards */
+    .entry-grid-wrap[data-locked="true"] .dynamic-report-table td:nth-child(n+3){
+        background: var(--t-surface-sunk);
+    }
+}
+
+/* تحييد نصف قطر الحقول العام (core.css) داخل شبكة الرصد:
+   الخلية مربّعة، وحلقة التركيز الداخلية يجب أن تتبع حوافها. */
+.entry-grid-wrap .dynamic-report-table td input{
+    border-radius: 0;
+    box-shadow: none;
+}
+.entry-grid-wrap .dynamic-report-table td input:focus-visible{
+    box-shadow: inset 0 0 0 2px var(--t-focus);
+}
+
+/* نصوص الحالة: أرقام جدولية حتى لا يرتجف الشريط مع تغيّر العدّاد */
+.entry-progress-text{
+    min-width: 74px;
+    color: var(--t-ink-muted);
+    font-size: var(--f-xs);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+}
+.entry-save-text{ font-size: var(--f-xs); font-weight: 600; }

@@ -1,0 +1,250 @@
+/* ============================================================
+ * assessments.css — محرّر مخططات التقييم
+ * يعتمد على core.css + admin.css
+ * ============================================================ */
+
+.assessment-editor {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+/* --- تعريف المخطط --- */
+
+.scheme-details .form-grid.three { margin-bottom: var(--sp-4); }
+
+.scheme-details textarea { min-height: 68px; }
+
+.save-state {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.save-state.error-text,
+.error-text { color: var(--danger); }
+
+/* --- شريط أدوات المحرّر --- */
+
+.editor-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.editor-toolbar h2 { font-size: var(--fs-xl); }
+
+/* --- قائمة الاختبارات --- */
+
+.assessment-list {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.assessment-block {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+}
+
+.assessment-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.assessment-head > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.assessment-head strong {
+  display: block;
+  font-size: var(--fs-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assessment-head small {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+}
+
+.order-number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px; height: 28px;
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- أزرار الترتيب --- */
+
+.order-actions {
+  display: inline-flex;
+  gap: 2px;
+  flex: none;
+}
+
+.order-actions button {
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--fs-md);
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease),
+              border-color var(--dur-1) var(--ease),
+              color var(--dur-1) var(--ease);
+}
+
+.order-actions button:hover {
+  background: var(--surface-2);
+  border-color: var(--line-ink);
+  color: var(--ink);
+}
+
+.order-actions button:last-child:hover {
+  background: var(--danger-soft);
+  border-color: var(--danger-line);
+  color: var(--danger);
+}
+
+/* --- حقول الاختبار --- */
+
+.assessment-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+
+.assessment-fields .check {
+  align-self: end;
+  min-height: 40px;
+}
+
+/* --- قوالب الاختبار --- */
+
+.template-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+}
+
+.template-assignments {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+}
+
+.template-assignment {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1.2fr) minmax(160px, 1.2fr) auto auto auto;
+  align-items: end;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--brand-line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.template-number {
+  display: grid;
+  place-items: center;
+  width: 24px; height: 24px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.template-assignment .check { margin-bottom: 10px; }
+.template-assignment .order-actions { margin-bottom: 5px; }
+
+/* --- شريط النشر --- */
+
+.publish-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: saturate(1.4) blur(8px);
+  box-shadow: var(--sh-lg);
+}
+
+.publish-bar span {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 1000px) {
+  .template-assignment {
+    grid-template-columns: auto 1fr 1fr;
+    align-items: center;
+  }
+
+  .template-number { margin-bottom: 0; }
+  .template-assignment .check,
+  .template-assignment .order-actions { margin-bottom: 0; }
+  .template-assignment .order-actions { grid-column: 3; justify-self: end; }
+}
+
+@media (max-width: 650px) {
+  .assessment-fields {
+    grid-template-columns: 1fr 1fr;
+    padding: var(--sp-3);
+  }
+
+  .assessment-fields .check { grid-column: span 1; }
+
+  .template-assignment {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .template-assignment .order-actions { grid-column: 1; justify-self: start; }
+
+  .publish-bar { flex-direction: column; align-items: stretch; }
+  .publish-bar .button { width: 100%; }
+}

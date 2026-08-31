@@ -1,0 +1,217 @@
+/* @font-face {
+  font-family: "SKR HEAD1 Decorative";
+  src: url("../fonts/SKR-HEAD1-Decorative.ttf") format("truetype"),
+    local("SKR HEAD1 Decorative"),
+    local("SKR HEAD1 Decorat");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+.school-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+  align-items: center;
+  direction: ltr;
+  gap: 66px;
+  min-height: 112px;
+  margin-bottom: 8px;
+}
+
+.report-heading-title,
+.report-heading-subject {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.report-school-logo {
+  display: grid;
+  place-items: center;
+}
+
+.report-school-logo img {
+  display: block;
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+}
+
+.report-heading-title,
+.report-heading-subject {
+  display: grid;
+  direction: rtl;
+  font-family: "SKR HEAD1 Decorative";
+  font-weight: 400;
+  line-height: 1.25;
+  text-shadow: none;
+}
+
+.report-heading-title {
+  justify-items: center;
+  text-align: center;
+}
+
+.report-heading-subject {
+  justify-items: center;
+  text-align: center;
+}
+
+.report-heading-title strong,
+.report-heading-subject strong {
+  font-size: 23px;
+  font-family: inherit;
+  font-weight: 400;
+  text-shadow: none;
+}
+
+.report-heading-title span {
+  margin-top: 13px;
+  font-size: 25px;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.report-heading-subject span {
+  margin-top: 9px;
+  font-size: 17px;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.report-heading-subject time {
+  margin-top: 5px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.report-meta {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 12px;
+}
+
+.report-meta > * {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.report-meta strong {
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.dynamic-report-table .header-mark,
+.builder-preview .header-mark {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.vertical-header > span {
+  gap: 3px;
+}
+
+.report-sheet--dense .dynamic-report-table {
+  font-size: 12px;
+}
+
+.report-sheet--dense .dynamic-report-table thead th {
+  padding: 2px;
+}
+
+.report-sheet--dense .dynamic-report-table td {
+  height: 5.9mm;
+  padding: 0 3px;
+  line-height: 1.1;
+}
+
+.report-sheet--dense .dynamic-report-table input {
+  height: 5.55mm;
+  padding: 0 2px;
+}
+
+.dynamic-report-table .total-column {
+  background: #ededed;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+@media print {
+  html,
+  body,
+  .report-sheet {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .school-header {
+    grid-template-columns: minmax(0, 1fr) 124px minmax(0, 1fr);
+    gap: 30px;
+    min-height: 132px;
+    margin-bottom: 4px;
+  }
+
+  .report-school-logo img {
+    width: 116px;
+    height: 116px;
+  }
+
+  .report-heading-title strong,
+  .report-heading-subject strong {
+    font-size: 26px;
+  }
+
+  .report-heading-title span {
+    margin-top: 14px;
+    font-size: 28px;
+  }
+
+  .report-heading-subject span {
+    margin-top: 10px;
+    font-size: 19px;
+  }
+
+  .report-heading-subject time {
+    margin-top: 6px;
+    font-size: 17px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .school-header {
+    grid-template-columns: minmax(0, 1fr) 88px minmax(0, 1fr);
+    gap: 8px;
+    min-height: 94px;
+    text-align: initial;
+  }
+
+  .report-school-logo img {
+    width: 82px;
+    height: 82px;
+  }
+
+  .report-heading-title strong,
+  .report-heading-subject strong {
+    font-size: 17px;
+  }
+
+  .report-heading-title span {
+    margin-top: 8px;
+    font-size: 19px;
+  }
+
+  .report-heading-subject span {
+    margin-top: 5px;
+    font-size: 13px;
+  }
+
+  .report-heading-subject time {
+    margin-top: 3px;
+    font-size: 12px;
+  }
+}

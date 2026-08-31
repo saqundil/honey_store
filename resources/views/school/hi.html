@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>خلاصة الاختبارات القصيرة</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Libre+Baskerville:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --frame-outer-gap: 6mm;
+            --frame-inner-gap: 4mm;
+            --frame-width: 7px;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px;
+            background: #eeeeee;
+            color: #111;
+            font-family: "Amiri", "Times New Roman", serif;
+        }
+
+        .actions {
+            width: min(222mm, 100%);
+            margin: 0 auto 12px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .print-button {
+            border: 1px solid #111;
+            padding: 8px 18px;
+            background: #fff;
+            color: #111;
+            font: 700 17px "Amiri", serif;
+            cursor: pointer;
+        }
+
+        .print-button:hover,
+        .print-button:focus-visible {
+            background: #111;
+            color: #fff;
+        }
+
+        .report {
+            width: min(222mm, 100%);
+            min-height: 314mm;
+            margin: auto;
+            padding: calc(var(--frame-outer-gap) + var(--frame-width) + var(--frame-inner-gap));
+            background: #fff;
+            position: relative;
+            box-shadow: 0 0 8px rgba(0,0,0,.15);
+        }
+
+        .report::before {
+            content: "";
+            position: absolute;
+            inset: var(--frame-outer-gap);
+            border: var(--frame-width) double #111;
+            pointer-events: none;
+        }
+
+        .report > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+            align-items: center;
+            direction: ltr;
+            min-height: 82px;
+            margin: 0 7px 5px;
+        }
+
+        .school-en {
+            direction: ltr;
+            text-align: left;
+            font-family: "Libre Baskerville", Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: #484533;
+            white-space: nowrap;
+        }
+
+        .school-ar {
+            direction: rtl;
+            text-align: right;
+            font-size: 25px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .logo {
+            width: 88px;
+            height: 88px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ================= TITLE ================= */
+
+        .report-title {
+            display: grid;
+            grid-template-columns: 1fr 2.1fr 1fr;
+            align-items: center;
+            gap: 10px;
+            direction: rtl;
+            font-size: 19px;
+            font-weight: 700;
+            padding: 1px 9px 9px;
+            white-space: nowrap;
+        }
+
+        .title-right {
+            text-align: right;
+        }
+
+        .title-center {
+            text-align: center;
+        }
+
+        .title-center strong {
+            border-bottom: 2px solid #111;
+            line-height: 1;
+        }
+
+        .title-left {
+            text-align: left;
+        }
+
+        /* ================= TABLE ================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            border: 4px solid #111;
+            font-size: 17px;
+        }
+
+        th,
+        td {
+            border: 1.5px solid #111;
+        }
+
+        thead th {
+            height: 54px;
+            background: #f4f4f4;
+            text-align: center;
+            vertical-align: middle;
+            border-bottom-width: 4px;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        tbody td {
+            height: 35px;
+            padding: 1px 7px;
+            vertical-align: middle;
+        }
+
+        th.student,
+        td.student {
+            border-left-width: 4px;
+        }
+
+        /* ترتيب الأعمدة من اليمين */
+        .number {
+            width: 7%;
+            text-align: center;
+        }
+
+        .student {
+            width: 38%;
+            text-align: right;
+            padding-right: 9px;
+            font-weight: 700;
+        }
+
+        .quiz {
+            width: 18%;
+            text-align: center;
+        }
+
+        .final {
+            width: 19%;
+            text-align: center;
+            background: #f4f4f4;
+        }
+
+        .student-name {
+            white-space: nowrap;
+        }
+
+        .mark {
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .mark-input {
+            width: 100%;
+            height: 30px;
+            border: 0;
+            border-bottom: 1px solid transparent;
+            outline: 0;
+            background: transparent;
+            color: #111;
+            direction: ltr;
+            text-align: center;
+            font: 700 17px "Libre Baskerville", Georgia, serif;
+            appearance: textfield;
+        }
+
+        .mark-input::-webkit-inner-spin-button,
+        .mark-input::-webkit-outer-spin-button {
+            margin: 0;
+            appearance: none;
+        }
+
+        .mark-input:focus {
+            border-bottom-color: #111;
+            background: #fff;
+        }
+
+        .mark-input.is-invalid {
+            color: #a40000;
+            border-bottom-color: #a40000;
+        }
+
+        .final-value {
+            direction: ltr;
+            font-family: "Libre Baskerville", Georgia, serif;
+            font-weight: 700;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+            margin-top: 9px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+        }
+
+        /* ================= PRINT ================= */
+
+        @media print {
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            .actions {
+                display: none;
+            }
+
+            .mark-input {
+                height: auto;
+                border: 0;
+            }
+
+            .report {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                box-shadow: none;
+                border-width: 7px;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .report {
+                width: 100%;
+                min-height: auto;
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+                direction: rtl;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .school-en,
+            .school-ar {
+                text-align: center;
+                white-space: normal;
+            }
+
+            .report-title {
+                grid-template-columns: 1fr;
+                gap: 5px;
+                white-space: normal;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            thead th {
+                font-size: 14px;
+            }
+
+            tbody td {
+                height: 34px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="actions" aria-label="إجراءات التقرير">
+    <button class="print-button" type="button" id="print-report">طباعة التقرير</button>
+</div>
+
+<div class="report">
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="school-en">
+            Al-Jami’a Schools Group
+        </div>
+
+        <div class="logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQu3HSSf0XPREcuQF9f4ETheeEzuEeq2JT0fNGoIE-1yuPE0GlXjs5bDzQT&amp;s=10" alt="شعار مجموعة مدارس الجامعة">
+        </div>
+
+        <div class="school-ar">
+            مجموعة مدارس الجامعة
+        </div>
+
+    </header>
+
+
+    <!-- REPORT TITLE -->
+    <section class="report-title">
+
+        <div class="title-right">
+            المبحث : اللغة العربية
+        </div>
+
+        <div class="title-center">
+            خلاصة الاختبارات القصيرة
+            &nbsp;&nbsp;
+            تقويم <strong>الشهر الثالث</strong>
+        </div>
+
+        <div class="title-left">
+            الصف: السادس أ
+        </div>
+
+    </section>
+
+
+    <!-- STUDENTS TABLE -->
+    <table>
+
+        <thead>
+            <tr>
+                <th class="number">
+                    الرقم
+                </th>
+
+                <th class="student">
+                    اسم الطالب
+                </th>
+
+                <th class="quiz">
+                    اختبار قصير<br>
+                    <span class="mark">(2.5)</span>
+                </th>
+
+                <th class="quiz">
+                    اختبار قصير<br>
+                    <span class="mark">(2.5)</span>
+                </th>
+
+                <th class="final">
+                    العلامة النهائية<br>
+                    <span class="mark">(5)</span>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td class="number">1.</td>
+                <td class="student student-name">أحمد حمزة سليمان بوزجم</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">2.</td>
+                <td class="student student-name">أمير عماد محمد بطاينة</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">3.</td>
+                <td class="student student-name">أوس زيد علاوي الخلايلة</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">4.</td>
+                <td class="student student-name">باسل محمد فؤاد شعبان حمام</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">5.</td>
+                <td class="student student-name">حسام محمد حسين تيم</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">6.</td>
+                <td class="student student-name">دوجان محمد دوجان اللوزي</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">7.</td>
+                <td class="student student-name">ريان أيمن محمد عده</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">8.</td>
+                <td class="student student-name">زيد زياد إبراهيم جخيم</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">9.</td>
+                <td class="student student-name">عامر منصور عبد القادر أبو</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">10.</td>
+                <td class="student student-name">عبدالله علي عبد الهادي العمارة</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">11.</td>
+                <td class="student student-name">فارس خالد صدقي محمد</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">12.</td>
+                <td class="student student-name">كرم إيهاب درويش تزيتر</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">13.</td>
+                <td class="student student-name">كرم محمود سهيل غنام</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">14.</td>
+                <td class="student student-name">ليث ثائر عباس عادي</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td class="number">15.</td>
+                <td class="student student-name">ليث صهيب محمد الجمل</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+
+    <div class="footer">
+        <span>المعلم: __________________</span>
+        <span>التاريخ: ____ / ____ / ______</span>
+    </div>
+
+</div>
+
+<script>
+    const storageKey = "quiz-summary-marks-v1";
+    let savedMarks = {};
+
+    try {
+        savedMarks = JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch {
+        savedMarks = {};
+    }
+
+    const formatMark = value => Number(value.toFixed(2)).toString();
+
+    const readMark = input => {
+        if (input.value === "") {
+            input.classList.remove("is-invalid");
+            input.removeAttribute("aria-invalid");
+            return null;
+        }
+
+        const value = Number(input.value);
+        const isValid = Number.isFinite(value) && value >= 0 && value <= 2.5;
+        input.classList.toggle("is-invalid", !isValid);
+
+        if (isValid) {
+            input.removeAttribute("aria-invalid");
+            return value;
+        }
+
+        input.setAttribute("aria-invalid", "true");
+        return undefined;
+    };
+
+    const saveRows = () => {
+        const data = {};
+
+        document.querySelectorAll("tbody tr").forEach(row => {
+            const name = row.querySelector(".student-name").textContent.trim();
+            const inputs = row.querySelectorAll(".mark-input");
+            data[name] = [inputs[0].value, inputs[1].value];
+        });
+
+        localStorage.setItem(storageKey, JSON.stringify(data));
+    };
+
+    const updateFinalMark = (row, persist = true) => {
+        const inputs = row.querySelectorAll(".mark-input");
+        const firstMark = readMark(inputs[0]);
+        const secondMark = readMark(inputs[1]);
+        const finalCell = row.querySelector(".final-value");
+
+        finalCell.textContent = firstMark === null || secondMark === null ||
+            firstMark === undefined || secondMark === undefined
+            ? ""
+            : formatMark(firstMark + secondMark);
+
+        if (persist && firstMark !== undefined && secondMark !== undefined) {
+            saveRows();
+        }
+    };
+
+    document.querySelectorAll("tbody tr").forEach((row, rowIndex) => {
+        const cells = row.cells;
+        const name = row.querySelector(".student-name").textContent.trim();
+        const stored = savedMarks[name] || ["", ""];
+
+        [2, 3].forEach((cellIndex, markIndex) => {
+            const input = document.createElement("input");
+            input.className = "mark-input";
+            input.type = "number";
+            input.min = "0";
+            input.max = "2.5";
+            input.step = "0.25";
+            input.inputMode = "decimal";
+            input.value = stored[markIndex] || "";
+            input.setAttribute("aria-label", `علامة الاختبار ${markIndex + 1} للطالب ${name}`);
+            input.addEventListener("input", () => updateFinalMark(row));
+            input.addEventListener("keydown", event => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                const inputs = [...document.querySelectorAll(".mark-input")];
+                inputs[inputs.indexOf(input) + 1]?.focus();
+            });
+            cells[cellIndex].classList.add("quiz");
+            cells[cellIndex].replaceChildren(input);
+        });
+
+        cells[4].classList.add("final", "final-value");
+        updateFinalMark(row, false);
+    });
+
+    document.getElementById("print-report").addEventListener("click", () => window.print());
+</script>
+
+</body>
+</html>
