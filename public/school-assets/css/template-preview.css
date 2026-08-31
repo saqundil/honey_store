@@ -1,0 +1,43 @@
+.preview-page { width: 100%; }
+
+.template-preview-viewport {
+  position: relative;
+  width: min(210mm, 100%);
+  height: var(--preview-height, 297mm);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--sh-lg);
+}
+
+.template-preview-sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0;
+  padding: 7mm 14mm;
+  transform: scale(var(--preview-scale, 1));
+  transform-origin: top right;
+  box-shadow: none;
+}
+
+@media screen and (max-width: 800px) {
+  .preview-page { gap: var(--sp-3); }
+  .report-info { padding: var(--sp-2) var(--sp-3); }
+
+  .template-preview-sheet .school-header {
+    grid-template-columns: minmax(0, 1fr) 124px minmax(0, 1fr);
+    gap: 30px;
+    min-height: 132px;
+    margin-bottom: 4px;
+    text-align: initial;
+  }
+
+  .template-preview-sheet .report-school-logo img { width: 116px; height: 116px; }
+  .template-preview-sheet .report-heading-title strong,
+  .template-preview-sheet .report-heading-subject strong { font-size: 26px; }
+  .template-preview-sheet .report-heading-title span { margin-top: 14px; font-size: 28px; }
+  .template-preview-sheet .report-heading-subject span { margin-top: 10px; font-size: 19px; }
+  .template-preview-sheet .report-heading-subject time { margin-top: 6px; font-size: 17px; }
+}

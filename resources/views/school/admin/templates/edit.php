@@ -60,9 +60,11 @@ page_header($id?'محرر جدول العلامات':'جدول علامات جد
                 </header>
                 <div class="tb-preview-body">
                 <?php $report = ['title' => $template['name'], 'class_name' => 'الصف السادس (أ)', 'subject_name' => 'اللغة العربية', 'semester' => 'الأول', 'academic_year' => date('Y') . '/' . ((int) date('Y') + 1)]; ?>
-                    <div id="preview-sheet" class="report-sheet report-sheet--dense">
-                        <?php require dirname(__DIR__, 2) . '/includes/report-header.php'; ?>
-                        <div id="live-preview" class="builder-preview"></div>
+                    <div id="preview-viewport" class="tb-preview-viewport">
+                        <div id="preview-sheet" class="report-sheet report-sheet--dense">
+                            <?php require dirname(__DIR__, 2) . '/includes/report-header.php'; ?>
+                            <div id="live-preview" class="builder-preview"></div>
+                        </div>
                     </div>
                 </div>
             </section>

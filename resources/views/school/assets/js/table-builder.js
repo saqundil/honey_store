@@ -758,5 +758,24 @@
   $('#save-template').onclick = save;
   $('#save-template-2').onclick = save;
 
+  function fitMobilePreview() {
+    const viewport = $('#preview-viewport');
+    const sheet = $('#preview-sheet');
+    if (!viewport || !sheet || !window.matchMedia?.('(max-width: 560px)').matches) {
+      sheet?.style?.removeProperty?.('--preview-scale');
+      return;
+    }
+    const sheetWidth = sheet.offsetWidth;
+    if (sheetWidth) sheet.style.setProperty?.('--preview-scale', String(viewport.clientWidth / sheetWidth));
+  }
+
+  if (window.ResizeObserver) {
+    const previewViewport = $('#preview-viewport');
+    if (previewViewport) new ResizeObserver(fitMobilePreview).observe(previewViewport);
+  } else {
+    window.addEventListener?.('resize', fitMobilePreview);
+  }
+
   renderAll();
+  fitMobilePreview();
 })();

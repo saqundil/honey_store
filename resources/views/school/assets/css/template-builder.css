@@ -84,6 +84,7 @@
 }
 
 .tb-preview-body .report-sheet { width: 100%; min-height: 0; margin: 0; box-shadow: var(--sh-lg); }
+.tb-preview-viewport { width: 100%; }
 .builder-preview { min-height: 0; padding: 0; background: #fff; direction: rtl; }
 .builder-preview table { margin: 0; }
 
@@ -270,6 +271,39 @@
 @media (max-width: 560px) {
   .tb-bar { align-items: stretch; flex-direction: column; }
   .tb-bar-actions { justify-content: space-between; }
+  .tb-preview-body { padding: 8px; overflow: hidden; }
+  .tb-preview-viewport {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 210 / 297;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: var(--sh-lg);
+  }
+  .tb-preview-body .report-sheet {
+    position: absolute;
+    top: 0; right: 0;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 7mm 14mm;
+    transform: scale(var(--preview-scale, .4));
+    transform-origin: top right;
+    box-shadow: none;
+  }
+  .tb-preview-body .school-header {
+    grid-template-columns: minmax(0, 1fr) 124px minmax(0, 1fr);
+    gap: 30px;
+    min-height: 132px;
+    margin-bottom: 4px;
+    text-align: initial;
+  }
+  .tb-preview-body .report-school-logo img { width: 116px; height: 116px; }
+  .tb-preview-body .report-heading-title strong,
+  .tb-preview-body .report-heading-subject strong { font-size: 26px; }
+  .tb-preview-body .report-heading-title span { margin-top: 14px; font-size: 28px; }
+  .tb-preview-body .report-heading-subject span { margin-top: 10px; font-size: 19px; }
+  .tb-preview-body .report-heading-subject time { margin-top: 6px; font-size: 17px; }
   .tb-row-main { align-items: flex-start; flex-direction: column; gap: 2px; }
   .tb-structure-actions .button { flex: 1 1 auto; justify-content: center; }
 }
