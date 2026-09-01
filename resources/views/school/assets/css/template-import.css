@@ -376,11 +376,15 @@
   border-top: 1px solid var(--line);
 }
 
-.import-name {
-  flex: 1 1 320px;
+.import-paste-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  flex: 1 1 420px;
+  gap: var(--sp-3);
   min-width: 0;
-  margin: 0;
 }
+
+.import-paste-fields label { margin: 0; }
 
 .import-submit {
   display: inline-flex;
@@ -652,6 +656,8 @@
     flex-direction: column;
     gap: var(--sp-3);
   }
+
+  .import-paste-fields { grid-template-columns: 1fr; }
 
   .import-submit {
     justify-content: space-between;

@@ -33,12 +33,15 @@ try {
     $pdo->prepare('INSERT INTO subjects(name) VALUES(?)')->execute([$subjectName]);
     $subjectId = (int) $pdo->lastInsertId();
 
-    $insertTemplate = $pdo->prepare("INSERT INTO table_templates(name,status,created_by) VALUES(?,'active',?)");
+    $insertGroup = $pdo->prepare('INSERT INTO template_groups(name,created_by) VALUES(?,?)');
+    $insertTemplate = $pdo->prepare("INSERT INTO table_templates(group_id,name,status,created_by) VALUES(?,?,'active',?)");
     $insertVersion = $pdo->prepare('INSERT INTO table_template_versions(template_id,version_number,created_by) VALUES(?,1,?)');
     $templateVersions = [];
     foreach ([$firstTeacher, $secondTeacher] as $teacherId) {
+        $insertGroup->execute(['مجموعة قوالب المرحلة الرابعة', $teacherId]);
+        $templateGroupId = (int) $pdo->lastInsertId();
         for ($index = 1; $index <= 8; $index++) {
-            $insertTemplate->execute(["قالب {$index}", $teacherId]);
+            $insertTemplate->execute([$templateGroupId, "قالب {$index}", $teacherId]);
             $insertVersion->execute([(int) $pdo->lastInsertId(), $teacherId]);
             $templateVersions[$teacherId][] = (int) $pdo->lastInsertId();
         }

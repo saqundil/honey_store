@@ -40,7 +40,7 @@ function identityColumns(): array
  * يحوّل أعمدة المعلم إلى حمولة TemplateService كاملة.
  * المفاتيح تُولَّد آليًا بالصيغة التي يفرضها TemplateService.
  */
-function buildTemplatePayload(string $sectionName, array $columns): array
+function buildTemplatePayload(string $sectionName, array $columns, string $templateGroupName): array
 {
     $payload = identityColumns();
     $order = count($payload);
@@ -92,7 +92,7 @@ function buildTemplatePayload(string $sectionName, array $columns): array
         throw new InvalidArgumentException("القسم «{$sectionName}» يحتاج عمودًا واحدًا على الأقل.");
     }
 
-    return ['template_id' => 0, 'name' => $sectionName, 'description' => '', 'settings' => [], 'groups' => [], 'columns' => $payload];
+    return ['template_id' => 0, 'group_name' => $templateGroupName, 'name' => $sectionName, 'description' => '', 'settings' => [], 'groups' => [], 'columns' => $payload];
 }
 
 try {
@@ -146,7 +146,8 @@ try {
                 }
 
                 // قسم جديد: يُنشأ قالبه وإصداره الأول عبر TemplateService نفسه
-                $templateId = $templates->save(buildTemplatePayload($label, $section['columns'] ?? []), $actorId);
+                $examName = trim((string) ($payload['name'] ?? ''));
+                $templateId = $templates->save(buildTemplatePayload($label, $section['columns'] ?? [], $examName !== '' ? $examName : 'قوالب الاختبارات'), $actorId);
                 $statement = db()->prepare('SELECT current_version_id FROM table_templates WHERE id=?');
                 $statement->execute([$templateId]);
                 $sections[] = ['template_version_id' => (int) $statement->fetchColumn(), 'label' => $label];

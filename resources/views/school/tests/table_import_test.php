@@ -473,10 +473,18 @@ if ($pdo) {
     unset($draft['notes']);
     $adminId = (int) $pdo->query('SELECT id FROM admin_users ORDER BY id LIMIT 1')->fetchColumn();
     $service = new App\Services\TemplateService($pdo, new App\Repositories\TemplateRepository($pdo, $adminId, true));
+    try {
+        $service->save($draft, $adminId);
+        assert(false, 'TemplateService accepted a template without a group.');
+    } catch (InvalidArgumentException $exception) {
+        assert(str_contains($exception->getMessage(), 'مجموعة'));
+    }
+    $draft['group_name'] = 'مجموعة اختبار الاستيراد ' . bin2hex(random_bytes(4));
     $templateId = $service->save($draft, $adminId);
     try {
         $saved = (new App\Repositories\TemplateRepository($pdo, $adminId, true))->currentConfiguration($templateId);
         assert($saved !== null);
+        assert($saved['group_name'] === $draft['group_name']);
         assert(count($saved['columns']) === count($draft['columns']));
         assert(count($saved['groups']) === count($draft['groups']));
         $savedTotal = array_values(array_filter($saved['columns'], static fn(array $column): bool => $column['type'] === 'calculated_total'))[0];
@@ -493,6 +501,7 @@ if ($pdo) {
     } finally {
         $pdo->prepare('UPDATE table_templates SET current_version_id=NULL WHERE id=?')->execute([$templateId]);
         $pdo->prepare('DELETE FROM table_templates WHERE id=?')->execute([$templateId]);
+        $pdo->prepare('DELETE FROM template_groups WHERE created_by=? AND name=?')->execute([$adminId, $draft['group_name']]);
     }
     echo "Draft saved and removed through TemplateService.\n";
 }

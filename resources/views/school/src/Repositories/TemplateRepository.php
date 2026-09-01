@@ -12,20 +12,33 @@ final class TemplateRepository
 
     public function all(): array
     {
-        $sql = "SELECT t.*, v.version_number FROM table_templates t LEFT JOIN table_template_versions v ON v.id=t.current_version_id WHERE t.status<>'archived'";
+        $sql = "SELECT t.*, g.name AS group_name, v.version_number FROM table_templates t JOIN template_groups g ON g.id=t.group_id LEFT JOIN table_template_versions v ON v.id=t.current_version_id WHERE t.status<>'archived'";
         $params = [];
         if (!$this->canViewAll) {
             $sql .= ' AND t.created_by=?';
             $params[] = $this->actorId;
         }
-        $statement = $this->db->prepare($sql . ' ORDER BY t.updated_at DESC');
+        $statement = $this->db->prepare($sql . ' ORDER BY g.name, g.id, t.updated_at DESC');
+        $statement->execute($params);
+        return $statement->fetchAll();
+    }
+
+    public function groups(): array
+    {
+        $sql = 'SELECT id,name,created_by FROM template_groups';
+        $params = [];
+        if (!$this->canViewAll) {
+            $sql .= ' WHERE created_by=?';
+            $params[] = $this->actorId;
+        }
+        $statement = $this->db->prepare($sql . ' ORDER BY name');
         $statement->execute($params);
         return $statement->fetchAll();
     }
 
     public function availableVersions(): array
     {
-        $sql = "SELECT v.id, v.version_number, t.id AS template_id, t.current_version_id, t.name FROM table_template_versions v JOIN table_templates t ON t.id=v.template_id WHERE t.status='active'";
+        $sql = "SELECT v.id, v.version_number, t.id AS template_id, t.current_version_id, t.name, g.name AS group_name FROM table_template_versions v JOIN table_templates t ON t.id=v.template_id JOIN template_groups g ON g.id=t.group_id WHERE t.status='active'";
         $params = [];
         if (!$this->canViewAll) {
             $sql .= ' AND t.created_by=?';
@@ -51,7 +64,7 @@ final class TemplateRepository
 
     public function configuration(int $versionId): ?array
     {
-        $sql = 'SELECT v.*, t.name, t.description, t.status FROM table_template_versions v JOIN table_templates t ON t.id=v.template_id WHERE v.id=?';
+        $sql = 'SELECT v.*, t.name, t.description, t.status, t.group_id, g.name AS group_name FROM table_template_versions v JOIN table_templates t ON t.id=v.template_id JOIN template_groups g ON g.id=t.group_id WHERE v.id=?';
         $params = [$versionId];
         if (!$this->canViewAll) {
             $sql .= ' AND t.created_by=?';

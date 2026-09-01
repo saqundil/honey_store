@@ -116,6 +116,7 @@ final class GradebookRepository
                     st.name  AS stage_name,
                     t.name   AS term_name,
                     y.name   AS academic_year_name,
+                    u.name   AS teacher_name,
                     (SELECT COUNT(*) FROM class_enrollments ce
                         WHERE ce.class_id=c.id AND ce.academic_term_id=c.academic_term_id AND ce.status="active") AS students_count,
                     (SELECT COUNT(*) FROM class_assessments ca
@@ -137,6 +138,7 @@ final class GradebookRepository
                 JOIN stages st ON st.id=c.stage_id
                 JOIN academic_terms t ON t.id=c.academic_term_id
                 JOIN academic_years y ON y.id=t.academic_year_id
+                JOIN admin_users u ON u.id=c.teacher_id
                 WHERE c.status="active"';
         $params = [];
         if (!$this->canViewAll) {
@@ -174,7 +176,7 @@ final class GradebookRepository
                 JOIN stages st ON st.id=c.stage_id
                 JOIN academic_terms t ON t.id=c.academic_term_id
                 JOIN academic_years y ON y.id=t.academic_year_id
-                WHERE c.id=?';
+                WHERE c.id=? AND c.status="active"';
         $params = [$classId];
         if (!$this->canViewAll) {
             $sql .= ' AND c.teacher_id=?';

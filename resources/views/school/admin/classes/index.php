@@ -23,9 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $state = $setup->state($teacherId);
 page_header('الصفوف', 'classes');
 // تجميع الصفوف تحت مراحلها ليقرأها المعلم كما يفكّر بها
+$displayClasses = is_super_admin()
+	? (new App\Repositories\ReferenceRepository(db(), $teacherId, true))->classes()
+	: $state['classes'];
 $byStage = [];
-foreach ($state['classes'] as $item) {
-	$byStage[$item['stage_name']][] = $item;
+foreach ($displayClasses as $item) {
+	$heading = (is_super_admin() ? $item['teacher_name'] . ' · ' : '') . $item['stage_name'];
+	$byStage[$heading][] = $item;
 }
 ?>
 <div class="section-head">
@@ -70,7 +74,7 @@ foreach ($state['classes'] as $item) {
 					<?php foreach ($items as $item): ?>
 						<a class="class-link" href="<?= school_e(school_url('admin/gradebook/class.php?id=' . (int) $item['id'])) ?>">
 							<strong><?= school_e($item['name']) ?></strong>
-							<small><?= school_e($item['term_name']) ?></small>
+							<small><?= school_e(($item['academic_year_name'] ?? '') . ' · ' . $item['term_name']) ?></small>
 							<span class="go" aria-hidden="true">→</span>
 						</a>
 					<?php endforeach; ?>

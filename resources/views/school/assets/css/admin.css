@@ -414,6 +414,24 @@
 /* لوحة استيراد الطلاب */
 .import-panel { border-style: dashed; }
 
+.template-group-row th {
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 2px solid var(--brand-line);
+  background: var(--brand-soft);
+  color: var(--brand);
+  text-align: start;
+}
+
+.template-group-row:first-child th { border-top: 0; }
+
+.template-group-row span { font-weight: 800; }
+
+.template-group-row small {
+  margin-inline-start: var(--sp-2);
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
 /* ============================================================
  * 4. صفحة تسجيل الدخول
  * ============================================================ */

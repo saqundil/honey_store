@@ -4,7 +4,7 @@ require dirname(__DIR__, 2) . '/includes/bootstrap.php';
 require_admin();
 $teacherId = current_user_id();
 $authorization = new App\Services\AuthorizationService(db());
-$references = new App\Repositories\ReferenceRepository(db(), $teacherId);
+$references = new App\Repositories\ReferenceRepository(db(), $teacherId, is_super_admin());
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf($_POST['csrf_token'] ?? null);
     $id = (int) ($_POST['id'] ?? 0);
@@ -12,12 +12,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!isset($_FILES['csv']) || $_FILES['csv']['error'] !== UPLOAD_ERR_OK || $_FILES['csv']['size'] > 2_000_000) {
             throw new RuntimeException('ملف CSV غير صالح أو أكبر من 2MB.');
         }
-        $classId=(int)$_POST['import_class_id'];$authorization->requireAccess('class',$classId,user());$classStatement=db()->prepare('SELECT academic_term_id FROM classes WHERE id=? AND teacher_id=?');$classStatement->execute([$classId,$teacherId]);$termId=(int)$classStatement->fetchColumn();$handle=fopen($_FILES['csv']['tmp_name'],'rb');$pdo=db();$pdo->beginTransaction();
-        try{$insert=$pdo->prepare('INSERT INTO students(teacher_id,student_number,name,class_id) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id),name=VALUES(name),class_id=VALUES(class_id),status="active"');$enroll=$pdo->prepare('INSERT INTO class_enrollments(teacher_id,academic_term_id,class_id,student_id,status) VALUES(?,?,?,?,"active") ON DUPLICATE KEY UPDATE class_id=VALUES(class_id),status="active",left_at=NULL');$row=0;while(($data=fgetcsv($handle,2000,','))!==false){$row++;if($row===1&&strtolower(trim((string)($data[0]??'')))==='student_number')continue;$number=trim((string)($data[0]??''));$name=trim((string)($data[1]??''));if($number===''||$name==='')continue;$insert->execute([$teacherId,$number,$name,$classId]);$studentId=(int)$pdo->lastInsertId();$enroll->execute([$teacherId,$termId,$classId,$studentId]);}$pdo->commit();fclose($handle);}catch(Throwable $exception){$pdo->rollBack();fclose($handle);throw $exception;}
-    } elseif (isset($_POST['toggle'])) { $authorization->requireAccess('student',$id,user());$statement=db()->prepare("UPDATE students SET status=IF(status='active','inactive','active') WHERE id=? AND teacher_id=?"); $statement->execute([$id,$teacherId]); }
-    else {
-        $classId=(int)$_POST['class_id'];$authorization->requireAccess('class',$classId,user());if($id)$authorization->requireAccess('student',$id,user());$classStatement=db()->prepare('SELECT academic_term_id FROM classes WHERE id=? AND teacher_id=?');$classStatement->execute([$classId,$teacherId]);$termId=(int)$classStatement->fetchColumn();$pdo=db();$pdo->beginTransaction();
-        try{$number=trim((string)$_POST['student_number']);$name=trim((string)$_POST['name']);if($id){$statement=$pdo->prepare('UPDATE students SET student_number=?,name=?,class_id=? WHERE id=? AND teacher_id=?');$statement->execute([$number,$name,$classId,$id,$teacherId]);}else{$statement=$pdo->prepare('INSERT INTO students(teacher_id,student_number,name,class_id) VALUES(?,?,?,?)');$statement->execute([$teacherId,$number,$name,$classId]);$id=(int)$pdo->lastInsertId();}$statement=$pdo->prepare('INSERT INTO class_enrollments(teacher_id,academic_term_id,class_id,student_id,status) VALUES(?,?,?,?,"active") ON DUPLICATE KEY UPDATE class_id=VALUES(class_id),status="active",left_at=NULL');$statement->execute([$teacherId,$termId,$classId,$id]);$pdo->commit();}catch(Throwable $exception){$pdo->rollBack();throw $exception;}
+        $classId = (int) $_POST['import_class_id'];
+        $authorization->requireAccess('class', $classId, user());
+        $classStatement = db()->prepare('SELECT academic_term_id,teacher_id FROM classes WHERE id=?');
+        $classStatement->execute([$classId]);
+        $classContext = $classStatement->fetch();
+        $termId = (int) $classContext['academic_term_id'];
+        $classOwnerId = (int) $classContext['teacher_id'];
+        $handle = fopen($_FILES['csv']['tmp_name'], 'rb');
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $insert = $pdo->prepare('INSERT INTO students(teacher_id,student_number,name,class_id) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id),name=VALUES(name),class_id=VALUES(class_id),status="active"');
+            $enroll = $pdo->prepare('INSERT INTO class_enrollments(teacher_id,academic_term_id,class_id,student_id,status) VALUES(?,?,?,?,"active") ON DUPLICATE KEY UPDATE class_id=VALUES(class_id),status="active",left_at=NULL');
+            $row = 0;
+            while (($data = fgetcsv($handle, 2000, ',')) !== false) {
+                $row++;
+                if ($row === 1 && strtolower(trim((string) ($data[0] ?? ''))) === 'student_number') continue;
+                $number = trim((string) ($data[0] ?? ''));
+                $name = trim((string) ($data[1] ?? ''));
+                if ($number === '' || $name === '') continue;
+                $insert->execute([$classOwnerId, $number, $name, $classId]);
+                $studentId = (int) $pdo->lastInsertId();
+                $enroll->execute([$classOwnerId, $termId, $classId, $studentId]);
+            }
+            $pdo->commit();
+            fclose($handle);
+        } catch (Throwable $exception) {
+            $pdo->rollBack();
+            fclose($handle);
+            throw $exception;
+        }
+    } elseif (isset($_POST['toggle'])) {
+        $authorization->requireAccess('student', $id, user());
+        $statement = db()->prepare("UPDATE students SET status=IF(status='active','inactive','active') WHERE id=?");
+        $statement->execute([$id]);
+    } else {
+        $classId = (int) $_POST['class_id'];
+        $authorization->requireAccess('class', $classId, user());
+        if ($id) $authorization->requireAccess('student', $id, user());
+        $classStatement = db()->prepare('SELECT academic_term_id,teacher_id FROM classes WHERE id=?');
+        $classStatement->execute([$classId]);
+        $classContext = $classStatement->fetch();
+        $termId = (int) $classContext['academic_term_id'];
+        $classOwnerId = (int) $classContext['teacher_id'];
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $number = trim((string) $_POST['student_number']);
+            $name = trim((string) $_POST['name']);
+            if ($id) {
+                $ownerStatement = $pdo->prepare('SELECT teacher_id FROM students WHERE id=?');
+                $ownerStatement->execute([$id]);
+                if ((int) $ownerStatement->fetchColumn() !== $classOwnerId) throw new InvalidArgumentException('لا يمكن نقل طالب بين حسابات المعلمين.');
+                $statement = $pdo->prepare('UPDATE students SET student_number=?,name=?,class_id=? WHERE id=?');
+                $statement->execute([$number, $name, $classId, $id]);
+            } else {
+                $statement = $pdo->prepare('INSERT INTO students(teacher_id,student_number,name,class_id) VALUES(?,?,?,?)');
+                $statement->execute([$classOwnerId, $number, $name, $classId]);
+                $id = (int) $pdo->lastInsertId();
+            }
+            $statement = $pdo->prepare('INSERT INTO class_enrollments(teacher_id,academic_term_id,class_id,student_id,status) VALUES(?,?,?,?,"active") ON DUPLICATE KEY UPDATE class_id=VALUES(class_id),status="active",left_at=NULL');
+            $statement->execute([$classOwnerId, $termId, $classId, $id]);
+            $pdo->commit();
+        } catch (Throwable $exception) {
+            $pdo->rollBack();
+            throw $exception;
+        }
     }
     school_redirect('admin/students/index.php');
 }
@@ -26,7 +87,7 @@ if ($contextClassId) { $authorization->requireAccess('class', $contextClassId, u
 $students=$references->students($contextClassId,trim((string)($_GET['q']??''))); $classes=$references->classes();
 $contextClass = null;
 foreach ($classes as $classRow) { if ((int) $classRow['id'] === $contextClassId) { $contextClass = $classRow; break; } }
-$editing=null;if(isset($_GET['edit'])){$authorization->requireAccess('student',(int)$_GET['edit'],user());$statement=db()->prepare('SELECT * FROM students WHERE id=? AND teacher_id=?');$statement->execute([(int)$_GET['edit'],$teacherId]);$editing=$statement->fetch()?:null;}
+$editing=null;if(isset($_GET['edit'])){$authorization->requireAccess('student',(int)$_GET['edit'],user());$statement=db()->prepare('SELECT * FROM students WHERE id=?');$statement->execute([(int)$_GET['edit']]);$editing=$statement->fetch()?:null;}
 page_header('الطلاب','students');
 ?>
 <?php if ($contextClass): ?>
@@ -51,7 +112,7 @@ page_header('الطلاب','students');
                     <select name="class_id" required>
                         <?php foreach ($classes as $class):
                             $preselect = (int) ($editing['class_id'] ?? $contextClassId ?? 0) === (int) $class['id']; ?>
-                            <option value="<?= (int) $class['id'] ?>" <?= $preselect ? 'selected' : '' ?>><?= school_e($class['name']) ?></option>
+                            <option value="<?= (int) $class['id'] ?>" <?= $preselect ? 'selected' : '' ?>><?= school_e($class['name'] . (is_super_admin() ? ' · ' . $class['teacher_name'] : '')) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </label>
@@ -68,7 +129,7 @@ page_header('الطلاب','students');
                 <?= school_csrf_field() ?>
                 <label class="full">الصف
                     <select name="import_class_id" required>
-                        <?php foreach ($classes as $class): ?><option value="<?= (int) $class['id'] ?>" <?= $contextClassId === (int) $class['id'] ? 'selected' : '' ?>><?= school_e($class['name']) ?></option><?php endforeach; ?>
+                        <?php foreach ($classes as $class): ?><option value="<?= (int) $class['id'] ?>" <?= $contextClassId === (int) $class['id'] ? 'selected' : '' ?>><?= school_e($class['name'] . (is_super_admin() ? ' · ' . $class['teacher_name'] : '')) ?></option><?php endforeach; ?>
                     </select>
                 </label>
                 <label class="full">ملف CSV
@@ -86,7 +147,7 @@ page_header('الطلاب','students');
             <select name="class_id" aria-label="تصفية حسب الصف">
                 <option value="">كل الصفوف</option>
                 <?php foreach ($classes as $class): ?>
-                    <option value="<?= (int) $class['id'] ?>" <?= (string) $class['id'] === ($_GET['class_id'] ?? '') ? 'selected' : '' ?>><?= school_e($class['name']) ?></option>
+                    <option value="<?= (int) $class['id'] ?>" <?= (string) $class['id'] === ($_GET['class_id'] ?? '') ? 'selected' : '' ?>><?= school_e($class['name'] . (is_super_admin() ? ' · ' . $class['teacher_name'] : '')) ?></option>
                 <?php endforeach; ?>
             </select>
             <button class="button" type="submit">بحث</button>
@@ -109,7 +170,7 @@ page_header('الطلاب','students');
                         <tr>
                             <td class="num"><?= school_e($student['student_number']) ?></td>
                             <td><strong><?= school_e($student['name']) ?></strong></td>
-                            <td><?= school_e($student['class_name']) ?></td>
+                            <td><?= school_e($student['class_name'] . (is_super_admin() ? ' · ' . $student['teacher_name'] : '')) ?></td>
                             <td><span class="status <?= $student['status'] === 'active' ? 'active' : 'inactive' ?>"><?= $student['status'] === 'active' ? 'نشط' : 'غير نشط' ?></span></td>
                             <td class="actions-cell">
                                 <a href="?edit=<?= (int) $student['id'] ?>">تعديل</a>

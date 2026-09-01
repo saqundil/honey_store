@@ -71,6 +71,12 @@ try {
     assert(count($secondReferences->classes()) === 1);
     assert(count($firstReferences->students()) === 1);
     assert(count($secondReferences->students()) === 1);
+    $adminReferences = new ReferenceRepository($pdo, $firstTeacher, true);
+    $adminClassIds = array_map('intval', array_column($adminReferences->classes(), 'id'));
+    assert(in_array($firstClass, $adminClassIds, true));
+    assert(in_array($secondClass, $adminClassIds, true));
+    $adminStudentIds = array_map('intval', array_column($adminReferences->students(), 'id'));
+    assert(in_array($firstStudent, $adminStudentIds, true));
 
     $pdo->rollBack();
     echo "Phase 3 tests passed.\n";

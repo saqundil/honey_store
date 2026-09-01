@@ -49,7 +49,9 @@ try {
         $enrollments[$teacherId] = (int) $pdo->lastInsertId();
     }
 
-    $pdo->prepare("INSERT INTO table_templates(name,status,created_by) VALUES(?,'active',?)")->execute(['قالب علامات Phase 5', $firstTeacher]);
+    $pdo->prepare('INSERT INTO template_groups(name,created_by) VALUES(?,?)')->execute(['مجموعة قوالب Phase 5', $firstTeacher]);
+    $templateGroupId = (int) $pdo->lastInsertId();
+    $pdo->prepare("INSERT INTO table_templates(group_id,name,status,created_by) VALUES(?,?,'active',?)")->execute([$templateGroupId, 'قالب علامات Phase 5', $firstTeacher]);
     $templateId = (int) $pdo->lastInsertId();
     $pdo->prepare('INSERT INTO table_template_versions(template_id,version_number,created_by) VALUES(?,1,?)')->execute([$templateId, $firstTeacher]);
     $templateVersionId = (int) $pdo->lastInsertId();
@@ -83,7 +85,7 @@ try {
     $classAssessmentId = (int) $classAssessments[0]['id'];
     $assessmentTemplateId = (int) $scheme['assessments'][0]['templates'][0]['id'];
 
-    $pdo->prepare("INSERT INTO table_templates(name,status,created_by) VALUES(?,'active',?)")->execute(['قالب اختياري Phase 6', $firstTeacher]);
+    $pdo->prepare("INSERT INTO table_templates(group_id,name,status,created_by) VALUES(?,?, 'active',?)")->execute([$templateGroupId, 'قالب اختياري Phase 6', $firstTeacher]);
     $optionalTemplateId = (int) $pdo->lastInsertId();
     $pdo->prepare('INSERT INTO table_template_versions(template_id,version_number,created_by) VALUES(?,1,?)')->execute([$optionalTemplateId, $firstTeacher]);
     $optionalVersionId = (int) $pdo->lastInsertId();

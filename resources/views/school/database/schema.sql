@@ -14,7 +14,8 @@ INSERT INTO schema_migrations(migration) VALUES
     ('20260829_005_grade_entry.sql'),
     ('20260829_006_immutable_history.sql'),
     ('20260830_007_class_assessment_exam_date.sql'),
-    ('20260830_008_formula_divisor.sql');
+    ('20260830_008_formula_divisor.sql'),
+    ('20260901_009_template_groups.sql');
 
 CREATE TABLE admin_users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -93,11 +94,20 @@ CREATE TABLE class_enrollments (
     CONSTRAINT fk_enrollment_student_owner FOREIGN KEY (student_id, teacher_id) REFERENCES students(id, teacher_id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+CREATE TABLE template_groups (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, created_by BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_template_group_owner_name (created_by, name), UNIQUE KEY uq_template_group_id_owner (id, created_by),
+    CONSTRAINT fk_template_group_admin FOREIGN KEY (created_by) REFERENCES admin_users(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
 CREATE TABLE table_templates (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, description TEXT NULL,
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, group_id BIGINT UNSIGNED NOT NULL, name VARCHAR(190) NOT NULL, description TEXT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active', current_version_id BIGINT UNSIGNED NULL,
     created_by BIGINT UNSIGNED NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_template_status (status), CONSTRAINT fk_template_admin FOREIGN KEY (created_by) REFERENCES admin_users(id)
+    INDEX idx_template_status (status), INDEX idx_template_group_status (group_id, status),
+    CONSTRAINT fk_template_admin FOREIGN KEY (created_by) REFERENCES admin_users(id),
+    CONSTRAINT fk_template_group_owner FOREIGN KEY (group_id, created_by) REFERENCES template_groups(id, created_by) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 CREATE TABLE table_template_versions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, template_id BIGINT UNSIGNED NOT NULL, version_number INT UNSIGNED NOT NULL,

@@ -44,7 +44,31 @@ final class HeaderLayoutCalculator
                 $rows[0][] = $this->columnCell($entry['item'], $depth);
             }
         }
+        $rows = array_map($this->mergeEquivalentColumnHeaders(...), $rows);
         return ['rows' => $rows, 'columns' => $visible, 'depth' => $depth];
+    }
+
+    private function mergeEquivalentColumnHeaders(array $row): array
+    {
+        $merged = [];
+        foreach ($row as $cell) {
+            $previousIndex = count($merged) - 1;
+            $previous = $previousIndex >= 0 ? $merged[$previousIndex] : null;
+            $column = $cell['column'] ?? null;
+            $previousColumn = $previous['column'] ?? null;
+            $equivalent = $cell['kind'] === 'column' && ($previous['kind'] ?? null) === 'column'
+                && $cell['label'] === $previous['label']
+                && $cell['rowspan'] === $previous['rowspan']
+                && $cell['display_direction'] === $previous['display_direction']
+                && ($column['type'] ?? null) === ($previousColumn['type'] ?? null)
+                && ($column['max_mark'] ?? null) === ($previousColumn['max_mark'] ?? null);
+            if ($equivalent) {
+                $merged[$previousIndex]['colspan'] += $cell['colspan'];
+                continue;
+            }
+            $merged[] = $cell;
+        }
+        return $merged;
     }
 
     private function treeDepth(array $groups): int

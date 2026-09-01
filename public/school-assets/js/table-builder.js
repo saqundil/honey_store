@@ -315,8 +315,10 @@
     + (hint ? '<small>' + esc(hint) + '</small>' : '') + '</label>';
 
   function panelTemplate() {
+    const groupOptions = (window.TEMPLATE_GROUPS || []).map(name => '<option value="' + esc(name) + '"></option>').join('');
     return '<header class="tb-panel-head"><small>إعدادات الجدول</small><strong>معلومات عامة</strong></header>'
       + '<div class="tb-panel-body">'
+      + field('مجموعة القوالب', '<input id="f-template-group" type="text" list="template-group-options" maxlength="190" required value="' + esc(state.group_name || '') + '"><datalist id="template-group-options">' + groupOptions + '</datalist>', 'اختر مجموعة موجودة أو اكتب اسم مجموعة جديدة.')
       + field('اسم الجدول', '<input id="f-name" type="text" maxlength="190" value="' + esc(state.name) + '">')
       + field('وصف اختياري', '<input id="f-desc" type="text" maxlength="255" value="' + esc(state.description || '') + '">')
       + '<p class="tb-panel-hint">اضغط على أي عنوان داخل الجدول لتعديل ذلك العمود أو تلك المجموعة.</p>'
@@ -426,6 +428,11 @@
 
     live('#f-name', i => { state.name = i.value; });
     live('#f-desc', i => { state.description = i.value; });
+    live('#f-template-group', i => {
+      state.group_id = 0;
+      state.group_name = i.value;
+      $('.report-heading-title span').textContent = i.value || 'مجموعة القوالب';
+    });
 
     const group = selection.kind === 'group' ? findGroup(selection.key) : null;
     if (group) {
@@ -589,6 +596,8 @@
 
   function headerRows(){const roots=state.groups.filter(group=>!group.parent_key),children=key=>state.groups.filter(group=>group.parent_key===key),depth=group=>1+Math.max(0,...children(group.group_key).map(depth)),maxDepth=Math.max(1,(roots.length?Math.max(...roots.map(depth)):0)+1),rows=Array.from({length:maxDepth},()=>[]),ids=group=>[group.group_key,...children(group.group_key).flatMap(ids)],order=group=>Math.min(...state.columns.filter(column=>column.is_visible&&ids(group).includes(column.header_group_key)).map(column=>Number(column.sort_order)),Number.MAX_SAFE_INTEGER),cell=(column,rowspan)=>({kind:'column',ref:column.column_key,label:column.header_label||column.name,max:column.max_mark,colspan:1,rowspan,vertical:column.display_direction==='vertical',total:column.type==='calculated_total'});const walk=(group,level)=>{const columns=state.columns.filter(column=>column.is_visible&&ids(group).includes(column.header_group_key));if(!columns.length)return;rows[level].push({kind:'group',ref:group.group_key,label:group.name,colspan:columns.length,rowspan:1,vertical:group.display_direction==='vertical',total:false});[...children(group.group_key).map(item=>({kind:'group',item,order:order(item)})),...state.columns.filter(column=>column.is_visible&&column.header_group_key===group.group_key).map(item=>({kind:'column',item,order:Number(item.sort_order)}))].sort((a,b)=>a.order-b.order).forEach(entry=>entry.kind==='group'?walk(entry.item,level+1):rows[level+1].push(cell(entry.item,maxDepth-level-1)));};[...roots.map(item=>({kind:'group',item,order:order(item)})),...state.columns.filter(column=>column.is_visible&&!column.header_group_key).map(item=>({kind:'column',item,order:Number(item.sort_order)}))].sort((a,b)=>a.order-b.order).forEach(entry=>entry.kind==='group'?walk(entry.item,0):rows[0].push(cell(entry.item,maxDepth)));return rows;}
 
+  function mergeEquivalentHeaders(rows){return rows.map(row=>row.reduce((merged,header)=>{const previous=merged.at(-1),equivalent=header.kind==='column'&&previous?.kind==='column'&&header.label===previous.label&&header.max===previous.max&&header.rowspan===previous.rowspan&&header.vertical===previous.vertical&&header.total===previous.total;if(equivalent)previous.colspan+=header.colspan;else merged.push({...header});return merged;},[]));}
+
   function calculate(values){let changed=true,guard=0;while(changed&&guard++<state.columns.length){changed=false;state.columns.forEach(column=>{if(!column.formula||values[column.column_key]!=null)return;const sources=column.formula.sources.map(key=>values[key]);if(!sources.length||sources.some(value=>value==null))return;const sum=sources.reduce((total,value)=>total+Number(value),0);const raw=column.formula.type==='AVERAGE'?sum/sources.length:column.formula.type==='PERCENTAGE'?sum/Number(column.formula.base||1)*100:sum;const divisor=Number(column.formula.divisor)>0?Number(column.formula.divisor):1;values[column.column_key]=Number((raw/divisor).toFixed(Number(column.formula.decimals??2)));changed=true;});}return values;}
 
   const formatMark = value => String(Number(value)).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
@@ -604,7 +613,7 @@
     if(heading)heading.textContent=state.name||'جدول العلامات';
     if(!columns.length){$('#live-preview').innerHTML='<p class="tb-preview-empty">أضف عمودًا لبدء المعاينة</p>';return;}
     const colgroup=columns.map(column=>`<col style="width:${formatMark(Math.max(.1,Number(column.width_mm||15))/total*100)}%">`).join('');
-    const thead=headerRows().map(row=>`<tr>${row.map(header=>{
+    const thead=mergeEquivalentHeaders(headerRows()).map(row=>`<tr>${row.map(header=>{
       const classes=[header.kind,header.vertical?'vertical-header':'',header.total?'total-column':''].filter(Boolean).join(' ');
       const mark=header.max!==''&&header.max!=null?`<small class="header-mark" dir="ltr">(${escapeHtml(formatMark(header.max))})</small>`:'';
       return `<th class="${classes}" colspan="${header.colspan}" rowspan="${header.rowspan}"><span><span class="header-label">${escapeHtml(header.label)}</span>${mark}</span></th>`;

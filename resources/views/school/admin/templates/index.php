@@ -17,6 +17,7 @@ page_header('قوالب جداول التقييم', 'templates');
 </div>
 
 <?php if ($templates): ?>
+    <?php $templateCountsByGroup = array_count_values(array_map(static fn(array $template): int => (int) $template['group_id'], $templates)); ?>
     <div class="table-wrap">
         <table class="data-table">
             <thead>
@@ -29,7 +30,15 @@ page_header('قوالب جداول التقييم', 'templates');
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($templates as $template): ?>
+            <?php $currentTemplateGroup = null; foreach ($templates as $template): ?>
+                <?php if ($currentTemplateGroup !== (int) $template['group_id']): $currentTemplateGroup = (int) $template['group_id']; ?>
+                    <tr class="template-group-row">
+                        <th colspan="5" scope="rowgroup">
+                            <span><?= school_e($template['group_name']) ?></span>
+                            <small><?= (int) $templateCountsByGroup[$currentTemplateGroup] ?> قالب</small>
+                        </th>
+                    </tr>
+                <?php endif; ?>
                 <tr>
                     <td>
                         <strong><?= school_e($template['name']) ?></strong>

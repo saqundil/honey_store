@@ -49,7 +49,7 @@ function page_header(string $title, string $active = '', array $styles = []): vo
     <meta name="color-scheme" content="light">
     <title><?= school_e($title) ?> | <?= school_e(school_config('name')) ?></title>
     <link rel="stylesheet" href="<?= school_e(school_url('assets/css/core.css')) ?>">
-    <link rel="stylesheet" href="<?= school_e(school_url('assets/css/admin.css')) ?>">
+    <link rel="stylesheet" href="<?= school_e(school_url('assets/css/admin.css?v=' . filemtime(dirname(__DIR__) . '/assets/css/admin.css'))) ?>">
     <link rel="stylesheet" href="<?= school_e(school_url('assets/css/school-brand.css')) ?>">
     <?php foreach ($styles as $style): ?>
         <link rel="stylesheet" href="<?= school_e(school_url($style)) ?>">

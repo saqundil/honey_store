@@ -43,14 +43,17 @@ final class TemplateService
         try {
             $templateId = (int) ($payload['template_id'] ?? 0);
             if ($templateId) {
-                if (!$this->templates->find($templateId)) {
+                $existing = $this->templates->find($templateId);
+                if (!$existing) {
                     throw new InvalidArgumentException('القالب غير موجود أو لا تملك صلاحية تعديله.');
                 }
-                $statement = $this->db->prepare('UPDATE table_templates SET name=?,description=? WHERE id=?');
-                $statement->execute([$name, trim((string) ($payload['description'] ?? '')), $templateId]);
+                $groupId = $this->resolveGroup($payload, (int) $existing['created_by'], (int) $existing['group_id']);
+                $statement = $this->db->prepare('UPDATE table_templates SET group_id=?,name=?,description=? WHERE id=?');
+                $statement->execute([$groupId, $name, trim((string) ($payload['description'] ?? '')), $templateId]);
             } else {
-                $statement = $this->db->prepare('INSERT INTO table_templates(name,description,created_by) VALUES(?,?,?)');
-                $statement->execute([$name, trim((string) ($payload['description'] ?? '')), $adminId]);
+                $groupId = $this->resolveGroup($payload, $adminId);
+                $statement = $this->db->prepare('INSERT INTO table_templates(group_id,name,description,created_by) VALUES(?,?,?,?)');
+                $statement->execute([$groupId, $name, trim((string) ($payload['description'] ?? '')), $adminId]);
                 $templateId = (int) $this->db->lastInsertId();
             }
             $statement = $this->db->prepare('SELECT COALESCE(MAX(version_number),0)+1 FROM table_template_versions WHERE template_id=? FOR UPDATE');
@@ -102,5 +105,33 @@ final class TemplateService
             if ($ownsTransaction && $this->db->inTransaction()) $this->db->rollBack();
             throw $exception;
         }
+    }
+
+    private function resolveGroup(array $payload, int $ownerId, int $currentGroupId = 0): int
+    {
+        $groupId = (int) ($payload['group_id'] ?? 0);
+        $groupName = trim((string) ($payload['group_name'] ?? ''));
+
+        if ($groupId > 0 && $groupName === '') {
+            $statement = $this->db->prepare('SELECT id FROM template_groups WHERE id=? AND created_by=?');
+            $statement->execute([$groupId, $ownerId]);
+            if ($statement->fetchColumn()) return $groupId;
+            throw new InvalidArgumentException('مجموعة القالب غير موجودة أو لا تملك صلاحية استخدامها.');
+        }
+
+        if ($groupName === '') {
+            if ($currentGroupId > 0) return $currentGroupId;
+            throw new InvalidArgumentException('يجب اختيار مجموعة للقالب أو كتابة اسم مجموعة جديدة.');
+        }
+        if (mb_strlen($groupName) > 190) throw new InvalidArgumentException('اسم مجموعة القوالب أطول من الحد المسموح.');
+
+        $statement = $this->db->prepare('SELECT id FROM template_groups WHERE created_by=? AND name=?');
+        $statement->execute([$ownerId, $groupName]);
+        $existingId = $statement->fetchColumn();
+        if ($existingId) return (int) $existingId;
+
+        $statement = $this->db->prepare('INSERT INTO template_groups(name,created_by) VALUES(?,?)');
+        $statement->execute([$groupName, $ownerId]);
+        return (int) $this->db->lastInsertId();
     }
 }

@@ -30,6 +30,19 @@ $nestedLayout = (new HeaderLayoutCalculator())->calculate($nestedGroups, $nested
 assert($nestedLayout['depth'] === 3);
 assert($nestedLayout['rows'][0][0]['colspan'] === 1);
 
+$repeatedColumns = array_map(
+    static fn(int $index): array => [
+        'column_key' => 'behavior_' . $index, 'name' => 'الالتزام بقوانين المعلم', 'header_label' => '',
+        'type' => 'manual_mark', 'max_mark' => '1.00', 'sort_order' => $index,
+        'is_visible' => 1, 'header_group_id' => null, 'display_direction' => 'horizontal',
+    ],
+    [1, 2, 3]
+);
+$repeatedLayout = (new HeaderLayoutCalculator())->calculate([], $repeatedColumns);
+assert(count($repeatedLayout['columns']) === 3);
+assert(count($repeatedLayout['rows'][0]) === 1);
+assert($repeatedLayout['rows'][0][0]['colspan'] === 3);
+
 $cycleDetected = false;
 try {
     (new FormulaEngine())->validate([

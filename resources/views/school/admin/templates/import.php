@@ -18,8 +18,13 @@ $pdfReady = $extractor->isAvailable();
 $pdfWarning = $extractor->warning();
 $docxExtractor = new DocxTableExtractor();
 $docxReady = $docxExtractor->isAvailable();
+$templateRepository = new TemplateRepository(db(), current_user_id(), is_super_admin());
+$templateGroupNames = array_values(array_unique(array_column($templateRepository->groups(), 'name')));
 $error = null;
 $name = trim((string) ($_POST['name'] ?? ''));
+$pasteGroupName = trim((string) ($_POST['paste_group_name'] ?? ''));
+$docxGroupName = trim((string) ($_POST['docx_group_name'] ?? ''));
+$pdfGroupName = trim((string) ($_POST['pdf_group_name'] ?? ''));
 $batchResult = $_SESSION['template_docx_result'] ?? null;
 unset($_SESSION['template_docx_result']);
 
@@ -28,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $import = new TableImportService();
     try {
         if (isset($_POST['import_docx'])) {
+            if ($docxGroupName === '') throw new RuntimeException('اختر مجموعة القوالب أو اكتب اسم مجموعة جديدة.');
             $file = $_FILES['docx'] ?? null;
             if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
                 throw new RuntimeException('لم يصل الملف بشكل صحيح. اختر ملف Word بصيغة DOCX وأعد المحاولة.');
@@ -39,13 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $tables = $docxExtractor->tables($file['tmp_name'], (string) $file['name']);
-            $service = new TemplateService(db(), new TemplateRepository(db(), current_user_id(), is_super_admin()));
+            $service = new TemplateService(db(), $templateRepository);
             $created = [];
             $failed = [];
             foreach ($tables as $index => $table) {
                 $tableName = $table['name'];
                 try {
                     $draft = $import->fromRows($table['rows'], $tableName);
+                    $draft['group_name'] = $docxGroupName;
                     $created[] = ['id' => $service->save($draft, current_user_id()), 'name' => $draft['name']];
                 } catch (Throwable $exception) {
                     $failed[] = ['number' => $index + 1, 'name' => $tableName, 'message' => $exception->getMessage()];
@@ -58,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             school_redirect('admin/templates/import.php?docx=done');
         } elseif (isset($_POST['import_pdf'])) {
+            if ($pdfGroupName === '') throw new RuntimeException('اختر مجموعة القوالب أو اكتب اسم مجموعة جديدة.');
             $file = $_FILES['pdf'] ?? null;
             if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
                 throw new RuntimeException('لم يصل الملف بشكل صحيح. تأكد من اختيار ملف PDF وإعادة المحاولة.');
@@ -74,7 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $direction = (string) ($_POST['direction'] ?? 'auto');
             $rows = $extractor->rows($file['tmp_name'], (int) ($_POST['page'] ?? 1), $direction === 'auto' ? null : $direction === 'rtl');
             $draft = $import->fromRows($rows, $name);
+            $draft['group_name'] = $pdfGroupName;
         } else {
+            if ($pasteGroupName === '') throw new RuntimeException('اختر مجموعة القوالب أو اكتب اسم مجموعة جديدة.');
             $html = (string) ($_POST['pasted_html'] ?? '');
             $text = (string) ($_POST['pasted_text'] ?? '');
             if (strlen($html) > IMPORT_MAX_PASTE_BYTES) {
@@ -84,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('الصق الجدول في المساحة المخصصة أولًا.');
             }
             $draft = stripos($html, '<table') !== false ? $import->fromHtml($html, $name) : $import->fromDelimitedText($text !== '' ? $text : strip_tags($html), $name);
+            $draft['group_name'] = $pasteGroupName;
         }
         $_SESSION['template_import'] = $draft;
         school_redirect('admin/templates/edit.php?import=1');
@@ -141,6 +152,9 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
 
     <form method="post" enctype="multipart/form-data" class="import-form<?= $batchResult ? ' has-result' : '' ?>" data-initial-mode="<?= school_e($initialMode) ?>">
         <?= school_csrf_field() ?>
+        <datalist id="template-group-options">
+            <?php foreach ($templateGroupNames as $groupName): ?><option value="<?= school_e($groupName) ?>"></option><?php endforeach; ?>
+        </datalist>
 
         <section class="import-card import-workspace">
             <div class="import-tabs" role="tablist" aria-label="طريقة استيراد القالب">
@@ -159,7 +173,10 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                 <input type="hidden" name="pasted_html" id="pasted-html">
                 <input type="hidden" name="pasted_text" id="pasted-text">
                 <div class="import-row">
-                    <label class="import-name">اسم القالب<input name="name" value="<?= school_e($name) ?>" placeholder="يُملأ تلقائيًا عند تركه فارغًا"></label>
+                    <div class="import-paste-fields">
+                        <label>مجموعة القوالب<input name="paste_group_name" data-group-name list="template-group-options" maxlength="190" value="<?= school_e($pasteGroupName) ?>" placeholder="اختر مجموعة أو اكتب اسمًا جديدًا"></label>
+                        <label>اسم القالب<input name="name" value="<?= school_e($name) ?>" placeholder="يُملأ تلقائيًا عند تركه فارغًا"></label>
+                    </div>
                     <div class="import-submit">
                         <span id="paste-state" class="hint">لم يُلصق شيء بعد</span>
                         <button class="button primary" type="submit" name="import_paste">بناء المسودة</button>
@@ -181,6 +198,7 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                         <span class="file-drop-help">أو اضغط لاختيار ملف DOCX</span>
                         <span class="file-drop-name" data-file-name>لم يتم اختيار ملف</span>
                     </label>
+                    <label>مجموعة القوالب<input name="docx_group_name" data-group-name list="template-group-options" maxlength="190" value="<?= school_e($docxGroupName) ?>" placeholder="اختر مجموعة أو اكتب اسمًا جديدًا"></label>
                 </div>
                 <?php if (!$docxReady): ?><p class="hint warn">امتداد ZIP غير مفعّل في PHP؛ فعّله لقراءة ملفات DOCX.</p><?php endif; ?>
                 <div class="import-panel-foot">
@@ -206,6 +224,7 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                         <span class="file-drop-name" data-file-name>لم يتم اختيار ملف</span>
                     </label>
                     <div class="import-pdf-settings">
+                        <label>مجموعة القوالب<input name="pdf_group_name" data-group-name list="template-group-options" maxlength="190" value="<?= school_e($pdfGroupName) ?>" placeholder="اختر مجموعة أو اكتب اسمًا جديدًا"></label>
                         <label>الصفحة<input type="number" name="page" value="1" min="1" step="1" <?= $pdfReady ? '' : 'disabled' ?>></label>
                         <label>اتجاه الأعمدة<select name="direction" <?= $pdfReady ? '' : 'disabled' ?>><option value="auto">تلقائي</option><option value="rtl">من اليمين لليسار</option><option value="ltr">من اليسار لليمين</option></select></label>
                     </div>
@@ -237,6 +256,10 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
             tab.tabIndex = selected ? 0 : -1;
         });
         panels.forEach(panel => { panel.hidden = panel.dataset.importPanel !== mode; });
+        panels.forEach(panel => {
+            const groupInput = panel.querySelector('[data-group-name]');
+            if (groupInput) groupInput.required = panel.dataset.importPanel === mode;
+        });
     };
 
     tabs.forEach(tab => tab.addEventListener('click', () => showMode(tab.dataset.importMode)));

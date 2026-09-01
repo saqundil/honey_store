@@ -26,7 +26,7 @@ teacher_shell_header(
             <p>اختر صفًا لعرض اختباراته ورصد العلامات.</p>
         </div>
         <div class="classes-hero-user">
-            <strong>صفوفي</strong>
+            <strong><?= is_super_admin() ? 'جميع الصفوف' : 'صفوفي' ?></strong>
             <span><?= count($classes) ?> صفًا نشطًا</span>
         </div>
     </div>
@@ -52,7 +52,7 @@ teacher_shell_header(
                    aria-label="<?= school_e($class['name'] . ' — ' . $students . ' طالبًا، ' . $total . ' اختبار') ?>"
                    data-empty="<?= $total === 0 ? 'true' : 'false' ?>">
                     <header class="class-card-head">
-                        <div class="class-card-name"><?= school_e($class['name']) ?></div>
+                        <div class="class-card-name"><?= school_e($class['name'] . (is_super_admin() ? ' · ' . $class['teacher_name'] : '')) ?></div>
                         <div class="class-card-sub">
                             <?= school_e($class['stage_name']) ?>
                             · <?= school_e($class['term_name']) ?>

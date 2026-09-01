@@ -5,7 +5,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/includes/bootstrap.php';
 require_admin();
 
-$references = new App\Repositories\ReferenceRepository(db(), current_user_id());
+$references = new App\Repositories\ReferenceRepository(db(), current_user_id(), is_super_admin());
 $templateRepository = new App\Repositories\TemplateRepository(db(), current_user_id(), is_super_admin());
 $authorization = new App\Services\AuthorizationService(db());
 $classes = $references->classes();
@@ -96,8 +96,8 @@ page_header('إنشاء تقرير', 'reports', ['assets/css/report-create.css',
                 <div class="create-fields">
                     <label class="field-wide">إصدار القالب<select name="template_version_id" id="report-template" data-requested-template="<?= $requestedTemplateId > 0 ? 'true' : 'false' ?>" required><?php foreach ($versions as $version): ?><option value="<?= (int) $version['id'] ?>" <?= (int) $version['id'] === (int) ($selectedVersion['id'] ?? 0) ? 'selected' : '' ?>><?= school_e($version['name']) ?> · الإصدار <?= (int) $version['version_number'] ?></option><?php endforeach; ?></select></label>
                     <label>المادة<select name="subject_id" id="report-subject" required><?php foreach ($subjects as $subject): ?><option value="<?= (int) $subject['id'] ?>"><?= school_e($subject['name']) ?></option><?php endforeach; ?></select></label>
-                    <label>الصف<select name="class_id" id="report-class" required><?php foreach ($classes as $class): ?><option value="<?= (int) $class['id'] ?>" data-semester="<?= school_e($class['term_name']) ?>"><?= school_e($class['name']) ?></option><?php endforeach; ?></select></label>
-                    <label>السنة الأكاديمية<select name="academic_year_id" id="report-year" required><?php foreach ($years as $year): ?><option value="<?= (int) $year['id'] ?>"><?= school_e($year['name']) ?></option><?php endforeach; ?></select></label>
+                    <label>الصف<select name="class_id" id="report-class" required><?php foreach ($classes as $class): ?><option value="<?= (int) $class['id'] ?>" data-semester="<?= school_e($class['term_name']) ?>"><?= school_e($class['name'] . (is_super_admin() ? ' · ' . $class['teacher_name'] : '')) ?></option><?php endforeach; ?></select></label>
+                    <label>السنة الأكاديمية<select name="academic_year_id" id="report-year" required><?php foreach ($years as $year): ?><option value="<?= (int) $year['id'] ?>"><?= school_e($year['name'] . (is_super_admin() ? ' · ' . $year['teacher_name'] : '')) ?></option><?php endforeach; ?></select></label>
                     <label>الفصل<input name="semester" id="report-semester" value="<?= school_e($classes[0]['term_name'] ?? '') ?>"></label>
                     <label>تاريخ التقرير<input type="date" name="report_date" id="report-date" required value="<?= date('Y-m-d') ?>"></label>
                 </div>

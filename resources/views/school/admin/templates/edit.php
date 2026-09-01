@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__,2).'/includes/bootstrap.php'; require_admin();
 $repository=new App\Repositories\TemplateRepository(db(),current_user_id(),is_super_admin()); $id=(int)($_GET['id']??0); $template=$id?$repository->currentConfiguration($id):null;
+$templateGroups=array_values(array_unique(array_column($repository->groups(),'name')));
 if($id&&!$template){http_response_code(404);exit('القالب غير موجود');}
 if($template){
     $groupKeys=[]; foreach($template['groups'] as $group)$groupKeys[(int)$group['id']]=$group['group_key'];
@@ -11,7 +12,7 @@ if($template){
     // مسودة قادمة من admin/templates/import.php: تُعرض للمراجعة ولا تُحفظ قبل «حفظ الإصدار»
     $template=$_SESSION['template_import']; unset($_SESSION['template_import']);
     $importNotes=$template['notes']??[]; unset($template['notes']);
-}else{$template=['template_id'=>0,'name'=>'جدول علامات جديد','description'=>'','settings'=>[],'groups'=>[],'columns'=>[
+}else{$template=['template_id'=>0,'group_id'=>0,'group_name'=>'','name'=>'جدول علامات جديد','description'=>'','settings'=>[],'groups'=>[],'columns'=>[
     ['column_key'=>'student_number','name'=>'الرقم','header_label'=>'','type'=>'student_number','max_mark'=>'','step_value'=>0.25,'width_mm'=>10,'sort_order'=>1,'is_visible'=>true,'header_group_key'=>null,'text_direction'=>'rtl','display_direction'=>'horizontal'],
     ['column_key'=>'student_name','name'=>'اسم الطالب','header_label'=>'','type'=>'student_name','max_mark'=>'','step_value'=>0.25,'width_mm'=>48,'sort_order'=>2,'is_visible'=>true,'header_group_key'=>null,'text_direction'=>'rtl','display_direction'=>'horizontal'],
 ]];}
@@ -59,7 +60,7 @@ page_header($id?'محرر جدول العلامات':'جدول علامات جد
                     <span class="tb-hint">اضغط على أي عنوان في الجدول لتعديله</span>
                 </header>
                 <div class="tb-preview-body">
-                <?php $report = ['title' => $template['name'], 'class_name' => 'الصف السادس (أ)', 'subject_name' => 'اللغة العربية', 'semester' => 'الأول', 'academic_year' => date('Y') . '/' . ((int) date('Y') + 1)]; ?>
+                <?php $report = ['title' => $template['name'], 'class_name' => $template['group_name'] ?: 'مجموعة القوالب', 'subject_name' => 'اللغة العربية', 'semester' => 'الأول', 'academic_year' => date('Y') . '/' . ((int) date('Y') + 1)]; ?>
                     <div id="preview-viewport" class="tb-preview-viewport">
                         <div id="preview-sheet" class="report-sheet report-sheet--dense">
                             <?php require dirname(__DIR__, 2) . '/includes/report-header.php'; ?>
@@ -94,7 +95,8 @@ page_header($id?'محرر جدول العلامات':'جدول علامات جد
 </div>
 
 <script>
-window.BUILDER_DATA = <?= json_encode(['template_id' => $id, 'name' => $template['name'], 'description' => $template['description'], 'groups' => $template['groups'], 'columns' => $template['columns'], 'settings' => $template['settings'] ?? []], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+window.BUILDER_DATA = <?= json_encode(['template_id' => $id, 'group_id' => (int) ($template['group_id'] ?? 0), 'group_name' => $template['group_name'] ?? '', 'name' => $template['name'], 'description' => $template['description'], 'groups' => $template['groups'], 'columns' => $template['columns'], 'settings' => $template['settings'] ?? []], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+window.TEMPLATE_GROUPS = <?= json_encode($templateGroups, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 window.APP = { baseUrl: <?= json_encode(school_url()) ?>, csrf: <?= json_encode(school_csrf_token()) ?> };
 </script>
-<?php page_footer(['assets/js/table-builder.js']); ?>
+<?php page_footer(['assets/js/table-builder.js?v=' . filemtime(dirname(__DIR__, 2) . '/assets/js/table-builder.js')]); ?>
