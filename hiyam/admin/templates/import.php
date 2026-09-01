@@ -11,6 +11,7 @@ const IMPORT_MAX_PDF_BYTES = 8_000_000;
 
 $extractor = new PdfTableExtractor();
 $pdfReady = $extractor->isAvailable();
+$pdfWarning = $extractor->warning();
 $error = null;
 $name = trim((string) ($_POST['name'] ?? ''));
 
@@ -128,6 +129,8 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                         أداة <code>pdftotext</code> غير متوفرة على هذا الخادم. ثبّت poppler أو Xpdf،
                         أو اضبط <code>PDFTOTEXT_PATH</code> على مسارها، أو استخدم اللصق.
                     </p>
+                <?php elseif ($pdfWarning !== ''): ?>
+                    <p class="hint warn"><?= e($pdfWarning) ?></p>
                 <?php endif; ?>
 
                 <div class="import-pdf-fields">

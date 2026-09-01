@@ -521,8 +521,9 @@ final class TableImportService
             // «المجموع 8/2»: المكوّنات تجمع 8 ثم تُقسم على 2، فالقصوى 4 والقاسم 2
             $ratio = $this->ratioInLabel($column['label']);
             $divisor = $ratio && (($sourceTotal === null) || abs($ratio[0] - $sourceTotal) < 0.001) ? $ratio[1] : 1.0;
-            // مجموع مصادر معروفة أوثق من رقم مقروء من نص الرأس
-            if ($column['type'] === 'calculated_total' && $sourceTotal !== null) $built['max_mark'] = $this->number($sourceTotal / $divisor);
+            if ($column['type'] === 'calculated_total' && $sourceTotal !== null && $built['max_mark'] === '') {
+                $built['max_mark'] = $this->number($sourceTotal / $divisor);
+            }
             $built['formula'] = ['type' => $calculated[$column['type']], 'sources' => $sources, 'missing' => 'blank', 'base' => $base, 'divisor' => $divisor, 'decimals' => 2];
             if ($divisor > 1) $this->notes[] = "قُرئ رأس «{$column['label']}» على أنه مجموع مقسوم على {$this->number($divisor)}.";
             $result[] = $built;

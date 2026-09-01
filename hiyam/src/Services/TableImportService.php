@@ -331,11 +331,12 @@ final class TableImportService
         $columns = [];
         foreach ($raw as $index => $item) {
             $label = $item['label'] !== '' ? $item['label'] : 'عمود ' . ($index + 1);
+            $maxMark = $this->maxMarkFromLabel($label);
             $columns[] = [
-                'label' => $label,
+                'label' => $maxMark !== '' ? $this->withoutMaxMark($label) : $label,
                 'type' => $this->guessType($label),
                 'header_group_key' => $item['group'],
-                'max_mark' => $this->maxMarkFromLabel($label),
+                'max_mark' => $maxMark,
                 'source_column' => $index,
                 'vertical' => $item['vertical'] ?? false,
                 'width_mm' => $item['width_mm'] ?? null,
@@ -368,6 +369,12 @@ final class TableImportService
         if ($this->ratioInLabel($text)) return ''; // «المجموع 8/2» نسبة قسمة لا علامة قصوى
         if (preg_match('/(?:من|\/|out of)\s*(\d+(?:\.\d+)?)/ui', $text, $match)) return $match[1];
         return '';
+    }
+
+    private function withoutMaxMark(string $label): string
+    {
+        $clean = preg_replace('/\s*[\(\[\{]\s*[\d\x{0660}-\x{0669}\x{06F0}-\x{06F9}]+(?:[.,\x{066B}][\d\x{0660}-\x{0669}\x{06F0}-\x{06F9}]+)?\s*[\)\]\}]\s*/u', ' ', $label);
+        return trim(preg_replace('/\s+/u', ' ', $clean ?? $label));
     }
 
     /**
@@ -514,8 +521,9 @@ final class TableImportService
             // «المجموع 8/2»: المكوّنات تجمع 8 ثم تُقسم على 2، فالقصوى 4 والقاسم 2
             $ratio = $this->ratioInLabel($column['label']);
             $divisor = $ratio && (($sourceTotal === null) || abs($ratio[0] - $sourceTotal) < 0.001) ? $ratio[1] : 1.0;
-            // مجموع مصادر معروفة أوثق من رقم مقروء من نص الرأس
-            if ($column['type'] === 'calculated_total' && $sourceTotal !== null) $built['max_mark'] = $this->number($sourceTotal / $divisor);
+            if ($column['type'] === 'calculated_total' && $sourceTotal !== null && $built['max_mark'] === '') {
+                $built['max_mark'] = $this->number($sourceTotal / $divisor);
+            }
             $built['formula'] = ['type' => $calculated[$column['type']], 'sources' => $sources, 'missing' => 'blank', 'base' => $base, 'divisor' => $divisor, 'decimals' => 2];
             if ($divisor > 1) $this->notes[] = "قُرئ رأس «{$column['label']}» على أنه مجموع مقسوم على {$this->number($divisor)}.";
             $result[] = $built;

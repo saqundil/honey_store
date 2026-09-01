@@ -206,12 +206,20 @@ assert(count($draft['notes']) === 2);
 assert($draft['columns'][0]['type'] === 'student_number');
 assert($draft['columns'][1]['type'] === 'student_name');
 $columnsByName = array_column($draft['columns'], null, 'name');
-assert($columnsByName['الواجب (5)']['max_mark'] === '5');
+assert($columnsByName['الواجب']['max_mark'] === '5');
 assert($columnsByName['المشاركة من 5']['max_mark'] === '5');
 $percentage = $columnsByName['النسبة'];
 assert($percentage['type'] === 'percentage');
 assert($percentage['formula']['type'] === 'PERCENTAGE');
 assert($percentage['formula']['base'] === '10');
+
+$declaredTotal = $import->fromRows([[
+    $import->cell('الرقم'), $import->cell('اسم الطالب'), $import->cell('الاستماع (10)'),
+    $import->cell('المحادثة (10)'), $import->cell('العلامة النهائية (120)'),
+]]);
+$declaredByName = array_column($declaredTotal['columns'], null, 'name');
+assert(isset($declaredByName['الاستماع'], $declaredByName['المحادثة'], $declaredByName['العلامة النهائية']));
+assert($declaredByName['العلامة النهائية']['max_mark'] === '120');
 
 // عمود محسوب بلا مصادر يُخفَّض إلى علامة يدوية بدل أن يكسر الحفظ
 $lonely = '<table><tr><th>الرقم</th><th>اسم الطالب</th><th>المجموع</th></tr></table>';
@@ -272,6 +280,19 @@ $columnsByName = array_column($draft['columns'], null, 'name');
 assert($columnsByName['Quiz']['header_group_key'] === $draft['groups'][0]['group_key']);
 assert($columnsByName['Total']['formula']['sources'] === ['quiz', 'homework', 'exam']);
 
+// نموذج علامات فارغ: صفوف الطلاب تحمل الرقم والاسم فقط، فلا يجوز اختزال أعمدة العلامات إلى عمودين
+$blankArabicLayout = <<<'TEXT'
+    النهائية    الكتابي    الإملاء    التعبير    المحادثة    الاستماع            اسم الطالب    الرقم
+                                                                                                                                                    آية زياد عيسى       1
+                                                                                                                                                    بيان عمر محمود      2
+                                                                                                                                                    بسمة مروان محمد     3
+TEXT;
+$blankArabicLines = array_map(static fn(string $line): array => mb_str_split(rtrim($line)), explode("\n", $blankArabicLayout));
+$blankArabicSlots = $columnSlots->invoke($extractor, $blankArabicLines);
+assert(count($blankArabicSlots) === 8, 'Blank Arabic grade sheet columns must come from its rich header row.');
+$blankArabicRows = array_map(static fn(array $line): array => $splitLine->invoke($extractor, $line, $blankArabicSlots), $blankArabicLines);
+assert(count($blankArabicRows[1]) === 8);
+
 // من ملف PDF حقيقي، عندما يكون pdftotext متاحًا على الجهاز
 if ($extractor->isAvailable()) {
     $draft = $import->fromRows($extractor->rows(__DIR__ . '/fixtures/grade-sheet.pdf', 1, false), 'كشف من PDF');
@@ -279,10 +300,140 @@ if ($extractor->isAvailable()) {
     assert(array_column($draft['columns'], 'name') === ['No', 'Name', 'Quiz', 'Homework', 'Exam', 'Total']);
     assert(array_column($draft['columns'], 'type') === ['student_number', 'student_name', 'manual_mark', 'manual_mark', 'manual_mark', 'calculated_total']);
     assert(end($draft['columns'])['formula']['sources'] === ['quiz', 'homework', 'exam']);
+    $bboxRows = new ReflectionMethod(PdfTableExtractor::class, 'bboxRows');
+    $bboxDraft = $import->fromRows($bboxRows->invoke($extractor, __DIR__ . '/fixtures/grade-sheet.pdf', 1, false), 'كشف إحداثيات');
+    $assertSaveable($bboxDraft);
+    assert(array_column($bboxDraft['columns'], 'name') === ['No', 'Name', 'Quiz', 'Homework', 'Exam', 'Total']);
     echo "PDF extraction checked against tests/fixtures/grade-sheet.pdf.\n";
 } else {
     echo "pdftotext غير متاح؛ تم تخطي اختبار استخراج PDF.\n";
 }
+
+// كشف عربي كما يسلّمه pdftotext -bbox-layout: الكلمات بترتيب الرسم لا القراءة، أي معكوسة
+// الأرقام تبقى بترتيبها، و«لا» رسمٌ واحد فيخرج حرفاه بترتيب القراءة: هنا يقع قلب الهجاء
+$mirror = static function (string $text): string {
+    $letters = mb_str_split($text);
+    $mirrored = '';
+    for ($index = count($letters) - 1; $index >= 0; $index--) {
+        if ($index > 0 && $letters[$index - 1] === 'ل' && $letters[$index] === 'ا') {
+            $mirrored .= 'لا';
+            $index--;
+            continue;
+        }
+        $mirrored .= $letters[$index];
+    }
+    return preg_replace_callback('/[\d\/.]+/', static fn(array $match): string => strrev($match[0]), $mirrored) ?? $mirrored;
+};
+$bboxBlock = static function (string $text, float $left, float $right, float $top, float $bottom, bool $visual = true) use ($mirror): string {
+    $words = explode(' ', $text);
+    if ($visual) $words = array_map($mirror, array_reverse($words));
+    $box = 'xMin="' . $left . '" yMin="' . $top . '" xMax="' . $right . '" yMax="' . $bottom . '"';
+    $inner = '';
+    foreach ($words as $word) $inner .= '<word ' . $box . '>' . htmlspecialchars($word, ENT_XML1) . '</word>';
+    return '<block ' . $box . '><line ' . $box . '>' . $inner . '</line></block>';
+};
+$conversationSheet = static function (bool $visual) use ($bboxBlock): string {
+    $blocks = [
+        // عنوان الصفحة فوق الجدول: ليس رأس عمود، ولا يجوز أن يلتحم بأول خلية
+        $bboxBlock('مبحث اللغة العربية', 460, 560, 26, 38, $visual),
+        $bboxBlock('الفصل الدراسي الأول', 460, 560, 40, 52, $visual),
+        $bboxBlock('الصف الثامن', 460, 560, 54, 66, $visual),
+        $bboxBlock('مجموعة مدارس الجامعة', 200, 340, 26, 42, $visual),
+        $bboxBlock('تقييم المحادثة', 240, 320, 46, 62, $visual),
+        // حتى لو تداخلت ترويسة الصفحة رأسيًا مع الجدول، لا تصبح أعمدة
+        $bboxBlock('مجموعة مدارس الجامعة', 40, 160, 112, 140, $visual),
+        $bboxBlock('التقييم النهائي', 165, 250, 112, 140, $visual),
+        $bboxBlock('مبحث اللغة العربية الفصل الدراسي الأول 2024-2025', 255, 385, 112, 140, $visual),
+        $bboxBlock('م', 545, 560, 128, 142, $visual),
+        $bboxBlock('اسم الطالب', 460, 530, 128, 142, $visual),
+        $bboxBlock('الالتزام بالوقت 2', 390, 450, 112, 158, $visual),
+        $bboxBlock('سلامة اللغة 2', 330, 388, 112, 158, $visual),
+        $bboxBlock('الثقة بالنفس 2', 270, 328, 112, 158, $visual),
+        $bboxBlock('ترتيب الأفكار 2', 210, 268, 112, 158, $visual),
+        $bboxBlock('التلوين الصوتي 2', 150, 208, 112, 158, $visual),
+        $bboxBlock('المجموع 10', 90, 148, 112, 158, $visual),
+    ];
+    foreach (['الما شادي اسعد عبدالهادي', 'جيانا علاء طلافحة', 'سناء عمر لطفي الفراج', 'كنزي سلمان أبو زمزم'] as $index => $student) {
+        $top = 170 + $index * 16;
+        $blocks[] = $bboxBlock((string) ($index + 1), 545, 560, $top, $top + 14, $visual);
+        $blocks[] = $bboxBlock($student, 440, 535, $top, $top + 14, $visual);
+    }
+    return '<doc><page width="595" height="842">' . implode('', $blocks) . '</page></doc>';
+};
+
+$bboxBlocks = new ReflectionMethod(PdfTableExtractor::class, 'bboxBlocks');
+$bboxGrid = new ReflectionMethod(PdfTableExtractor::class, 'bboxGrid');
+// نص -layout للصفحة نفسها: هجاء صحيح تُصلَّح به الحروف التي يقلبها فكّ الرسم المتصل
+$layoutSpelling = 'مبحث اللغة العربية الفصل الدراسي الأول الالتزام بالوقت سلامة اللغة الثقة بالنفس ترتيب الأفكار التلوين الصوتي المجموع جيانا علاء طلافحة سناء عمر لطفي الفراج';
+$parsedBlocks = $bboxBlocks->invoke($extractor, $conversationSheet(true), $layoutSpelling);
+$mirroredRows = $bboxGrid->invoke($extractor, $parsedBlocks, true);
+assert(array_column($mirroredRows[0], 'text') === [
+    'م', 'اسم الطالب', 'الالتزام بالوقت 2', 'سلامة اللغة 2', 'الثقة بالنفس 2', 'ترتيب الأفكار 2', 'التلوين الصوتي 2', 'المجموع (10)',
+], 'Right-to-left headers must come back in reading order, not mirrored.');
+assert(array_column($mirroredRows[1], 'text') === ['1', 'الما شادي اسعد عبدالهادي', '', '', '', '', '', '']);
+assert(array_column($mirroredRows[2], 'text')[1] === 'جيانا علاء طلافحة', 'A lam-alef ligature must be re-spelled from the -layout text.');
+foreach ($mirroredRows[0] as $headerCell) {
+    assert(!str_contains($headerCell['text'], 'مبحث') && !str_contains($headerCell['text'], 'مدارس'), 'Page headings sit above the table and are not columns.');
+}
+
+$repeatedHeaderRows = new ReflectionMethod(PdfTableExtractor::class, 'repeatedHeaderRows');
+$identity = [
+    ['text' => 'م', 'colspan' => 1, 'rowspan' => 1, 'header' => true],
+    ['text' => 'اسم الطالب', 'colspan' => 1, 'rowspan' => 1, 'header' => true],
+];
+$conversationHeaders = array_map(
+    static fn(string $text): array => ['text' => $text, 'colspan' => 1, 'rowspan' => 1, 'header' => true],
+    ['الالتزام بالوقت 2', 'سلامة اللغة 2', 'الثقة بالنفس وطلاقة الحديث 2', 'الالتزام بالموضوع وترتيب الأفكار 2', 'التلوين الصوتي 2', 'المجموع (10)']
+);
+$groupedRows = $repeatedHeaderRows->invoke($extractor, [...$identity, ...$conversationHeaders, ...$conversationHeaders]);
+assert(count($groupedRows) === 2);
+assert(array_column(array_slice($groupedRows[0], 2), 'text') === ['المجموعة 1', 'المجموعة 2']);
+assert(array_column(array_slice($groupedRows[0], 2), 'colspan') === [6, 6]);
+$groupedDraft = $import->fromRows($groupedRows, 'تقييم المحادثة بمجموعتين');
+assert(count($groupedDraft['groups']) === 2);
+assert(count(array_filter($groupedDraft['columns'], fn(array $column): bool => $column['type'] === 'manual_mark')) === 10);
+assert(count(array_filter($groupedDraft['columns'], fn(array $column): bool => $column['type'] === 'calculated_total')) === 2);
+
+$shortTestsColumns = new ReflectionMethod(PdfTableExtractor::class, 'shortTestsColumns');
+$shortTestsBlocks = [
+    ['text' => 'االختبارات القصرية', 'x' => 300.0, 'y' => 80.0, 'top' => 70.0, 'bottom' => 90.0],
+];
+$shortTestsIdentity = [
+    ['x' => 470.0, 'text' => 'اسم الطالبة'],
+    ['x' => 560.0, 'text' => 'الرقم'],
+];
+$completed = $shortTestsColumns->invoke($extractor, $shortTestsBlocks, $shortTestsIdentity, true);
+assert(array_column($completed, 'text') === [
+    'ملاحظات', 'المجموع (30)', 'الاختبار 3 (10)', 'الاختبار 2 (10)', 'الاختبار 1 (10)', 'اسم الطالبة', 'الرقم',
+]);
+assert($shortTestsColumns->invoke($extractor, $shortTestsBlocks, $shortTestsIdentity, false) === $shortTestsIdentity);
+
+// الصفحة نفسها حين يسلّمها المحرك بترتيب القراءة: تُقرأ كما هي، ولا تُعكس مرة ثانية
+$logicalRows = $bboxGrid->invoke($extractor, $bboxBlocks->invoke($extractor, $conversationSheet(false), $layoutSpelling), true);
+assert(array_column($logicalRows[0], 'text') === array_column($mirroredRows[0], 'text'), 'Already-logical text must not be reversed.');
+
+$visualOrder = new ReflectionMethod(PdfTableExtractor::class, 'visualOrder');
+assert($visualOrder->invoke($extractor, 'بلاطلا مسا ةيبرعلا ةغللا ثحبم') === true);
+assert($visualOrder->invoke($extractor, 'اسم الطالب مبحث اللغة العربية') === false);
+assert($visualOrder->invoke($extractor, 'No Name Quiz Homework Total') === false);
+
+$logicalRtl = new ReflectionMethod(PdfTableExtractor::class, 'logicalRtl');
+assert($logicalRtl->invoke($extractor, '10 Name بلاطلا مسا') === 'اسم الطالب Name 10');
+
+// إعداد المحرك: مسار لا يعمل يجب أن يُقال صراحةً بدل الفشل عند أول رفع
+$missingEngine = new PdfTableExtractor("definitely-missing-pdftotext");
+assert($missingEngine->engine()["available"] === false);
+assert($missingEngine->engine()["bbox"] === false);
+assert(str_contains($missingEngine->warning(), "PDFTOTEXT_PATH"));
+if ($extractor->engine()["available"]) {
+    assert($extractor->engine()["name"] !== "", "A working pdftotext must name its engine.");
+}
+
+$plain = new ReflectionMethod(PdfTableExtractor::class, 'plain');
+assert($plain->invoke($extractor, "\u{202B}اسم الطالب\u{202C}") === 'اسم الطالب');
+$assertSaveable($import->fromRows($mirroredRows, "كشف المحادثة"));
+echo "Mirrored Arabic bbox extraction checked.\n";
+
 
 // المسودة تمر فعليًا عبر TemplateService::save، وهي البوابة التي تحرس القالب
 try {

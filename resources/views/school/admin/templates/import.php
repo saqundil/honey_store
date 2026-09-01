@@ -11,6 +11,7 @@ const IMPORT_MAX_PDF_BYTES = 8_000_000;
 
 $extractor = new PdfTableExtractor();
 $pdfReady = $extractor->isAvailable();
+$pdfWarning = $extractor->warning();
 $error = null;
 $name = trim((string) ($_POST['name'] ?? ''));
 
@@ -127,6 +128,8 @@ page_header('استيراد قالب', 'templates', ['assets/css/template-import
                     <p class="hint warn">
                         لا يتوفر محرك لقراءة PDF على هذا الخادم؛ استخدم اللصق من Word أو Excel.
                     </p>
+                <?php elseif ($pdfWarning !== ''): ?>
+                    <p class="hint warn"><?= school_e($pdfWarning) ?></p>
                 <?php endif; ?>
 
                 <div class="import-pdf-fields">
