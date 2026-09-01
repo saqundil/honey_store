@@ -11,7 +11,7 @@ page_header('قوالب جداول التقييم', 'templates');
         <h2>القوالب المحفوظة</h2>
     </div>
     <div class="quick-actions">
-        <a class="button" href="<?= school_e(school_url('admin/templates/import.php')) ?>">استيراد من جدول أو PDF</a>
+        <a class="button" href="<?= school_e(school_url('admin/templates/import.php')) ?>">استيراد Word أو جدول</a>
         <a class="button primary" href="<?= school_e(school_url('admin/templates/edit.php')) ?>">قالب جديد</a>
     </div>
 </div>
@@ -55,7 +55,7 @@ page_header('قوالب جداول التقييم', 'templates');
     <div class="empty-state">
         <div class="empty-state-mark" aria-hidden="true">＋</div>
         <h2>لا توجد قوالب بعد</h2>
-        <p>القالب يحدّد أعمدة الجدول وطريقة حساب العلامات. ابدأ بقالب فارغ، أو استورد جدولًا جاهزًا من Word أو Excel أو PDF.</p>
+        <p>القالب يحدّد أعمدة الجدول وطريقة حساب العلامات. ابدأ بقالب فارغ، أو ارفع ملف Word متعدد الجداول، أو استورد جدولًا جاهزًا.</p>
         <div class="quick-actions">
             <a class="button" href="<?= school_e(school_url('admin/templates/import.php')) ?>">استيراد جدول</a>
             <a class="button primary" href="<?= school_e(school_url('admin/templates/edit.php')) ?>">إنشاء قالب</a>

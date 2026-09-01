@@ -26,7 +26,7 @@
 /* يلاحق النموذج عند التمرير لأن الشرح مرجع أثناء العمل لا مقدمة تُقرأ مرة */
 .import-header {
   grid-column: 1;
-  grid-row: 1 / span 2;
+  grid-row: 1 / span 3;
   position: sticky;
   top: calc(var(--shell-header) + var(--sp-6));
 }
@@ -75,14 +75,194 @@
   gap: var(--sp-3);
 }
 
-.import-card {
-  padding: var(--sp-5);
+.import-form.has-result { grid-row: 3; }
+
+.import-result {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.import-result .alert { margin: 0; }
+
+.import-result-list {
+  padding: var(--sp-4);
   border: 1px solid var(--line);
-  border-top: 3px solid var(--brand);
+  border-inline-start: 3px solid var(--success);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.import-result-list.failures { border-inline-start-color: var(--warn); }
+
+.import-result-list ul {
+  margin: var(--sp-2) 0 0;
+  padding-inline-start: var(--sp-5);
+}
+
+.import-result-list li + li { margin-top: var(--sp-1); }
+
+.import-docx-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-bottom: var(--sp-4);
+}
+
+.import-docx-fields label { margin: 0; }
+
+.file-drop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  min-height: 150px;
+  padding: var(--sp-4);
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+
+.file-drop:hover,
+.file-drop.is-dragging {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.file-drop.is-dragging { box-shadow: inset 0 0 0 1px var(--brand); }
+
+.file-drop:focus-visible,
+.file-drop:focus-within {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: var(--focus-ring);
+}
+
+.file-drop-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.file-drop-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--brand-line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--brand);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.file-drop strong {
+  color: var(--ink);
+  font-size: var(--fs-sm);
+}
+
+.file-drop-help,
+.file-drop-name {
+  max-width: 100%;
+  font-size: var(--fs-xs);
+}
+
+.file-drop-name {
+  overflow: hidden;
+  color: var(--ink-4);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-drop.has-file {
+  border-style: solid;
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+
+.file-drop.has-file .file-drop-name {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.file-drop.is-invalid {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.file-drop.is-invalid .file-drop-name { color: var(--danger); }
+
+.file-drop:has(.file-drop-input:disabled) {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.import-card {
+  border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface);
   box-shadow: var(--sh-sm);
+  overflow: hidden;
 }
+
+.import-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.import-tab {
+  min-height: 44px;
+  padding: 8px var(--sp-3);
+  border: 0;
+  border-inline-start: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+
+.import-tab:first-child { border-inline-start: 0; }
+
+.import-tab:hover {
+  color: var(--ink);
+  background: var(--surface-3);
+}
+
+.import-tab.is-active {
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: var(--sh-xs);
+}
+
+.import-tab:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.import-mode-panel {
+  min-height: 420px;
+  padding: var(--sp-5);
+}
+
+.import-mode-panel[hidden] { display: none; }
 
 .import-card-head {
   display: flex;
@@ -100,6 +280,16 @@
   color: var(--ink-3);
   font-size: var(--fs-sm);
   line-height: var(--lh-base);
+}
+
+.import-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
 }
 
 /* ============================================================
@@ -309,10 +499,19 @@
 
 .import-pdf-fields {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: var(--sp-3);
+  grid-template-columns: minmax(0, 1.5fr) minmax(180px, .75fr);
+  gap: var(--sp-4);
+  align-items: stretch;
   margin-bottom: var(--sp-4);
 }
+
+.import-pdf-settings {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: center;
+}
+
+.import-pdf-settings label { margin: 0; }
 
 /* ============================================================
  * ملاحظات المسودة المستوردة (تُعرض داخل المحرّر)
@@ -424,6 +623,7 @@
   }
 
   .import-page > .alert,
+  .import-result,
   .import-form {
     grid-column: auto;
     grid-row: auto;
@@ -433,7 +633,16 @@
 }
 
 @media (max-width: 700px) {
-  .import-card { padding: var(--sp-4); }
+  .import-mode-panel {
+    min-height: 0;
+    padding: var(--sp-4);
+  }
+
+  .import-tab {
+    min-height: 42px;
+    padding-inline: var(--sp-2);
+    font-size: var(--fs-xs);
+  }
 
   .paste-area { min-height: 190px; }
   .paste-area:empty::before { padding-block: var(--sp-10); }
@@ -450,6 +659,14 @@
   }
 
   .import-pdf-fields { grid-template-columns: 1fr; }
+  .import-docx-fields { grid-template-columns: 1fr; }
+
+  .import-panel-foot {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .import-panel-foot .button { width: 100%; }
 
   .import-notes { margin-inline: var(--sp-4); }
 }
