@@ -99,4 +99,7 @@ window.BUILDER_DATA = <?= json_encode(['template_id' => $id, 'group_id' => (int)
 window.TEMPLATE_GROUPS = <?= json_encode($templateGroups, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 window.APP = { baseUrl: <?= json_encode(school_url()) ?>, csrf: <?= json_encode(school_csrf_token()) ?> };
 </script>
-<?php page_footer(['assets/js/table-builder.js?v=' . filemtime(dirname(__DIR__, 2) . '/assets/js/table-builder.js')]); ?>
+<?php page_footer(['assets/js/table-builder.js?v=' . max(
+    filemtime(dirname(__DIR__, 2) . '/assets/js/table-builder.js'),
+    filemtime(public_path('school-assets/js/table-builder.js'))
+)]); ?>

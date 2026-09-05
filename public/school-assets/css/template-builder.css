@@ -241,6 +241,11 @@
 
 .button.block { width: 100%; }
 
+.tb-panel-actions {
+  display: grid;
+  gap: var(--sp-2);
+}
+
 /* ---------- الذيل ---------- */
 
 .tb-foot {

@@ -396,7 +396,10 @@
       + formulaAdvanced
       + '<label class="tb-check"><input id="f-visible" type="checkbox"' + (column.is_visible ? ' checked' : '') + '> إظهار العمود في الجدول</label>'
       + '</div></details>'
+      + '<div class="tb-panel-actions">'
+      + (!IDENTITY.has(column.type) ? '<button type="button" class="button secondary block" data-copy-column="' + esc(column.column_key) + '">نسخ العمود</button>' : '')
       + '<button type="button" class="button danger block" data-del="column:' + esc(column.column_key) + '">حذف العمود</button>'
+      + '</div>'
       + '</div>';
   }
 
@@ -482,6 +485,7 @@
       if (parts[0] === 'group') removeGroup(parts[1]);
       else removeColumn(parts[1]);
     });
+    $$('[data-copy-column]').forEach(b => b.onclick = () => copyColumn(b.dataset.copyColumn));
   }
 
   function ensureFormula(column) {
@@ -539,6 +543,26 @@
     resequence();
     dirty();
     select('column', column.column_key);
+    renderPreviewAndBind();
+    focusFirst();
+  }
+
+  function copyColumn(key) {
+    const source = findColumn(key);
+    if (!source || IDENTITY.has(source.type)) return;
+
+    const copy = structuredClone(source);
+    copy.column_key = uniqueKey(source.column_key || source.name);
+    copy.name = source.name + ' - نسخة';
+    delete copy.id;
+    delete copy.template_version_id;
+    delete copy.header_group_id;
+
+    const sourceIndex = state.columns.indexOf(source);
+    state.columns.splice(sourceIndex + 1, 0, copy);
+    state.columns.forEach((column, index) => { column.sort_order = index + 1; });
+    dirty();
+    select('column', copy.column_key);
     renderPreviewAndBind();
     focusFirst();
   }
