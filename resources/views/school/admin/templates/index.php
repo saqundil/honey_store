@@ -50,14 +50,16 @@ page_header('قوالب جداول التقييم', 'templates');
                 <tr>
                     <td>
                         <div class="template-name" data-template-name="<?= (int) $template['id'] ?>">
-                            <strong><?= school_e($template['name']) ?></strong>
+                            <div class="template-name-display">
+                                <strong><?= school_e($template['name']) ?></strong>
+                                <?php if ($template['description']): ?><small><?= school_e($template['description']) ?></small><?php endif; ?>
+                            </div>
                             <form class="template-rename-form" hidden>
                                 <input type="text" maxlength="190" required value="<?= school_e($template['name']) ?>" aria-label="اسم القالب">
                                 <button type="submit">حفظ</button>
                                 <button type="button" data-cancel-rename>إلغاء</button>
                             </form>
                         </div>
-                        <?php if ($template['description']): ?><small><?= school_e($template['description']) ?></small><?php endif; ?>
                     </td>
                     <td class="num">v<?= (int) $template['version_number'] ?></td>
                     <td><span class="status <?= school_e($template['status']) ?>"><?= $template['status'] === 'active' ? 'نشط' : 'معطل' ?></span></td>
@@ -95,7 +97,7 @@ document.querySelectorAll('.template-rename').forEach(button => {
     button.addEventListener('click', () => {
         const container = document.querySelector(`[data-template-name="${button.dataset.id}"]`);
         const form = container.querySelector('.template-rename-form');
-        container.querySelector('strong').hidden = true;
+        container.querySelector('.template-name-display').hidden = true;
         form.hidden = false;
         form.querySelector('input').focus();
         form.querySelector('input').select();
@@ -104,12 +106,13 @@ document.querySelectorAll('.template-rename').forEach(button => {
 
 document.querySelectorAll('.template-rename-form').forEach(form => {
     const container = form.closest('.template-name');
-    const label = container.querySelector('strong');
+    const display = container.querySelector('.template-name-display');
+    const label = display.querySelector('strong');
     const input = form.querySelector('input');
     const close = () => {
         input.value = label.textContent.trim();
         form.hidden = true;
-        label.hidden = false;
+        display.hidden = false;
     };
 
     form.querySelector('[data-cancel-rename]').addEventListener('click', close);
@@ -135,7 +138,7 @@ document.querySelectorAll('.template-rename-form').forEach(form => {
             input.value = result.name;
             document.querySelectorAll(`[data-name][data-id="${container.dataset.templateName}"]`).forEach(action => action.dataset.name = result.name);
             form.hidden = true;
-            label.hidden = false;
+            display.hidden = false;
             UI.toast('تم تعديل اسم القالب.', 'success', 1200);
         } catch (error) {
             UI.toast(error.message, 'error');
