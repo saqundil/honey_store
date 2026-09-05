@@ -442,6 +442,43 @@
 
 .template-group-heading { justify-content: space-between; }
 
+.template-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.template-group-chevron {
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1;
+  transition: transform .15s ease;
+}
+
+.template-group-row.is-collapsed .template-group-chevron { transform: rotate(90deg); }
+
+.template-group-move {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--brand-line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--brand);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.template-group-move:disabled { opacity: .35; cursor: default; }
+
 .template-group-actions a {
   color: var(--brand-700);
   font-size: var(--fs-sm);
@@ -484,6 +521,7 @@
 
 @media (max-width: 700px) {
   .template-group-heading { align-items: flex-start; flex-direction: column; }
+  .template-group-actions { width: 100%; flex-wrap: wrap; }
   .template-rename-form { flex-wrap: nowrap; }
   .template-rename-form input { width: auto; min-width: 0; flex: 1; }
 }

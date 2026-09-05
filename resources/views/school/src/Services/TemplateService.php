@@ -130,8 +130,11 @@ final class TemplateService
         $existingId = $statement->fetchColumn();
         if ($existingId) return (int) $existingId;
 
-        $statement = $this->db->prepare('INSERT INTO template_groups(name,created_by) VALUES(?,?)');
-        $statement->execute([$groupName, $ownerId]);
+        $statement = $this->db->prepare(
+            'INSERT INTO template_groups(name,sort_order,created_by)
+             SELECT ?,COALESCE(MAX(sort_order),0)+10,? FROM template_groups WHERE created_by=?'
+        );
+        $statement->execute([$groupName, $ownerId, $ownerId]);
         return (int) $this->db->lastInsertId();
     }
 }

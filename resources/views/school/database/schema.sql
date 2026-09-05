@@ -16,7 +16,8 @@ INSERT INTO schema_migrations(migration) VALUES
     ('20260830_007_class_assessment_exam_date.sql'),
     ('20260830_008_formula_divisor.sql'),
     ('20260901_009_template_groups.sql'),
-    ('20260905_010_report_batches.sql');
+    ('20260905_010_report_batches.sql'),
+    ('20260905_011_template_group_order.sql');
 
 CREATE TABLE admin_users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -96,9 +97,9 @@ CREATE TABLE class_enrollments (
 ) ENGINE=InnoDB;
 
 CREATE TABLE template_groups (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, created_by BIGINT UNSIGNED NOT NULL,
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, sort_order INT NOT NULL DEFAULT 0, created_by BIGINT UNSIGNED NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_template_group_owner_name (created_by, name), UNIQUE KEY uq_template_group_id_owner (id, created_by),
+    UNIQUE KEY uq_template_group_owner_name (created_by, name), UNIQUE KEY uq_template_group_id_owner (id, created_by), INDEX idx_template_group_owner_order (created_by, sort_order, id),
     CONSTRAINT fk_template_group_admin FOREIGN KEY (created_by) REFERENCES admin_users(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 

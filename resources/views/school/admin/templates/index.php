@@ -32,14 +32,17 @@ page_header('قوالب جداول التقييم', 'templates');
             <tbody>
             <?php $currentTemplateGroup = null; foreach ($templates as $template): ?>
                 <?php if ($currentTemplateGroup !== (int) $template['group_id']): $currentTemplateGroup = (int) $template['group_id']; ?>
-                    <tr class="template-group-row">
+                    <tr class="template-group-row" data-template-group="<?= $currentTemplateGroup ?>">
                         <th colspan="5" scope="rowgroup">
                             <div class="template-group-heading">
-                                <div>
+                                <button type="button" class="template-group-toggle" aria-expanded="true" aria-label="طي مجموعة <?= school_e($template['group_name']) ?>">
+                                    <span class="template-group-chevron" aria-hidden="true">⌄</span>
                                     <span><?= school_e($template['group_name']) ?></span>
                                     <small><?= (int) $templateCountsByGroup[$currentTemplateGroup] ?> قالب</small>
-                                </div>
+                                </button>
                                 <div class="template-group-actions">
+                                    <button type="button" class="template-group-move" data-direction="up" title="نقل المجموعة إلى أعلى" aria-label="نقل مجموعة <?= school_e($template['group_name']) ?> إلى أعلى">↑</button>
+                                    <button type="button" class="template-group-move" data-direction="down" title="نقل المجموعة إلى أسفل" aria-label="نقل مجموعة <?= school_e($template['group_name']) ?> إلى أسفل">↓</button>
                                     <a href="<?= school_e(school_url('admin/reports/create.php?group=' . $currentTemplateGroup)) ?>">استخدام المجموعة</a>
                                     <a target="_blank" rel="noopener" href="<?= school_e(school_url('admin/reports/create.php?group=' . $currentTemplateGroup . '&after=print')) ?>">طباعة المجموعة</a>
                                 </div>
@@ -47,7 +50,7 @@ page_header('قوالب جداول التقييم', 'templates');
                         </th>
                     </tr>
                 <?php endif; ?>
-                <tr>
+                <tr class="template-item-row" data-parent-group="<?= (int) $template['group_id'] ?>">
                     <td>
                         <div class="template-name" data-template-name="<?= (int) $template['id'] ?>">
                             <div class="template-name-display">
@@ -92,6 +95,76 @@ page_header('قوالب جداول التقييم', 'templates');
 
 <script>
 window.APP = { baseUrl: <?= json_encode(school_url()) ?>, csrf: <?= json_encode(school_csrf_token()) ?> };
+
+const collapsedGroups = new Set(JSON.parse(localStorage.getItem('collapsed-template-groups') || '[]').map(String));
+
+const groupRows = () => [...document.querySelectorAll('.template-group-row')];
+const childRows = groupId => [...document.querySelectorAll(`[data-parent-group="${groupId}"]`)];
+
+function setGroupCollapsed(groupRow, collapsed) {
+    const groupId = groupRow.dataset.templateGroup;
+    const toggle = groupRow.querySelector('.template-group-toggle');
+    childRows(groupId).forEach(row => row.hidden = collapsed);
+    groupRow.classList.toggle('is-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.setAttribute('aria-label', `${collapsed ? 'فتح' : 'طي'} مجموعة ${toggle.querySelector('span:nth-child(2)').textContent.trim()}`);
+    if (collapsed) collapsedGroups.add(groupId);
+    else collapsedGroups.delete(groupId);
+    localStorage.setItem('collapsed-template-groups', JSON.stringify([...collapsedGroups]));
+}
+
+function refreshGroupMoveButtons() {
+    const rows = groupRows();
+    rows.forEach((row, index) => {
+        row.querySelector('[data-direction="up"]').disabled = index === 0;
+        row.querySelector('[data-direction="down"]').disabled = index === rows.length - 1;
+    });
+}
+
+function groupBlock(groupRow) {
+    return [groupRow, ...childRows(groupRow.dataset.templateGroup)];
+}
+
+async function persistGroupOrder() {
+    const response = await fetch(`${APP.baseUrl}/api/templates/group-order.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': APP.csrf },
+        body: JSON.stringify({ group_ids: groupRows().map(row => row.dataset.templateGroup) }),
+    });
+    const result = await response.json();
+    if (!result.ok) throw new Error(result.message || 'تعذّر حفظ ترتيب المجموعات.');
+}
+
+groupRows().forEach(row => {
+    setGroupCollapsed(row, collapsedGroups.has(row.dataset.templateGroup));
+    row.querySelector('.template-group-toggle').addEventListener('click', () => {
+        setGroupCollapsed(row, row.querySelector('.template-group-toggle').getAttribute('aria-expanded') === 'true');
+    });
+    row.querySelectorAll('.template-group-move').forEach(button => button.addEventListener('click', async () => {
+        const rows = groupRows();
+        const index = rows.indexOf(row);
+        const target = button.dataset.direction === 'up' ? rows[index - 1] : rows[index + 1];
+        if (!target) return;
+        const tbody = row.parentElement;
+        const moving = groupBlock(row);
+        if (button.dataset.direction === 'up') {
+            moving.forEach(node => tbody.insertBefore(node, target));
+        } else {
+            const anchor = groupBlock(target).at(-1).nextSibling;
+            moving.forEach(node => tbody.insertBefore(node, anchor));
+        }
+        refreshGroupMoveButtons();
+        button.disabled = true;
+        try {
+            await persistGroupOrder();
+            UI.toast('تم تغيير مكان المجموعة.', 'success', 1000);
+        } catch (error) {
+            UI.toast(error.message, 'error');
+            setTimeout(() => location.reload(), 600);
+        }
+    }));
+});
+refreshGroupMoveButtons();
 
 document.querySelectorAll('.template-rename').forEach(button => {
     button.addEventListener('click', () => {

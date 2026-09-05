@@ -18,20 +18,20 @@ final class TemplateRepository
             $sql .= ' AND t.created_by=?';
             $params[] = $this->actorId;
         }
-        $statement = $this->db->prepare($sql . ' ORDER BY g.name, g.id, t.updated_at DESC');
+        $statement = $this->db->prepare($sql . ' ORDER BY g.sort_order, g.id, t.updated_at DESC');
         $statement->execute($params);
         return $statement->fetchAll();
     }
 
     public function groups(): array
     {
-        $sql = 'SELECT id,name,created_by FROM template_groups';
+        $sql = 'SELECT id,name,sort_order,created_by FROM template_groups';
         $params = [];
         if (!$this->canViewAll) {
             $sql .= ' WHERE created_by=?';
             $params[] = $this->actorId;
         }
-        $statement = $this->db->prepare($sql . ' ORDER BY name');
+        $statement = $this->db->prepare($sql . ' ORDER BY sort_order,id');
         $statement->execute($params);
         return $statement->fetchAll();
     }
