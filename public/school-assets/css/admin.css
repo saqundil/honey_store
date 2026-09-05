@@ -432,6 +432,59 @@
   font-weight: 500;
 }
 
+.template-group-heading,
+.template-group-actions,
+.template-rename-form {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.template-group-heading { justify-content: space-between; }
+
+.template-group-actions a {
+  color: var(--brand-700);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.template-name strong { display: block; }
+
+.template-rename-form input {
+  width: min(320px, 50vw);
+  min-height: 34px;
+  padding: 5px 9px;
+}
+
+.template-rename-form button {
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.group-template-summary {
+  padding: var(--sp-3);
+  border: 1px solid var(--brand-line);
+  border-radius: var(--r-sm);
+  background: var(--brand-soft);
+  color: var(--ink-2);
+}
+
+.group-template-summary strong {
+  display: block;
+  margin-bottom: var(--sp-1);
+  color: var(--brand);
+}
+
+@media (max-width: 700px) {
+  .template-group-heading { align-items: flex-start; flex-direction: column; }
+  .template-rename-form { align-items: stretch; flex-wrap: wrap; }
+  .template-rename-form input { width: 100%; }
+}
+
 /* ============================================================
  * 4. صفحة تسجيل الدخول
  * ============================================================ */

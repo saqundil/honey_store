@@ -34,20 +34,36 @@ page_header('قوالب جداول التقييم', 'templates');
                 <?php if ($currentTemplateGroup !== (int) $template['group_id']): $currentTemplateGroup = (int) $template['group_id']; ?>
                     <tr class="template-group-row">
                         <th colspan="5" scope="rowgroup">
-                            <span><?= school_e($template['group_name']) ?></span>
-                            <small><?= (int) $templateCountsByGroup[$currentTemplateGroup] ?> قالب</small>
+                            <div class="template-group-heading">
+                                <div>
+                                    <span><?= school_e($template['group_name']) ?></span>
+                                    <small><?= (int) $templateCountsByGroup[$currentTemplateGroup] ?> قالب</small>
+                                </div>
+                                <div class="template-group-actions">
+                                    <a href="<?= school_e(school_url('admin/reports/create.php?group=' . $currentTemplateGroup)) ?>">استخدام المجموعة</a>
+                                    <a target="_blank" rel="noopener" href="<?= school_e(school_url('admin/reports/create.php?group=' . $currentTemplateGroup . '&after=print')) ?>">طباعة المجموعة</a>
+                                </div>
+                            </div>
                         </th>
                     </tr>
                 <?php endif; ?>
                 <tr>
                     <td>
-                        <strong><?= school_e($template['name']) ?></strong>
+                        <div class="template-name" data-template-name="<?= (int) $template['id'] ?>">
+                            <strong><?= school_e($template['name']) ?></strong>
+                            <form class="template-rename-form" hidden>
+                                <input type="text" maxlength="190" required value="<?= school_e($template['name']) ?>" aria-label="اسم القالب">
+                                <button type="submit">حفظ</button>
+                                <button type="button" data-cancel-rename>إلغاء</button>
+                            </form>
+                        </div>
                         <?php if ($template['description']): ?><small><?= school_e($template['description']) ?></small><?php endif; ?>
                     </td>
                     <td class="num">v<?= (int) $template['version_number'] ?></td>
                     <td><span class="status <?= school_e($template['status']) ?>"><?= $template['status'] === 'active' ? 'نشط' : 'معطل' ?></span></td>
                     <td class="num"><?= school_e($template['updated_at']) ?></td>
                     <td class="actions-cell">
+                        <button class="link-button template-rename" data-id="<?= (int) $template['id'] ?>">تسمية</button>
                         <a href="<?= school_e(school_url('admin/templates/edit.php?id=' . $template['id'])) ?>">تعديل</a>
                         <a href="<?= school_e(school_url('admin/templates/preview.php?id=' . $template['id'])) ?>">معاينة</a>
                         <a href="<?= school_e(school_url('admin/reports/create.php?template=' . $template['id'])) ?>">استخدام</a>
@@ -74,6 +90,60 @@ page_header('قوالب جداول التقييم', 'templates');
 
 <script>
 window.APP = { baseUrl: <?= json_encode(school_url()) ?>, csrf: <?= json_encode(school_csrf_token()) ?> };
+
+document.querySelectorAll('.template-rename').forEach(button => {
+    button.addEventListener('click', () => {
+        const container = document.querySelector(`[data-template-name="${button.dataset.id}"]`);
+        const form = container.querySelector('.template-rename-form');
+        container.querySelector('strong').hidden = true;
+        form.hidden = false;
+        form.querySelector('input').focus();
+        form.querySelector('input').select();
+    });
+});
+
+document.querySelectorAll('.template-rename-form').forEach(form => {
+    const container = form.closest('.template-name');
+    const label = container.querySelector('strong');
+    const input = form.querySelector('input');
+    const close = () => {
+        input.value = label.textContent.trim();
+        form.hidden = true;
+        label.hidden = false;
+    };
+
+    form.querySelector('[data-cancel-rename]').addEventListener('click', close);
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const name = input.value.trim();
+        if (!name) {
+            input.focus();
+            return;
+        }
+
+        const controls = form.querySelectorAll('input, button');
+        controls.forEach(control => control.disabled = true);
+        try {
+            const response = await fetch(`${APP.baseUrl}/api/templates/rename.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': APP.csrf },
+                body: JSON.stringify({ id: container.dataset.templateName, name }),
+            });
+            const result = await response.json();
+            if (!result.ok) throw new Error(result.message || 'تعذّر تعديل اسم القالب.');
+            label.textContent = result.name;
+            input.value = result.name;
+            document.querySelectorAll(`[data-name][data-id="${container.dataset.templateName}"]`).forEach(action => action.dataset.name = result.name);
+            form.hidden = true;
+            label.hidden = false;
+            UI.toast('تم تعديل اسم القالب.', 'success', 1200);
+        } catch (error) {
+            UI.toast(error.message, 'error');
+        } finally {
+            controls.forEach(control => control.disabled = false);
+        }
+    });
+});
 
 document.querySelectorAll('.template-copy, .template-status, .template-delete').forEach(button => {
     button.addEventListener('click', async () => {

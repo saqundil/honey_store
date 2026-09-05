@@ -36,6 +36,23 @@ final class TemplateRepository
         return $statement->fetchAll();
     }
 
+    public function currentVersionsForGroup(int $groupId): array
+    {
+        $sql = "SELECT v.id, v.version_number, t.id AS template_id, t.current_version_id, t.name, g.id AS group_id, g.name AS group_name
+                FROM table_templates t
+                JOIN template_groups g ON g.id=t.group_id
+                JOIN table_template_versions v ON v.id=t.current_version_id
+                WHERE t.group_id=? AND t.status='active'";
+        $params = [$groupId];
+        if (!$this->canViewAll) {
+            $sql .= ' AND t.created_by=?';
+            $params[] = $this->actorId;
+        }
+        $statement = $this->db->prepare($sql . ' ORDER BY t.updated_at DESC,t.id');
+        $statement->execute($params);
+        return $statement->fetchAll();
+    }
+
     public function availableVersions(): array
     {
         $sql = "SELECT v.id, v.version_number, t.id AS template_id, t.current_version_id, t.name, g.name AS group_name FROM table_template_versions v JOIN table_templates t ON t.id=v.template_id JOIN template_groups g ON g.id=t.group_id WHERE t.status='active'";

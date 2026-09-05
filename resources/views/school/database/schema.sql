@@ -15,7 +15,8 @@ INSERT INTO schema_migrations(migration) VALUES
     ('20260829_006_immutable_history.sql'),
     ('20260830_007_class_assessment_exam_date.sql'),
     ('20260830_008_formula_divisor.sql'),
-    ('20260901_009_template_groups.sql');
+    ('20260901_009_template_groups.sql'),
+    ('20260905_010_report_batches.sql');
 
 CREATE TABLE admin_users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -259,9 +260,9 @@ CREATE TRIGGER trg_grade_audit_no_delete BEFORE DELETE ON grade_value_audits FOR
 CREATE TABLE reports (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, template_version_id BIGINT UNSIGNED NOT NULL, class_id BIGINT UNSIGNED NOT NULL,
     subject_id BIGINT UNSIGNED NOT NULL, academic_year_id BIGINT UNSIGNED NOT NULL, title VARCHAR(190) NOT NULL, semester VARCHAR(50) NULL,
-    report_date DATE NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'draft', created_by BIGINT UNSIGNED NOT NULL,
+    report_date DATE NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'draft', batch_token CHAR(32) NULL, created_by BIGINT UNSIGNED NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, locked_at TIMESTAMP NULL,
-    INDEX idx_report_lookup (class_id, academic_year_id, report_date),
+    INDEX idx_report_lookup (class_id, academic_year_id, report_date), INDEX idx_report_batch_owner (batch_token, created_by),
     CONSTRAINT fk_report_version FOREIGN KEY (template_version_id) REFERENCES table_template_versions(id),
     CONSTRAINT fk_report_class FOREIGN KEY (class_id) REFERENCES classes(id), CONSTRAINT fk_report_subject FOREIGN KEY (subject_id) REFERENCES subjects(id),
     CONSTRAINT fk_report_year FOREIGN KEY (academic_year_id) REFERENCES academic_years(id), CONSTRAINT fk_report_admin FOREIGN KEY (created_by) REFERENCES admin_users(id)

@@ -22,6 +22,7 @@ body{margin:0;padding:28px;background:#eee;color:#111;font-family:Amiri,"Times N
 .print-actions a:hover{background:#F6F7F3;border-color:#2A3B33;color:#131A17}
 .print-actions button:focus-visible,
 .print-actions a:focus-visible{outline:2px solid #2F9A80;outline-offset:2px}
+.report-sheet+.report-sheet{margin-top:18px}
 
 /* ترويسة قديمة يبقيها التوافق؛ يتجاوزها school-brand.css المحمَّل بعدها */
 .school-header{display:grid;grid-template-columns:1fr 100px 1fr;align-items:center;direction:ltr;min-height:82px;margin:0 7px 5px}
@@ -37,6 +38,7 @@ body{margin:0;padding:28px;background:#eee;color:#111;font-family:Amiri,"Times N
     body{padding:0;background:#fff}
     .print-actions{display:none}
     .report-sheet{width:210mm;height:296mm;min-height:0;margin:0;padding:7mm 14mm;box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+    .report-sheet:not(:last-child){break-after:page;page-break-after:always}
     @page{size:A4 portrait;margin:0}
 }
 

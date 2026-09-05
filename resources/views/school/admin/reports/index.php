@@ -30,7 +30,10 @@ declare(strict_types=1);require dirname(__DIR__,2).'/includes/bootstrap.php';req
                     <td><?= school_e($report['class_name']) ?></td>
                     <td><?= school_e($report['subject_name']) ?></td>
                     <td class="num"><?= school_e($report['report_date']) ?></td>
-                    <td class="actions-cell"><a href="<?= school_e(school_url('admin/reports/view.php?id=' . $report['id'])) ?>">فتح</a></td>
+                    <td class="actions-cell">
+                        <a href="<?= school_e(school_url('admin/reports/view.php?id=' . $report['id'])) ?>">فتح</a>
+                        <?php if ($report['batch_token']): ?><a href="<?= school_e(school_url('admin/reports/batch.php?batch=' . $report['batch_token'])) ?>">المجموعة</a><?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

@@ -4,6 +4,7 @@
   const classSelect = document.querySelector('#report-class');
   const searchInput = document.querySelector('#student-search');
   const templateSelect = document.querySelector('#report-template');
+  const groupSummary = document.querySelector('[data-group-summary]');
   const studentRows = [...document.querySelectorAll('.student-row')];
   const countLabel = document.querySelector('#student-count');
   const summaryCount = document.querySelector('#summary-count');
@@ -12,7 +13,7 @@
   const submitButton = document.querySelector('.create-report-button');
   const semesterInput = document.querySelector('#report-semester');
 
-  if (templateSelect.dataset.requestedTemplate !== 'true') {
+  if (templateSelect && templateSelect.dataset.requestedTemplate !== 'true') {
     const savedVersion = localStorage.getItem('report-template-version');
     if (savedVersion && [...templateSelect.options].some(option => option.value === savedVersion)) {
       templateSelect.value = savedVersion;
@@ -28,7 +29,9 @@
     const count = selectedRows().length;
     countLabel.textContent = `${count} / 32`;
     summaryCount.textContent = count;
-    summaryTemplate.textContent = templateSelect.options[templateSelect.selectedIndex]?.textContent || '';
+    summaryTemplate.textContent = groupSummary?.dataset.groupSummary
+      || templateSelect?.options[templateSelect.selectedIndex]?.textContent
+      || '';
     submitButton.disabled = count === 0;
   }
 
@@ -47,10 +50,8 @@
 
   function syncClass() {
     semesterInput.value = classSelect.selectedOptions[0]?.dataset.semester || '';
-    studentRows.forEach(row => {
-      const correctClass = row.dataset.class === classSelect.value;
-      row.querySelector('input').checked = correctClass;
-    });
+    studentRows.forEach(row => row.querySelector('input').checked = false);
+    classRows().slice(0, 32).forEach(row => row.querySelector('input').checked = true);
     searchInput.value = '';
     filterStudents();
   }
@@ -73,7 +74,7 @@
   });
   classSelect.addEventListener('change', syncClass);
   searchInput.addEventListener('input', filterStudents);
-  templateSelect.addEventListener('change', () => {
+  templateSelect?.addEventListener('change', () => {
     localStorage.setItem('report-template-version', templateSelect.value);
     updateSummary();
   });
