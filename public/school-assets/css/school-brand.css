@@ -121,7 +121,12 @@
 }
 
 .report-sheet--dense .dynamic-report-table thead th {
+  font-size: 15px;
   padding: 2px;
+}
+
+.report-sheet--dense .dynamic-report-table thead th.student-name-column {
+  font-size: 20px;
 }
 
 .report-sheet--dense .dynamic-report-table td {

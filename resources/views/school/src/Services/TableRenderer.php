@@ -31,7 +31,9 @@ final class TableRenderer
                 $column = $cell['column'] ?? null;
                 $vertical = $cell['display_direction'] === 'vertical' ? ' vertical-header' : '';
                 $total = ($column['type'] ?? null) === 'calculated_total' ? ' total-column' : '';
-                echo '<th class="' . school_e(trim($cell['kind'] . $vertical . $total)) . '" colspan="' . (int) $cell['colspan'] . '" rowspan="' . (int) $cell['rowspan'] . '">';
+                $studentName = ($column['type'] ?? null) === 'student_name' ? ' student-name-column' : '';
+                $studentNumber = ($column['type'] ?? null) === 'student_number' ? ' student-number-column' : '';
+                echo '<th class="' . school_e(trim($cell['kind'] . $vertical . $total . $studentName . $studentNumber)) . '" colspan="' . (int) $cell['colspan'] . '" rowspan="' . (int) $cell['rowspan'] . '">';
                 echo '<span><span class="header-label">' . school_e($cell['label']) . '</span>';
                 if ($column && $column['max_mark'] !== null && $column['max_mark'] !== '') echo '<small class="header-mark" dir="ltr">(' . school_e($this->formatMark($column['max_mark'])) . ')</small>';
                 echo '</span></th>';
@@ -49,8 +51,13 @@ final class TableRenderer
                     'student_name' => $student['name'],
                     default => $values[$key] ?? '',
                 };
-                $total = $column['type'] === 'calculated_total' ? ' class="total-column"' : '';
-                echo '<td' . $total . ' data-column-key="' . school_e($key) . '">';
+                $class = match ($column['type']) {
+                    'student_number' => 'student-number-column',
+                    'student_name' => 'student-name-column',
+                    'calculated_total' => 'total-column',
+                    default => '',
+                };
+                echo '<td' . ($class !== '' ? ' class="' . $class . '"' : '') . ' data-column-key="' . school_e($key) . '">';
                 if ($editable && $column['type'] === 'manual_mark') {
                     echo '<input class="mark-input" type="number" min="0" max="' . school_e($column['max_mark']) . '" step="' . school_e($column['step_value'] ?? '0.25') . '" value="' . school_e($value) . '">';
                 } elseif ($editable && in_array($column['type'], ['text', 'date'], true)) {
@@ -66,8 +73,13 @@ final class TableRenderer
             echo '<tr class="empty-report-row" aria-hidden="true">';
             foreach ($layout['columns'] as $column) {
                 $value = $column['type'] === 'student_number' ? (string) ($index + 1) : '';
-                $total = $column['type'] === 'calculated_total' ? ' class="total-column"' : '';
-                echo '<td' . $total . ' data-column-key="' . school_e($column['column_key']) . '"><span class="cell-value">' . school_e($value) . '</span></td>';
+                $class = match ($column['type']) {
+                    'student_number' => 'student-number-column',
+                    'student_name' => 'student-name-column',
+                    'calculated_total' => 'total-column',
+                    default => '',
+                };
+                echo '<td' . ($class !== '' ? ' class="' . $class . '"' : '') . ' data-column-key="' . school_e($column['column_key']) . '"><span class="cell-value">' . school_e($value) . '</span></td>';
             }
             echo '</tr>';
         }
